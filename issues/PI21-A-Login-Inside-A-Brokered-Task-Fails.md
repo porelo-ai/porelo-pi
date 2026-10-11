@@ -1,6 +1,6 @@
 # PI21 — A login inside a brokered Pi task fails
 
-**Status:** Analyzed.
+**Status:** Estimated.
 **Size:** M - a few root steps in the image, an acceptance scenario, and a measurement that Pi still
 starts and keeps its sessions; no change to Sokar.
 

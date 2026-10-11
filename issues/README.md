@@ -4,12 +4,12 @@ What is open in this repository, grouped by state in the order Review, Rework, I
 Analyzed, Accepted, Idea, Estimated, Finished and Rejected; a group with nothing in it is left out.
 Within a group, the order is the priority. The number is identity, not sequence.
 
-## Analyzed
+## Estimated
 
-| # | Size | Blocked by | What it covers | Open questions |
-|---|---|---|---|---|
-| <a id="pi21"></a>[PI21](PI21-A-Login-Inside-A-Brokered-Task-Fails.md) | M |  | a person cannot put a provider key into a task | — |
-| <a id="pi27"></a>[PI27](PI27-Declare-The-App-Copilot-Is-Granted-Through.md) | S |  | the app `vault authorize github-copilot` signs in through for Pi | — |
+| # | Size | Blocked by | What it covers |
+|---|---|---|---|
+| <a id="pi21"></a>[PI21](PI21-A-Login-Inside-A-Brokered-Task-Fails.md) | M |  | a person cannot put a provider key into a task |
+| <a id="pi27"></a>[PI27](PI27-Declare-The-App-Copilot-Is-Granted-Through.md) | S |  | the app `vault authorize github-copilot` signs in through for Pi |
 
 ## What lives here and what in Sokar
 
