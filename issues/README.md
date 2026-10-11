@@ -1,23 +1,14 @@
 # Issues
 
-What is open in this repository, grouped by the MVP (`sokar-project` PJ17): **Now**
-serves one person, one machine, one agent, from install to a reviewed push; **Soon** follows right
-after it; **Later** is the rest. Within a group, ordered by what to do next rather than by number. The
-number is identity, not sequence.
+What is open in this repository, grouped by state in the order Review, Rework, Implementing, Backlog,
+Analyzed, Accepted, Idea, Estimated and Rejected; a group with nothing in it is left out. Within a
+group, the order is the priority. The number is identity, not sequence.
 
-## Now
-
-None open.
-
-## Soon
-
-Nothing open.
-
-## Later
+## Analyzed
 
 | # | Status | Size | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|---|
-| [PI21](PI21-A-Login-Inside-A-Brokered-Task-Fails.md) | open | M |  | a person cannot put a provider key into a task | 2 |
+| [PI21](PI21-A-Login-Inside-A-Brokered-Task-Fails.md) | Analyzed | M |  | a person cannot put a provider key into a task | 2 |
 
 ## What lives here and what in Sokar
 
