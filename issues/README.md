@@ -6,9 +6,9 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 ## Analyzed
 
-| # | Status | Size | Blocked by | What it covers | Open questions |
-|---|---|---|---|---|---|
-| [PI21](PI21-A-Login-Inside-A-Brokered-Task-Fails.md) | Analyzed | M |  | a person cannot put a provider key into a task | 2 |
+| # | Size | Blocked by | What it covers | Open questions |
+|---|---|---|---|---|
+| [PI21](PI21-A-Login-Inside-A-Brokered-Task-Fails.md) | M |  | a person cannot put a provider key into a task | 2 |
 
 ## What lives here and what in Sokar
 
