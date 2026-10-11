@@ -40,6 +40,6 @@ past the broker. The model cannot do this alone.
 ## To be checked
 
 - Whether Pi 0.85.0 starts, keeps its sessions and resumes with `~/.pi/agent` root's and sticky, and how
-  it reports the refused write at `/login` - mine, measured on the VM.
+  it reports the refused write at `/login` - measured on the VM.
 - Whether the scenario can show a refused `/login` without a browser approval, or writes the file the
-  way Pi's store does - mine.
+  way Pi's store does.
