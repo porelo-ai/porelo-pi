@@ -15,9 +15,9 @@ Nothing open.
 
 ## Later
 
-| # | Status | Blocked by | What it covers | Open questions |
-|---|---|---|---|---|
-| [PI21](PI21-A-Login-Inside-A-Brokered-Task-Fails.md) | open |  | a person cannot put a provider key into a task | 1 |
+| # | Status | Size | Blocked by | What it covers | Open questions |
+|---|---|---|---|---|---|
+| [PI21](PI21-A-Login-Inside-A-Brokered-Task-Fails.md) | open | M |  | a person cannot put a provider key into a task | 2 |
 
 ## What lives here and what in Sokar
 
