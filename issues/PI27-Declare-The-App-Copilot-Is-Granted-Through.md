@@ -34,8 +34,10 @@ none, so the command refuses as for an agent that does not sign in.
   today's `pi.yaml`.
 - **The weekly update** (`.github/workflows/update.yml`) checks that the new pinned tree's
   `github-copilot.js` still holds that id, and stops the pin move when it does not.
-- **`doc/index.md`:** the GitHub Copilot sign-in is the one command, with whose app it is, the owner not
-  verified, and where a person revokes it (GitHub's authorized OAuth apps).
+- **`doc/index.md`:** the GitHub Copilot sign-in is the one command. It says plainly that the grant goes
+  through the app cited as GitHub's own for its editor plugin, as Pi does without Sokar, that Pi presents
+  itself to GitHub as that editor, that the app's owner is not verified, and where a person revokes it
+  (GitHub's authorized OAuth apps).
 - **On the VM**, with the adapter installed per account: on an empty vault, `sokar vault authorize
   github-copilot` shows a device code, which proves the id reached GitHub, and is then left unfinished. A
   full grant needs an account with Copilot.
@@ -44,13 +46,8 @@ none, so the command refuses as for an agent that does not sign in.
 
 - On an empty vault with Pi installed, `sokar vault authorize github-copilot` starts the device flow with Pi's
   client id; today it is refused.
-- `doc/index.md` names the app, and says its owner is not verified.
-
-## Open questions
-
-- Pi's id is, by every account, GitHub's own app for its editor plugin, and Pi presents itself to GitHub as
-  that editor. Should Sokar grant through it as Pi does without Sokar, or offer Copilot for Pi only through a
-  grant made with Oh My Pi's app?
+- `doc/index.md` names the app, says Pi presents itself as that editor, and that the app's owner is not
+  verified.
 
 ## To be checked
 
