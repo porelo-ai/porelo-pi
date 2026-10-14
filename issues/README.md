@@ -9,12 +9,12 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | # | Size | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
 | <a id="pi28"></a>[PI28](PI28-Read-The-Code-Changed-Since-The-Last-Skills-Review.md) | M | — | the code changed since 2026-09-27 read against the seven skills | 0 |
-| <a id="pi29"></a>[PI29](PI29-Rename-The-Adapter-Porelo.md) | S | sokar-project [PJ41](https://github.com/sokar-ai/sokar-project/blob/main/issues/README.md#pj41) | the adapter renamed Porelo, by script, with its exceptions | 0 |
 
 ## Estimated
 
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
+| <a id="pi29"></a>[PI29](PI29-Rename-The-Adapter-Porelo.md) | S | sokar-project [PJ41](https://github.com/sokar-ai/sokar-project/blob/main/issues/README.md#pj41) | the adapter renamed Porelo, by script, with its exceptions |
 | <a id="pi21"></a>[PI21](PI21-A-Login-Inside-A-Brokered-Task-Fails.md) | M |  | a person cannot put a provider key into a task |
 | <a id="pi27"></a>[PI27](PI27-Declare-The-App-Copilot-Is-Granted-Through.md) | S |  | the app `vault authorize github-copilot` signs in through for Pi |
 
