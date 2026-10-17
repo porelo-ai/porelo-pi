@@ -10,8 +10,19 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 
 ## [Unreleased]
 
+### Security
+
+- The log formatter drops terminal control characters but newline and tab from what it shows and from how a run ended, so an escape sequence in Pi's output, a provider's error or a tool's name no longer reaches the terminal.
+- No checkout leaves the job's token in `.git/config`, where the build, the bill check and both acceptance legs could read it; the update job's push alone gets the token, through git's environment in that one step.
+
 ### Changed
 
+- The log formatter cuts a long line after 300 characters counted as code points, so an emoji at the cut is no longer split in half.
+- The update job neither calls its pull request green nor merges it when a step before ended in anything but success, a step killed by its limit or a cancel included.
+- A release upload stops when the Debian index cannot be read or Artifactory cannot say whether the `.rpm` is there, and the `.rpm` is checked as well as the `.deb`.
+- A publish is believed only once the Debian index lists the exact version built, not merely the package's name.
+- Every job that validates installs shfmt 3.12.0, checked against its release's digest, since Spotless checks the shell scripts with it.
+- The update job fails when deleting its rented machines fails, instead of going on as if they were gone.
 - Built on the snapshot of `porelo-parent` (0.2.1-SNAPSHOT, with the release tooling 0.5.1-SNAPSHOT), against Porelo 0.5.0.
 
 ## [0.5.0] - 2026-10-17

@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.fuin.porelo.wire.Json;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * The shipped Pi version, and the Node runtime it runs on, agree everywhere they are written.
@@ -64,6 +66,9 @@ class PinAgreementTest {
 
     private static final Pattern PINNED =
             Pattern.compile("<agent\\.cli\\.version>([^<]+)</agent\\.cli\\.version>");
+
+    /** Every npm command that installs packages, and so runs their lifecycle scripts. */
+    private static final Pattern INSTALL = Pattern.compile("\\bnpm\\s+(ci|install|i|add)\\b");
 
     private static final Pattern RELOCK_IMAGE =
             Pattern.compile(
@@ -158,6 +163,19 @@ class PinAgreementTest {
         assertThat(scriptDefaults(script())).isEmpty();
         assertThat(scriptDefaults("NODE_VERSION=\"${NODE_VERSION:-22.0.0}\"\n"))
                 .containsExactly("NODE_VERSION");
+        // Each shape bash gives a default in is a default, quoted or not.
+        assertThat(scriptDefaults("NODE_VERSION=${NODE_VERSION:-22.0.0}\n"))
+                .as("an unquoted default")
+                .containsExactly("NODE_VERSION");
+        assertThat(scriptDefaults(": \"${FD_SHA256:=" + "a".repeat(64) + "}\"\n"))
+                .as("a default assigned with :=")
+                .containsExactly("FD_SHA256");
+        assertThat(scriptDefaults("RG_VERSION=\"${RG_VERSION-14.1.1}\"\n"))
+                .as("a default without the colon")
+                .containsExactly("RG_VERSION");
+        assertThat(scriptDefaults("[ -n \"${!pin:-}\" ]\nJAVA_CMD=\"${JAVA_CMD:-x}\"\n"))
+                .as("a check that a pin is set, and a fallback that is no pin")
+                .isEmpty();
     }
 
     @Test
@@ -167,6 +185,18 @@ class PinAgreementTest {
         // writable.
         assertThat(installsRunningScripts(script())).isEmpty();
         assertThat(installsRunningScripts(script().replace(" --ignore-scripts", ""))).hasSize(2);
+        // npm runs install scripts on every way of installing, not only on npm ci.
+        assertThat(
+                        installsRunningScripts(
+                                "npm install --omit=dev\n"
+                                        + "    (cd x && npm i left-pad)\n"
+                                        + "npm add left-pad\n"
+                                        + "npm install --ignore-scripts\n"
+                                        + "npm info left-pad\n"
+                                        + "# npm install in a comment\n"))
+                .as("installs that run lifecycle scripts")
+                .containsExactly(
+                        "npm install --omit=dev", "(cd x && npm i left-pad)", "npm add left-pad");
     }
 
     @Test
@@ -176,16 +206,64 @@ class PinAgreementTest {
     }
 
     @Test
-    void refusesABuilderImageNamedByTagAlone() throws IOException {
+    void refusesABuilderImageNamedByTagAlone(@TempDir final Path dir) throws Exception {
 
         // A tag is a name its owner may repoint, and npm ci, the Node download and its checksum all
         // run inside that image: whoever repoints it controls the checks that protect the package.
-        final String pom = pom().replaceFirst("(?m)^\\s*<pin\\.node\\.image\\.digest>.*$", "");
+        final Processes.Result tagged =
+                buildTree(dir.resolve("tagged"), "docker.io/library/node:22-slim");
 
-        assertThat(runtimeDisagreements(pom))
-                .singleElement()
-                .asString()
-                .contains("pin.node.image.digest");
+        assertThat(tagged.exit())
+                .as("exit with a tag-only builder:%n%s", tagged.output())
+                .isEqualTo(2);
+        assertThat(WorkflowSteps.calls(dir.resolve("tagged/stubs"), "podman"))
+                .as("podman calls before the refusal")
+                .isEmpty();
+        assertThat(tagged.output()).contains("must be pinned by an @sha256: digest");
+
+        // The same run with a digest gets as far as podman, so the refusal above is the tag's.
+        final Processes.Result pinned =
+                buildTree(
+                        dir.resolve("pinned"),
+                        "docker.io/library/node:22-slim@sha256:" + "a".repeat(64));
+        assertThat(WorkflowSteps.calls(dir.resolve("pinned/stubs"), "podman"))
+                .as("podman calls with a digest-pinned builder:%n%s", pinned.output())
+                .isNotEmpty();
+    }
+
+    /**
+     * Runs a copy of the build script in a module of its own with the pom's pins, the given builder
+     * image, and a podman stub that does nothing.
+     */
+    private static Processes.Result buildTree(final Path module, final String builder)
+            throws IOException, InterruptedException {
+        Files.createDirectories(module.resolve("buildtools"));
+        Files.copy(BUILD_SCRIPT, module.resolve(BUILD_SCRIPT));
+        Files.createDirectories(module.resolve("src/main/npm"));
+        Files.copy(MANIFEST, module.resolve(MANIFEST));
+        Files.copy(LOCKFILE, module.resolve(LOCKFILE));
+        final Path sbom = Path.of("buildtools/sbom");
+        Files.createDirectories(module.resolve(sbom));
+        Files.copy(sbom.resolve("package.json"), module.resolve(sbom).resolve("package.json"));
+        Files.copy(
+                sbom.resolve("package-lock.json"),
+                module.resolve(sbom).resolve("package-lock.json"));
+        final Path stubs = module.resolve("stubs");
+        WorkflowSteps.stub(stubs, "podman", "exit 0");
+        final String pom = pom();
+        final ProcessBuilder run =
+                new ProcessBuilder("bash", module.resolve(BUILD_SCRIPT).toString())
+                        .directory(module.toFile());
+        final Map<String, String> env = run.environment();
+        for (int i = 0; i < TREE_PINS.size(); i++) {
+            final String value = pinned(pom, TREE_PINS.get(i));
+            assertThat(value).as("%s in pom.xml", TREE_PINS.get(i)).isNotNull();
+            env.put(SCRIPT_PINS.get(i), value);
+        }
+        env.put("PI_BUILDER_IMAGE", builder);
+        env.put("JAVA_CMD", Path.of(System.getProperty("java.home"), "bin", "java").toString());
+        env.put("PATH", stubs + ":" + System.getenv("PATH"));
+        return Processes.run(run, Duration.ofSeconds(60));
     }
 
     @Test
@@ -311,19 +389,19 @@ class PinAgreementTest {
     }
 
     /**
-     * Returns the names of pins the build script defaults itself, as {@code NAME="${NAME:-value}"}.
+     * Returns the names of pins the build script defaults itself, in any of the shapes bash gives a
+     * default in: {@code ${NAME:-v}}, {@code ${NAME-v}}, {@code ${NAME:=v}} and {@code ${NAME=v}},
+     * quoted or not.
      *
      * <p>Only the pins: {@code JAVA_CMD} and the builder override fall back on purpose and are not
      * pins.
      *
      * @param script Content of {@code build-pi-tree.sh}.
-     * @return The names; empty when the script keeps none.
+     * @return The names, once per default; empty when the script keeps none.
      */
     static List<String> scriptDefaults(final String script) {
         final List<String> names = new ArrayList<>();
-        final Matcher matcher =
-                Pattern.compile("^([A-Z0-9_]+)=\"\\$\\{\\1:-[^}]*\\}\"", Pattern.MULTILINE)
-                        .matcher(script);
+        final Matcher matcher = Pattern.compile("\\$\\{([A-Z0-9_]+):?[-=]").matcher(script);
         while (matcher.find()) {
             if (SCRIPT_PINS.contains(matcher.group(1))) {
                 names.add(matcher.group(1));
@@ -333,8 +411,8 @@ class PinAgreementTest {
     }
 
     /**
-     * Returns every line of the build script that runs {@code npm ci} without {@code
-     * --ignore-scripts}.
+     * Returns every line of the build script that installs packages - {@code npm ci}, {@code
+     * install}, {@code i} or {@code add} - without {@code --ignore-scripts}.
      *
      * @param script Content of {@code build-pi-tree.sh}.
      * @return The lines, stripped; empty when every install disables scripts.
@@ -342,7 +420,7 @@ class PinAgreementTest {
     static List<String> installsRunningScripts(final String script) {
         return script.lines()
                 .map(String::strip)
-                .filter(line -> !line.startsWith("#") && line.matches(".*\\bnpm ci\\b.*"))
+                .filter(line -> !line.startsWith("#") && INSTALL.matcher(line).find())
                 .filter(line -> !line.contains("--ignore-scripts"))
                 .toList();
     }

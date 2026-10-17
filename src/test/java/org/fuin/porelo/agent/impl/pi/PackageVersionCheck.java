@@ -1,11 +1,13 @@
 package org.fuin.porelo.agent.impl.pi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -59,10 +61,67 @@ class PackageVersionCheck {
     }
 
     @Test
-    void aSnapshotSortsBelowItsReleaseAndAboveTheRunBefore() {
+    void aSnapshotSortsBelowItsReleaseAndAboveTheRunBeforeForApt() throws Exception {
 
-        assertThat(packageVersion("0.4.1-SNAPSHOT", "7")).isEqualTo("0.4.1~snapshot.7");
-        assertThat(packageVersion("0.4.1", "7")).isEqualTo("0.4.1");
+        // A snapshot sorting above its release would keep every installation on the snapshot.
+        assumeTrue(onPath("dpkg"), "dpkg is not installed here");
+        assertSortsInOrder(
+                (a, b) -> {
+                    final Processes.Result r =
+                            Processes.run(
+                                    new ProcessBuilder("dpkg", "--compare-versions", a, "lt", b),
+                                    Duration.ofSeconds(30));
+                    assertThat(r.exit()).as("dpkg's answer: %s", r.output()).isBetween(0, 1);
+                    return r.exit() == 0;
+                });
+    }
+
+    @Test
+    void aSnapshotSortsBelowItsReleaseAndAboveTheRunBeforeForDnf() throws Exception {
+
+        assumeTrue(onPath("rpm"), "rpm is not installed here");
+        assertSortsInOrder(
+                (a, b) -> {
+                    final Processes.Result r =
+                            Processes.run(
+                                    new ProcessBuilder(
+                                            "rpm",
+                                            "--eval",
+                                            "%{lua: print(rpm.vercmp('" + a + "', '" + b + "'))}"),
+                                    Duration.ofSeconds(30));
+                    assertThat(r.exit()).as("rpm's answer: %s", r.output()).isZero();
+                    return r.output().strip().equals("-1");
+                });
+    }
+
+    /** Asks whether one package version sorts below another. */
+    @FunctionalInterface
+    private interface Below {
+        boolean test(String a, String b) throws IOException, InterruptedException;
+    }
+
+    /**
+     * Asserts that the release before, two snapshot runs and their release sort in that order, the
+     * runs 9 and 10 so that a comparison of text instead of numbers shows.
+     */
+    private static void assertSortsInOrder(final Below below)
+            throws IOException, InterruptedException {
+        final List<String> order =
+                List.of(
+                        packageVersion("0.4.0", "8"),
+                        packageVersion("0.4.1-SNAPSHOT", "9"),
+                        packageVersion("0.4.1-SNAPSHOT", "10"),
+                        packageVersion("0.4.1", "11"));
+        for (int i = 1; i < order.size(); i++) {
+            assertThat(below.test(order.get(i - 1), order.get(i)))
+                    .as("%s sorts below %s", order.get(i - 1), order.get(i))
+                    .isTrue();
+        }
+    }
+
+    private static boolean onPath(final String command) {
+        return Stream.of(System.getenv("PATH").split(":"))
+                .anyMatch(dir -> Files.isExecutable(Path.of(dir, command)));
     }
 
     /** The version the packages must carry, from what Maven built and the run it was given. */

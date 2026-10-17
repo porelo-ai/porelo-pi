@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.MalformedInputException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -34,13 +34,14 @@ class NoOldNameTest {
     private static final Pattern RELEASED = Pattern.compile("## \\[\\d+\\.\\d+\\.\\d+\\].*");
 
     private static List<String> tracked() throws IOException, InterruptedException {
-        final Process git =
+        final ProcessBuilder builder =
                 new ProcessBuilder("git", "ls-files", "-z")
-                        .directory(RepositoryDocuments.root().toFile())
-                        .redirectErrorStream(true)
-                        .start();
-        final String out = new String(git.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-        assertThat(git.waitFor()).as("git ls-files: %s", out).isZero();
+                        .directory(RepositoryDocuments.root().toFile());
+        // The machine's own git configuration is no part of what this test reads.
+        builder.environment().put("GIT_CONFIG_GLOBAL", "/dev/null");
+        final Processes.Result git = Processes.run(builder, Duration.ofSeconds(30));
+        final String out = git.output();
+        assertThat(git.exit()).as("git ls-files: %s", out).isZero();
         return List.of(out.split("\0"));
     }
 

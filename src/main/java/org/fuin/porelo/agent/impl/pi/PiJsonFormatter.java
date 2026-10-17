@@ -46,11 +46,22 @@ public final class PiJsonFormatter implements LogFormatter {
     private static final java.util.regex.Pattern LEADING_STATUS =
             java.util.regex.Pattern.compile("^([45]\\d{2})\\b");
 
-    /** Long enough for a sentence or a provider's refusal, short enough to stay one line. */
+    /**
+     * In code points: long enough for a sentence or a provider's refusal, short enough to stay one
+     * line.
+     */
     private static final int MAX = 300;
+
+    /** Marks a line that was cut. */
+    private static final String CUT = "…";
 
     @Override
     public @Nullable String format(String line) {
+        final String shown = shape(line);
+        return shown == null ? null : printable(shown);
+    }
+
+    private static @Nullable String shape(String line) {
 
         final String trimmed = line.strip();
         if (!trimmed.startsWith("{")) {
@@ -200,16 +211,32 @@ public final class PiJsonFormatter implements LogFormatter {
             return null;
         }
         if (message.get("errorMessage") instanceof String said && !said.isBlank()) {
-            return collapse(said);
+            return printable(collapse(said));
         }
         return "request " + reason;
+    }
+
+    /**
+     * Drops every control character but a newline and a tab: what the formatter returns reaches a
+     * person's terminal, where an escape sequence moves the cursor, clears the screen or, as OSC
+     * 52, writes the clipboard.
+     */
+    private static String printable(String text) {
+        final StringBuilder out = new StringBuilder(text.length());
+        text.codePoints()
+                .filter(c -> !Character.isISOControl(c) || c == '\n' || c == '\t')
+                .forEach(out::appendCodePoint);
+        return out.toString();
     }
 
     private static String collapse(String text) {
         return cut(text.strip().replaceAll("\\s+", " "));
     }
 
+    /** Cuts after {@link #MAX} code points, so a character outside the BMP is never split. */
     private static String cut(String text) {
-        return text.length() > MAX ? text.substring(0, MAX) + "…" : text;
+        return text.codePointCount(0, text.length()) > MAX
+                ? text.substring(0, text.offsetByCodePoints(0, MAX)) + CUT
+                : text;
     }
 }

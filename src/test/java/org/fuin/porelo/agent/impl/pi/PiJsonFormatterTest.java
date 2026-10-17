@@ -2,6 +2,8 @@ package org.fuin.porelo.agent.impl.pi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+import org.fuin.porelo.agent.api.AgentEnd;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -216,5 +218,47 @@ class PiJsonFormatterTest {
 
         assertThat(formatter.format("{\"type\":\"agent_end\",\"messages\":\"none\"}"))
                 .isEqualTo("[unreadable] {\"type\":\"agent_end\",\"messages\":\"none\"}");
+    }
+
+    @Test
+    void passesNoTerminalControlCharacterToTheTerminal() {
+
+        // What it returns is printed to a person's terminal: an escape there clears the screen, and
+        // an OSC 52 writes the clipboard. JSON's \\u001b arrives as the live byte.
+        final List<String> shown =
+                List.of(
+                        formatter.format(
+                                "{\"type\":\"message_end\",\"message\":{\"role\":\"assistant\","
+                                        + "\"content\":[{\"type\":\"text\",\"text\":\"a\\u001b[2Jb\"}],"
+                                        + "\"stopReason\":\"stop\"}}"),
+                        formatter.format(
+                                "{\"type\":\"tool_execution_start\",\"toolName\":\"x\\u001b]52;c;aGk=\\u0007\"}"),
+                        formatter.format(
+                                "{\"type\":\"agent_end\",\"messages\":[{\"role\":\"assistant\",\"content\":[],"
+                                        + "\"stopReason\":\"error\",\"errorMessage\":\"401 \\u009b2J\\u001b[2J\"}],"
+                                        + "\"willRetry\":false}"),
+                        formatter.format("raw \u001b[31mred\u001b[0m\tand\u0000 more"));
+        final AgentEnd end =
+                PiJsonFormatter.ended(
+                        "{\"type\":\"agent_end\",\"messages\":[{\"role\":\"assistant\",\"content\":[],"
+                                + "\"stopReason\":\"error\",\"errorMessage\":\"401 a\\u001b[2Jb\"}],"
+                                + "\"willRetry\":false}");
+
+        assertThat(end).as("a refused run's end").isNotNull();
+        assertThat(shown).as("what format() returns").allSatisfy(PiJsonFormatterTest::printable);
+        printable(end.error());
+        assertThat(shown.get(0)).as("the text around the escape stays").isEqualTo("a[2Jb");
+        assertThat(shown.get(3)).as("a tab is not a control to strip").contains("\t");
+        assertThat(end.status()).as("the status still read from the message").isEqualTo(401);
+    }
+
+    private static void printable(final String text) {
+        assertThat(
+                        text.codePoints()
+                                .filter(c -> Character.isISOControl(c) && c != '\n' && c != '\t'))
+                .as(
+                        "control characters in %s",
+                        text.codePoints().mapToObj(Integer::toHexString).toList())
+                .isEmpty();
     }
 }

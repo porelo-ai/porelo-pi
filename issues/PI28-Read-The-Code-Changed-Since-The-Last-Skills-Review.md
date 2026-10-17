@@ -1,8 +1,8 @@
 # PI28 — Read The Code Changed Since The Last Skills Review
 
-**Status:** Backlog.
-**Size:** M - 34 files read against seven skills, each finding fixed with its own test; no
-contract another repository reads.
+**Status:** Implementing.
+**Size:** M - 34 files read against seven skills, each finding that can do harm fixed with its own
+test; no contract another repository reads.
 
 **What must be true.** The code changed since this repository was last read against its skills, on
 2026-09-27, has been read against them as well, and the versions read are on record.
@@ -80,7 +80,8 @@ content changed beyond the rename to Porelo since `fd8a2ec`: both `buildtools/*.
 `PiJsonFormatter`, `src/deb/copyright/copyright`, `src/deb/control/control`, 18 unit and check sources and the four
 features `credential`, `session`, `waiting`, `wake`. The workflows were read against `security-audit` too.
 
-Each finding is a guess until its test is seen red; none is fixed before [PI30](README.md#pi30).
+A finding that can do harm is a guess until its test is seen red; one that only reads wrong, or names no harm, is
+fixed without a test, as the shared testing rules say.
 
 **What ships:**
 - **A1, `PiJsonFormatter`: terminal control characters pass through.** `Json.parse` turns `\u001b` escapes back into
@@ -133,4 +134,14 @@ unchecked. `graal` and `concurrency-review` found nothing.
 **For Porelo, named in the channel, not built here:** `porelo task` prints every agent's formatted log to the terminal
 as it comes, so A1 is fixed for Pi here, and in general only in Porelo.
 
-**Size:** about 11 fixes and 16 tests; M holds.
+**How each was built.** Fixed without a test, since none names a harm a test would guard: A2 (the cut counts code
+points), B8 (`GIT_CONFIG_GLOBAL=/dev/null`), W5 (`|| true` dropped) and W6 (the text corrected). Each other finding has
+a test seen red on the unfixed code or against the guard broken on purpose: A1 in `PiJsonFormatterTest`; B1 in
+`ProcessesTest`, through the `Processes` helper both tests now use; B2 to B4 in `PinAgreementTest`; B5 in
+`WorkflowRulesTest`, the guards run as steps through `WorkflowSteps`; B6 in `WorkflowTimeLimitTest`; B7 in
+`PackageVersionCheck`, asking `dpkg` and `rpm`, skipped by assumption where either is absent; W1 and W7's push in
+`UpdateRequestTest`; W2 in `PublishReleaseTest`, which also checks the `.rpm` through Artifactory's storage API; W3 in
+`PackageIndexedTest`. W7's checkouts are held by `check-actions`. A step "The pinned shfmt" installs shfmt 3.12.0,
+checked against its release's digest, before every job that validates, since Spotless checks the scripts with it.
+
+**Size:** about 11 fixes and 13 tests; M holds.
