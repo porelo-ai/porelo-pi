@@ -17,6 +17,7 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 
 ### Changed
 
+- The acceptance suite allows the agent 120 seconds to reach work and an unattended run 120 seconds to end, about four times what the adapters' rented test machine measured, so a run stuck at a question fails in minutes, not half an hour.
 - The log formatter cuts a long line after 300 characters counted as code points, so an emoji at the cut is no longer split in half.
 - The update job neither calls its pull request green nor merges it when a step before ended in anything but success, a step killed by its limit or a cancel included.
 - A release upload stops when the Debian index cannot be read or Artifactory cannot say whether the `.rpm` is there, and the `.rpm` is checked as well as the `.deb`.
