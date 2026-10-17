@@ -24,7 +24,7 @@ on:
         default: latest
 
 # Read by every Maven call, the pinned-jdk action's too: Maven asks for a newer snapshot once a day, and a
-# cache restored the day Sokar publishes would keep yesterday's. Never run on a tag.
+# cache restored the day Porelo publishes would keep yesterday's. Never run on a tag.
 env:
   MAVEN_ARGS: -U
 
@@ -52,7 +52,7 @@ jobs:
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # Before the lookup, which is Sokar's release tool; and before anything is rented, so the
+      # Before the lookup, which is Porelo's release tool; and before anything is rented, so the
       # cleanup below always has something to run.
       - name: The pinned GraalVM
         uses: ./.github/actions/pinned-jdk
@@ -61,7 +61,7 @@ jobs:
         run: |
           ./mvnw -B -q -Pci-tools -s settings.xml dependency:build-classpath \
               -Dmdep.outputFile=target/cp.txt
-          git config user.name 'sokar-update'
+          git config user.name 'porelo-update'
           git config user.email 'noreply@fuin.org'
 
       # ------------------------------------------------------------------ detect and apply
@@ -105,9 +105,9 @@ jobs:
           for component in $COMPONENTS; do
               set -- "$@" --expect-moved "$component"
           done
-          java -cp "$(cat target/cp.txt)" org.fuin.sokar.release.Main compare-bills \
-              target/sokar-agent-pi.cdx.json \
-              https://fuinorg.jfrog.io/artifactory/sokar-dist-deb/pool/main/s/sokar-agent-pi/sokar-agent-pi.cdx.json \
+          java -cp "$(cat target/cp.txt)" org.fuin.porelo.release.Main compare-bills \
+              target/porelo-agent-pi.cdx.json \
+              https://fuinorg.jfrog.io/artifactory/porelo-dist-deb/pool/main/p/porelo-agent-pi/porelo-agent-pi.cdx.json \
               "$@" \
               > target/bill-change.txt 2>&1 \
               || echo "STOP=third-party components or licenses changed" >> "$GITHUB_ENV"
@@ -140,14 +140,14 @@ jobs:
         env:
           HETZNER_API: ${{ secrets.HETZNER_API }}
           HETZNER_SSH: ${{ secrets.HETZNER_SSH }}
-          SOKAR_CI_LEG: upd-ubuntu
-          SOKAR_E2E_OPENROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
-          SOKAR_E2E_MODEL: z-ai/glm-5.3-flash
+          PORELO_CI_LEG: upd-ubuntu
+          PORELO_E2E_OPENROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
+          PORELO_E2E_MODEL: z-ai/glm-5.3-flash
           # Only when the CLI moved; otherwise the package installs the CLI that is already pinned.
-          SOKAR_E2E_EXPECT_CLI: ${{ steps.follow.outputs.cli }}
+          PORELO_E2E_EXPECT_CLI: ${{ steps.follow.outputs.cli }}
         run: |
-          java -cp "$(cat target/cp.txt)" org.fuin.sokar.machines.Main acceptance \
-              --os ubuntu --package sokar-agent-pi \
+          java -cp "$(cat target/cp.txt)" org.fuin.porelo.machines.Main acceptance \
+              --os ubuntu --package porelo-agent-pi \
               --cucumber . --candidate target \
               || echo "STOP=acceptance failed on ubuntu" >> "$GITHUB_ENV"
 
@@ -157,13 +157,13 @@ jobs:
         env:
           HETZNER_API: ${{ secrets.HETZNER_API }}
           HETZNER_SSH: ${{ secrets.HETZNER_SSH }}
-          SOKAR_CI_LEG: upd-fedora
-          SOKAR_E2E_OPENROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
-          SOKAR_E2E_MODEL: z-ai/glm-5.3-flash
-          SOKAR_E2E_EXPECT_CLI: ${{ steps.follow.outputs.cli }}
+          PORELO_CI_LEG: upd-fedora
+          PORELO_E2E_OPENROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
+          PORELO_E2E_MODEL: z-ai/glm-5.3-flash
+          PORELO_E2E_EXPECT_CLI: ${{ steps.follow.outputs.cli }}
         run: |
-          java -cp "$(cat target/cp.txt)" org.fuin.sokar.machines.Main acceptance \
-              --os fedora --package sokar-agent-pi \
+          java -cp "$(cat target/cp.txt)" org.fuin.porelo.machines.Main acceptance \
+              --os fedora --package porelo-agent-pi \
               --cucumber . --candidate target \
               || echo "STOP=acceptance failed on fedora" >> "$GITHUB_ENV"
 
@@ -171,15 +171,15 @@ jobs:
         if: always() && steps.follow.outputs.moved == 'yes'
         env:
           HETZNER_API: ${{ secrets.HETZNER_API }}
-          SOKAR_CI_LEG: upd-ubuntu
-        run: java -cp "$(cat target/cp.txt)" org.fuin.sokar.machines.Main sweep --mine || true
+          PORELO_CI_LEG: upd-ubuntu
+        run: java -cp "$(cat target/cp.txt)" org.fuin.porelo.machines.Main sweep --mine || true
 
       - name: Delete what this run created - fedora leg
         if: always() && steps.follow.outputs.moved == 'yes'
         env:
           HETZNER_API: ${{ secrets.HETZNER_API }}
-          SOKAR_CI_LEG: upd-fedora
-        run: java -cp "$(cat target/cp.txt)" org.fuin.sokar.machines.Main sweep --mine || true
+          PORELO_CI_LEG: upd-fedora
+        run: java -cp "$(cat target/cp.txt)" org.fuin.porelo.machines.Main sweep --mine || true
 
       # ------------------------------------------------------------------ ask, or publish
 
@@ -198,7 +198,7 @@ jobs:
           git push --force origin "$BRANCH"
 
           {
-            echo "Applied by Sokar's release tool, one commit per move. To leave one out, drop its"
+            echo "Applied by Porelo's release tool, one commit per move. To leave one out, drop its"
             echo "commit and let the build run again."
             echo
             cat target/update/summary.md
@@ -236,9 +236,9 @@ jobs:
       - name: Merge, or say why not
         if: always() && steps.request.outputs.opened == 'yes'
         env:
-          GH_TOKEN: ${{ secrets.SOKAR_UPDATE_TOKEN || github.token }}
-          AUTO: ${{ vars.SOKAR_UPDATE_AUTO_MERGE }}
-          HAVE_TOKEN: ${{ secrets.SOKAR_UPDATE_TOKEN != '' }}
+          GH_TOKEN: ${{ secrets.PORELO_UPDATE_TOKEN || github.token }}
+          AUTO: ${{ vars.PORELO_UPDATE_AUTO_MERGE }}
+          HAVE_TOKEN: ${{ secrets.PORELO_UPDATE_TOKEN != '' }}
           TITLE: ${{ steps.follow.outputs.title }}
         run: |
           set -eu
@@ -246,11 +246,11 @@ jobs:
               echo "Not merging: $STOP."
               echo "The branch is open for whoever decides it."
           elif [ "$AUTO" != "true" ]; then
-              echo "Not merging: the repository variable SOKAR_UPDATE_AUTO_MERGE is '${AUTO:-unset}'."
+              echo "Not merging: the repository variable PORELO_UPDATE_AUTO_MERGE is '${AUTO:-unset}'."
               echo "Everything passed. Merging the pull request publishes: $TITLE."
               echo "Set the variable to 'true' when these runs have been watched enough."
           elif [ "$HAVE_TOKEN" != "true" ]; then
-              echo "::error::SOKAR_UPDATE_AUTO_MERGE is on but the secret SOKAR_UPDATE_TOKEN is not set."
+              echo "::error::PORELO_UPDATE_AUTO_MERGE is on but the secret PORELO_UPDATE_TOKEN is not set."
               echo "Merging with the workflow's own token triggers no build, so nothing would be"
               echo "published and the run would look successful. Refusing to merge."
               exit 1

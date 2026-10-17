@@ -13,13 +13,13 @@ binary: pi
 # inside a task is whether to trust a workspace carrying .pi or .agents/skills.
 #
 # --no-approve answers it by ignoring those files, and that is a choice, not a default: trusting
-# them would load the repository's own extensions after sokar-route.ts, where one could re-register
-# the provider Sokar routed. The cost is that a repository's own Pi extensions do not load.
+# them would load the repository's own extensions after porelo-route.ts, where one could re-register
+# the provider Porelo routed. The cost is that a repository's own Pi extensions do not load.
 sandboxed:
   arguments: ["--no-approve"]
 
-# How the agent is told what Sokar puts in its task - the mailbox where there is one, /sokar/files and
-# what arrives there. Sokar writes this guide to a read-only file in every task Sokar makes and puts these
+# How the agent is told what Porelo puts in its task - the mailbox where there is one, /porelo/files and
+# what arrives there. Porelo writes this guide to a read-only file in every task Porelo makes and puts these
 # arguments behind the 'sandboxed' ones, '{file}' standing for its path, on every start, attended or not, a resumed
 # one included. 'pi --help' on 0.85.0: "--append-system-prompt <text>  Append text or file contents to the system prompt", so a
 # path given there brings in the file's contents.
@@ -43,7 +43,7 @@ session:
   # Where it names the session it runs. Measured on 0.85.0: an unattended run's first record,
   # {"type":"session"}, carries the id, and '--session <id>' continues it. An attended session is kept as
   # ~/.pi/agent/sessions/--workspace--/<timestamp>_<id>.jsonl, whose name '--session' does not find - but
-  # its first record is the same {"type":"session"}, and Sokar reads the id from inside the newest file.
+  # its first record is the same {"type":"session"}, and Porelo reads the id from inside the newest file.
   session_id:
     record: { type: session }
     key: id
@@ -54,7 +54,7 @@ session:
   # the trust question is up. The bound covers a first image build.
   ready_marker: "Pi can explain its own features"
   ready_within_seconds: 300
-  # When the agent is at rest at its prompt, for Sokar to type its one wake line into the session
+  # When the agent is at rest at its prompt, for Porelo to type its one wake line into the session
   # and only then; never where 'waiting' matches. Read from the last 20 lines of the screen, plain. Measured
   # on the VM at a terminal: its footer ends its context line with "(auto)" at rest and at work, and while it works a line reads
   # "── <spinner> Working ───". "(auto)" also tells Pi's screen from the shell left when it exits. Pi has
@@ -66,12 +66,12 @@ session:
   # and wait, it writes the question as plain text above its prompt; with the question open and at
   # rest after the answer, the last 20 lines differ only in the model's words and the footer's token
   # counters, a resting screen often ends with a question too, and its title never changes. Nothing on
-  # it tells waiting from done, so Sokar says "cannot say" - which is true - rather than "not
+  # it tells waiting from done, so Porelo says "cannot say" - which is true - rather than "not
   # waiting", which a rule matching nothing would claim. And since a line typed into a question
-  # nobody can see is open becomes its answer, Sokar types no wake line into an agent without
+  # nobody can see is open becomes its answer, Porelo types no wake line into an agent without
   # 'waiting': Pi is never woken - not for a message, a handed-in file or a build verdict - and
   # finds them when it looks, as its guide tells it. The status extension this package installs does
-  # see its dialogs, but Sokar does not read an agent's own files.
+  # see its dialogs, but Porelo does not read an agent's own files.
 
 provider:
   # OpenRouter's half - upstream, bearer header, the /api/v1 the OpenAI dialect is served under -
@@ -84,7 +84,7 @@ provider:
   dialect: native
 
   # A URL, not a socket: Pi registers a provider with a baseUrl and has nowhere to put a socket
-  # path. Sokar answers that by binding a relay inside this task's own network namespace.
+  # path. Porelo answers that by binding a relay inside this task's own network namespace.
   endpoint: url
 
 # Pi's install ping and its update check go to pi.dev. Refused rather than merely absent, so a test can

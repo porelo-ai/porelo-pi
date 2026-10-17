@@ -2,7 +2,7 @@
 
 **Status:** Estimated.
 **Size:** M - a few root steps in the image, an acceptance scenario, and a measurement that Pi still
-starts and keeps its sessions; no change to Sokar.
+starts and keeps its sessions; no change to Porelo.
 
 **What must be true.** A person in an attended, brokered Pi task cannot put a provider key into the
 task with `/login`, so nothing in the task can use a provider past the broker.
@@ -18,7 +18,7 @@ past the broker. The model cannot do this alone.
 ## Plan
 
 - **In the image, as root:** `pi.yaml`'s `install.as_root` gets steps that make `/home/agent/.pi/agent`
-  root's with mode `1777`, and `auth.json` in it root's, read-only, holding `{}`. Sokar's image recipe
+  root's with mode `1777`, and `auth.json` in it root's, read-only, holding `{}`. Porelo's image recipe
   (`Containerfile`) creates the `agent` user before these steps and switches to it after, and the home
   directory is part of the image, not a volume.
 - **Why both:** a root-owned file alone does not hold, because the agent owns its directory and could

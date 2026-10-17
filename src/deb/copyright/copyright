@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: sokar-agent-pi
-Source: https://github.com/sokar-ai/sokar-pi
+Upstream-Name: porelo-agent-pi
+Source: https://github.com/porelo-ai/porelo-pi
 
 Files: *
 Copyright: 2026 Michael Schnell <michael@fuin.org>
@@ -19,7 +19,7 @@ License: GPL-3.0-or-later
  On Debian systems the complete text of the GNU General Public License version 3
  can be found in "/usr/share/common-licenses/GPL-3".
 
-Files: usr/libexec/sokar/agents/pi/pi-tree.tar.gz
+Files: usr/libexec/porelo/agents/pi/pi-tree.tar.gz
 Copyright: Earendil Works, Mario Zechner and the authors of the bundled npm packages
  Node.js contributors
  The fd developers
@@ -27,7 +27,7 @@ Copyright: Earendil Works, Mario Zechner and the authors of the bundled npm pack
 License: MIT and Apache-2.0 and BSD-3-Clause and ISC and BlueOak-1.0.0 and 0BSD and Unlicense
 Comment: The Pi coding agent with its npm dependencies, the Node.js runtime, fd and ripgrep. Which
  component carries which license, with its version and digest, is in the bill installed beside the
- package, /usr/share/sokar/sbom/sokar-agent-pi.cdx.json; each component's own license text is inside
+ package, /usr/share/porelo/sbom/porelo-agent-pi.cdx.json; each component's own license text is inside
  the tarball, with its package (pi/node_modules), as node/LICENSE, and under tools/licenses. fd is
  MIT or Apache-2.0, ripgrep Unlicense or MIT.
 

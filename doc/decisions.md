@@ -16,31 +16,31 @@ Ordered by what each decision covers; when one was taken, `git log` answers.
 | The agent in a task | [Pi does not check for a newer version in a task](#pi-does-not-check-for-a-newer-version-in-a-task) - the check could only fail, and never installs anything; telemetry off, pi.dev refused |
 | The agent in a task | [Pi shows nothing before work in a task](#pi-shows-nothing-before-work-in-a-task) - no dialog with a credential, without one, or headless; the status extension loads without a token |
 | The agent in a task | [Reaching work is checked by what the screen shows, not by the dialogs known](#reaching-work-is-checked-by-what-the-screen-shows-not-by-the-dialogs-known) - a declared marker, waited for attended; Pi draws it only after a question |
-| The agent in a task | [Waiting for a person is declared as unknown, because it is](#waiting-for-a-person-is-declared-as-unknown-because-it-is) - Pi's screen does not tell a question from idle, so Sokar says "cannot say" |
+| The agent in a task | [Waiting for a person is declared as unknown, because it is](#waiting-for-a-person-is-declared-as-unknown-because-it-is) - Pi's screen does not tell a question from idle, so Porelo says "cannot say" |
 | The agent in a task | [A task that comes back continues its conversation](#a-task-that-comes-back-continues-its-conversation) - the session id read from Pi's first record, unattended or attached |
 | Which project this is | [Three projects, two names](#three-projects-two-names) - Pi, and the different Pi that Oh My Pi forks |
-| The build | [The release tooling is Sokar's, configured from the pom](#the-release-tooling-is-sokars-configured-from-the-pom) - data beside the pin, the relock image kept equal to the builder's by a test |
-| The build | [A release is built from releases only](#a-release-is-built-from-releases-only) - on a tag nothing from Central's snapshots, and a tag on a Sokar snapshot refused by the step itself |
+| The build | [The release tooling is Porelo's, configured from the pom](#the-release-tooling-is-porelos-configured-from-the-pom) - data beside the pin, the relock image kept equal to the builder's by a test |
+| The build | [A release is built from releases only](#a-release-is-built-from-releases-only) - on a tag nothing from Central's snapshots, and a tag on a Porelo snapshot refused by the step itself |
 | The build | [`build-pi-tree.sh` stays a shell script](#build-pi-treesh-stays-a-shell-script) - it orchestrates podman and npm, and Java would be the same calls in more lines |
 | The build | [`follow-upstream.sh` is a shell script for the same reason](#follow-upstreamsh-is-a-shell-script-for-the-same-reason) - process calls and `git`, with no decision of its own |
-| The build | [Actions run from a commit, and Dependabot moves them](#actions-run-from-a-commit-and-dependabot-moves-them) - every `uses:` by commit, GraalVM by Sokar's pin, checked by `check-actions` |
+| The build | [Actions run from a commit, and Dependabot moves them](#actions-run-from-a-commit-and-dependabot-moves-them) - every `uses:` by commit, GraalVM by Porelo's pin, checked by `check-actions` |
 | The build | [What an update takes, and when](#what-an-update-takes-and-when) - three days old and still the newest, one pull request per run, a real model call |
 | The build | [The bill generator is installed from its own lockfile, not resolved at build time](#the-bill-generator-is-installed-from-its-own-lockfile-not-resolved-at-build-time) - and neither it nor npm's cache is shipped |
-| The build | [NullAway comes from `sokar-parent`](#nullaway-comes-from-sokar-parent) - one compiler configuration for every repository; `.mvn/jvm.config` stays here |
-| The build | [No check requires a changelog entry](#no-check-requires-a-changelog-entry) - requiring one belongs to Sokar's changelog check, on logchange |
+| The build | [NullAway comes from `porelo-parent`](#nullaway-comes-from-porelo-parent) - one compiler configuration for every repository; `.mvn/jvm.config` stays here |
+| The build | [No check requires a changelog entry](#no-check-requires-a-changelog-entry) - requiring one belongs to Porelo's changelog check, on logchange |
 | Accepted risk | [The Node runtime digest was first read from the service that serves it](#accepted-risk-the-node-runtime-digest-was-first-read-from-the-service-that-serves-it) - reviewed and pinned, and the built runtime is asked its version |
 
 ## The endpoint is set by a file, not a variable
 
 Pi cannot be pointed at a broker with an environment variable: its endpoint comes from an extension
 it auto-discovers. That is the measured reason an agent definition declares **what shape of
-endpoint it can address** rather than Sokar assuming a variable exists - a distinction the contract
+endpoint it can address** rather than Porelo assuming a variable exists - a distinction the contract
 makes for every agent because of this one.
 
 Verified against OpenRouter and against GitHub Copilot, whose models use three APIs under one base
 (below).
 
-**What the container gets is one file**, `/home/agent/.pi/agent/extensions/sokar-route.ts`, written
+**What the container gets is one file**, `/home/agent/.pi/agent/extensions/porelo-route.ts`, written
 by `PiRoutingExtension`: a `pi.registerProvider(<provider>, { baseUrl, apiKey })` call whose key is
 the task's token, not the credential. No environment variable carries either. Three things about it
 are load-bearing:
@@ -51,7 +51,7 @@ are load-bearing:
   also written after the container exists, by which time its environment is already fixed.
 - **The dialect's path belongs to the provider, not to Pi.** OpenRouter serves the OpenAI dialect
   under `/api/v1`; a base URL without it answers 404, and one ending in `/v1` answers "model not
-  found" to a client that appends its own version segment. The path arrives on the endpoint Sokar
+  found" to a client that appends its own version segment. The path arrives on the endpoint Porelo
   hands over, from the provider's definition.
 - **The address is literal, not `localhost`.** Node resolves `localhost` to `::1` first and the relay
   binds IPv4, so `localhost` is a connection refused.
@@ -67,7 +67,7 @@ container -> host loopback via 169.254.1.2 : refused
 container -> its own 127.0.0.1             : refused
 ```
 
-So the **listening end** moves into the task's network namespace: `sokar vault relay` binds
+So the **listening end** moves into the task's network namespace: `porelo vault relay` binds
 `127.0.0.1` there and forwards to the broker's unix socket on the host. It resolves nothing and
 connects to nothing but a local file. When `vault.log` shows no request at all, `relay.log` beside it
 says whether Pi reached the relay.
@@ -82,15 +82,15 @@ firewall rather than the host's.
 Brokering is verified **against OpenRouter and against GitHub Copilot**, and for nothing else. How
 many providers this agent supports is not verified here, which is why no figure is given.
 
-**GitHub Copilot, measured on 0.85.0** with a real Copilot account, through Sokar on a VM:
+**GitHub Copilot, measured on 0.85.0** with a real Copilot account, through Porelo on a VM:
 `--provider github-copilot --model gpt-5-mini` answered, through the broker's `/responses`, and the
 container held only the task's token. So Pi carries a subscription reached through a browser sign-in
 too:
 
 - **The sign-in stays on the host.** The GitHub token comes from GitHub's device flow, granted once by
-  a person with `sokar vault authorize github-copilot`; Pi's own `/login` is never run, so its sign-in
+  a person with `porelo vault authorize github-copilot`; Pi's own `/login` is never run, so its sign-in
   flows never refresh a token inside the container. Pi reads the task's token from
-  `COPILOT_GITHUB_TOKEN`, the variable Sokar's provider names.
+  `COPILOT_GITHUB_TOKEN`, the variable Porelo's provider names.
 - **Redirection holds beyond the common dialect.** Copilot's models use three APIs in Pi's catalogue -
   `anthropic-messages`, `openai-completions`, `openai-responses` - all under one base, which the
   broker's endpoint replaces.
@@ -125,10 +125,10 @@ would have to catch before it is published.
 **A fresh task reaches Pi's prompt with no dialog**, measured on 0.85.0 at a terminal, a fresh task
 per run:
 
-- **With a credential:** Pi starts at its prompt, both extensions loaded (`sokar-route.ts`,
-  `sokar-status.ts`). The one question Pi asks - whether to trust a workspace carrying `.pi` or
+- **With a credential:** Pi starts at its prompt, both extensions loaded (`porelo-route.ts`,
+  `porelo-status.ts`). The one question Pi asks - whether to trust a workspace carrying `.pi` or
   `.agents/skills` - is answered by `--no-approve`.
-- **Without one:** Sokar does not start the agent at all ("the agent would start without a credential
+- **Without one:** Porelo does not start the agent at all ("the agent would start without a credential
   and fail on its first request"). Started by hand in a task with a shell attached, Pi still asks
   nothing; it warns that no model is available, and **the status extension loads** - it needs no
   token, so a task without a credential still reports what Pi is doing. Only the routing extension
@@ -154,22 +154,22 @@ fixture project carries no skill.
 
 ## Waiting for a person is declared as unknown, because it is
 
-Sokar tells a person an agent is waiting for them from a declaration in the agent's own YAML: literal
+Porelo tells a person an agent is waiting for them from a declaration in the agent's own YAML: literal
 lines on the attached screen that only a question draws. Pi has none. Measured on 0.85.0 at a terminal:
 asked to put a question and wait, it writes the question as plain text, and the rest of the
 screen is its idle screen byte for byte; the window title stays `π - <directory>` in every state.
 
-**So `pi.yaml` declares nothing, and Sokar says "cannot say".** A rule written anyway would match
-nothing and make Sokar say "not waiting" - telling a person no question is there when one may be. The
-acceptance scenario `waiting.feature` proves the answer Sokar gives is "cannot say", on the VM against
-Sokar 196; `WaitingDeclarationTest` fails the day a declaration appears, so it cannot appear without
+**So `pi.yaml` declares nothing, and Porelo says "cannot say".** A rule written anyway would match
+nothing and make Porelo say "not waiting" - telling a person no question is there when one may be. The
+acceptance scenario `waiting.feature` proves the answer Porelo gives is "cannot say", on the VM against
+Porelo 196; `WaitingDeclarationTest` fails the day a declaration appears, so it cannot appear without
 the measurement and the scenario that drives Pi to a question.
 
 **Pi's own extension does see its dialogs** - `PiStatusExtension` writes a state file around every
-prompt - but Sokar reads the screen, not files an agent package places, and a model's plain-text
+prompt - but Porelo reads the screen, not files an agent package places, and a model's plain-text
 question is not a dialog either.
 
-**What would change the answer:** a Pi release that draws something only a question shows, or Sokar
+**What would change the answer:** a Pi release that draws something only a question shows, or Porelo
 reading a signal an agent package provides.
 
 ## Three projects, two names
@@ -182,30 +182,30 @@ an issue or a measurement names which one it means.
 
 ## A task that comes back continues its conversation
 
-Sokar records the session a task's agent ran and passes it back with `--session` when the task starts
+Porelo records the session a task's agent ran and passes it back with `--session` when the task starts
 again. Where the id is, `pi.yaml` declares under `session.session_id`. Measured on 0.85.0: an unattended
 run's first record, `{"type":"session"}`, carries it as `id`, and `--session <id>` continues it. An
 attached session is kept as `~/.pi/agent/sessions/--workspace--/<timestamp>_<id>.jsonl`. Its name is not
 the id, and `--session` does not find the session by it; its first record is the same `{"type":"session"}`,
-and Sokar reads the id from inside the newest session file.
+and Porelo reads the id from inside the newest session file.
 
 **Proven at the version it pins.** `SessionIdDeclarationTest` reads the declaration against the measured
-records. `session.feature` drives it through Sokar on a VM: unattended, a word to remember in one run and
+records. `session.feature` drives it through Porelo on a VM: unattended, a word to remember in one run and
 given back in the next although the second prompt never names it; attended, a message, the task stopped
 and started again, and the earlier message back on its screen.
 
-## The release tooling is Sokar's, configured from the pom
+## The release tooling is Porelo's, configured from the pom
 
-The update, the pin and the bill are Sokar's `sokar-release`, shared by all three agent
+The update, the pin and the bill are Porelo's `porelo-release`, shared by all three agent
 repositories. Copies of the same tools in each repository drift apart.
 
-**What differs between agents is data**, and it lives in `pom.xml` as `sokar.release.*`, beside
+**What differs between agents is data**, and it lives in `pom.xml` as `porelo.release.*`, beside
 `agent.cli.version`: the label, the source definition, the npm registry and dist-tag, no digest,
 the package name and the Node image the lockfile is resolved in. Flags on each call would put the
 same facts on every workflow line, and the second copy is the one that goes stale.
 
 **The relock image is the one fact written twice**, because the tool reads the pom uninterpolated:
-`sokar.release.npm.image` spells out the builder that `pin.node.version` and `pin.node.image.digest`
+`porelo.release.npm.image` spells out the builder that `pin.node.version` and `pin.node.image.digest`
 name. `PinAgreementTest` fails when the two name different images, so a lockfile is never resolved by
 one npm and installed by another; a Node move rewrites both in one write.
 
@@ -221,19 +221,19 @@ itself is not measured this way - it needs podman.
 
 ## A release is built from releases only
 
-Between releases everything is built on snapshots: `sokar.version`, the parent, and with the parent the release
+Between releases everything is built on snapshots: `porelo.version`, the parent, and with the parent the release
 tooling. A tag's build takes none of them.
 
 - **Nothing from Central's snapshots on a tag.** The snapshot repository is a profile in `settings.xml` that
-  switches itself off when `sokar.release` is set, and `build.yml` sets `MAVEN_ARGS` to `-Dsokar.release` on a tag
+  switches itself off when `porelo.release` is set, and `build.yml` sets `MAVEN_ARGS` to `-Dporelo.release` on a tag
   and to `-U` elsewhere. Measured: with it, a build from an empty local repository cannot resolve the snapshot
   parent; without it, it does. Not `-P!standard`: Maven then lists the profile as inactive and still takes the
   parent from its repository, also measured.
 - **Nothing asked for again on a tag.** `-U` is in no command; `MAVEN_ARGS` carries it where it belongs, also into
   the `pinned-jdk` action.
-- **A tag on a snapshot is refused.** "Which channel" refuses a `sokar.version` that names a snapshot, in the build
+- **A tag on a snapshot is refused.** "Which channel" refuses a `porelo.version` that names a snapshot, in the build
   job and in the release job. `ReleaseChannelTest` runs both steps as a tag's run would, sees the refusal, and sees
-  a released Sokar let through; it was seen to fail with the refusal taken out. `check-releases` then refuses any
+  a released Porelo let through; it was seen to fail with the refusal taken out. `check-releases` then refuses any
   snapshot left in the effective pom.
 - **Secrets only where a tool needs them.** The tooling is resolved and the channel decided in steps that hold no
   secret. The steps that hold one run only what needs it: the acceptance legs and their clean-up the cloud's key and
@@ -250,9 +250,9 @@ pin nobody moves rots, and a stale action with a known flaw is not safer than th
 release arrives as a pull request with the new commit and its version, and nothing merges it
 automatically: the review is what the pin buys.
 
-**`sokar-release check-actions` fails the build on a step that names a tag, a branch, a bare hash or a
+**`porelo-release check-actions` fails the build on a step that names a tag, a branch, a bare hash or a
 line of releases like `# v7`**, and says how to pin it, so a new workflow cannot bring a tag back. It is
-Sokar's one check for this rule, run in the build job, and this repository keeps no second test for it.
+Porelo's one check for this rule, run in the build job, and this repository keeps no second test for it.
 A step of this repository and an image by digest pass. Measured against this repository's workflows,
 with a tag, a `# v7`, a `setup-graalvm` at a commit and a Dependabot without `/.github/actions/*` each
 put in: every one refused.
@@ -272,24 +272,24 @@ product's own Artifactory. The setup actions download their tools themselves, an
 - **The JFrog CLI is fixed by the action's commit.** `setup-jfrog-cli` 5.2.0 defaults to `jf` 2.124.0
   and asks for the newest only when told to, so a Dependabot bump moves both together, under review. It
   checks no digest, which is the same publisher's trust as the action.
-- **GraalVM is the one Sokar pins, checked against its digest.** `setup-graalvm` with `'25'` resolves
+- **GraalVM is the one Porelo pins, checked against its digest.** `setup-graalvm` with `'25'` resolves
   the newest 25.x at run time and checks nothing for community builds - and that JDK compiles the
   native binary this repository publishes. So every job uses `./.github/actions/pinned-jdk`: the
-  runner's own Java 25 runs `sokar-machines jdk --github` once, which installs the GraalVM
-  `sokar-machines` pins (`machines.graalvm.*`, moved by Sokar's Machines workflow under the same
+  runner's own Java 25 runs `porelo-machines jdk --github` once, which installs the GraalVM
+  `porelo-machines` pins (`machines.graalvm.*`, moved by Porelo's Machines workflow under the same
   three-day rule), checks its digest before unpacking, and sets `JAVA_HOME`. The build and the
   acceptance machines use the same pin, by construction. `check-actions` refuses `setup-graalvm` and
   `setup-java` even at a pinned commit, because the commit fixes the action, not the JDK it fetches.
   Measured on a VM as a stand-in runner - an empty home, Temurin 25 in place of
-  the runner's Java, Sokar's artifacts at `0bce03a`: GraalVM 25.0.2 installed and checked, and this
+  the runner's Java, Porelo's artifacts at `0bce03a`: GraalVM 25.0.2 installed and checked, and this
   repository's native build and packages made with it.
 
 ## What an update takes, and when
 
-Sokar's release tool applies these rules; `UpdateRulesTest`
+Porelo's release tool applies these rules; `UpdateRulesTest`
 fails when this repository stops asking for them.
 
-**A release is taken once it is three days old, and still the newest**: `sokar.release.min-age` is
+**A release is taken once it is three days old, and still the newest**: `porelo.release.min-age` is
 `3d`. A release withdrawn or patched within days never becomes a pull request, and the people who
 install on the first day get the days to report what breaks. A younger release is not skipped for the
 one before it: the job waits and says until when. A release whose date cannot be read is never old
@@ -303,12 +303,12 @@ temporary. Published metadata proves the download is intact; only a real request
 version still starts without a question, reads its credential variable, routes through the broker and
 gets an answer.
 
-**The CI machines are not kept current here.** GraalVM and the pre-pulled base images are Sokar's
+**The CI machines are not kept current here.** GraalVM and the pre-pulled base images are Porelo's
 machine tooling, under the same rule, once for every repository.
 
-**Node, `fd` and `ripgrep` are followed by the same job, under the same rule.** Each is declared to the tool as `sokar.release.pin.<name>.*`: where a release is read - Node on its LTS
+**Node, `fd` and `ripgrep` are followed by the same job, under the same rule.** Each is declared to the tool as `porelo.release.pin.<name>.*`: where a release is read - Node on its LTS
 line 22, the two tools from their newest GitHub release - where its digest is read, and the properties
-a move writes. A Node move also rewrites `sokar.release.npm.image`, which spells out its version and
+a move writes. A Node move also rewrites `porelo.release.npm.image`, which spells out its version and
 image digest, so the relock image cannot part from the builder. `UpdateRulesTest` fails when a tree pin
 is not declared to the tool, not followed by the job, or not offered when the job is dispatched.
 
@@ -355,7 +355,7 @@ merging, deciding - which belongs in Java rather than grown into this file.
 
 ## `follow-upstream.sh` is a shell script for the same reason
 
-It calls Sokar's release tool once per item, commits, and writes a table: process calls and `git`,
+It calls Porelo's release tool once per item, commits, and writes a table: process calls and `git`,
 with no decision of its own - what is asked, how old a release must be and what a move writes are the
 tool's and the pom's. It is a script rather than workflow steps so it runs on a workstation too, where
 it was measured against the published tool: all four followed (Node and Pi moved, in that order, the
@@ -369,7 +369,7 @@ halfway - undone completely, the others still moved.
     WHAT=all VERSION=1.2.3          (one version for all of them)
     VERSION='1.2.3; id'
     CHANNEL='latest;id'
-    SOKAR_RELEASE=relative/path
+    PORELO_RELEASE=relative/path
     a working tree with changes     (every move is committed)
 
 ## The bill generator is installed from its own lockfile, not resolved at build time
@@ -391,10 +391,10 @@ postinstall copies a binary its JS API finds without it. `PinAgreementTest` fail
 generator's version decides what the bill looks like, and that should change in a reviewed commit
 rather than on the day the registry serves something newer.
 
-## NullAway comes from `sokar-parent`
+## NullAway comes from `porelo-parent`
 
 The compiler configuration that runs NullAway - Error Prone with only NullAway, `OnlyNullMarked`, the
-two processor paths - is `sokar-parent`'s, managed for every Sokar repository, so this pom declares no
+two processor paths - is `porelo-parent`'s, managed for every Porelo repository, so this pom declares no
 compiler plugin. Only the `default-compile` execution runs it: tests pass `null` on purpose, and Error
 Prone never sees them.
 
@@ -404,13 +404,13 @@ on that JVM refuses it the compiler's internals - measured on JDK 25, an `Illega
 
 ## No check requires a changelog entry
 
-The changelog is written by hand in the same commit, and nothing enforces it. Sokar is moving to
+The changelog is written by hand in the same commit, and nothing enforces it. Porelo is moving to
 logchange - one YAML file per change, and a generated `CHANGELOG.md` - and a check for a hand-kept
 file would have to be rebuilt the moment that reaches this repository. Requiring an entry returns as
-Sokar's changelog check, proposed to logchange upstream first, keeping three lessons: a waiver answers for its own
+Porelo's changelog check, proposed to logchange upstream first, keeping three lessons: a waiver answers for its own
 commit only, documentation is not exempt, and a range that cannot be compared fails.
 
-**What would change it:** Sokar's changelog check landing, or logchange being adopted here.
+**What would change it:** Porelo's changelog check landing, or logchange being adopted here.
 
 ## Accepted risk: the Node runtime digest was first read from the service that serves it
 

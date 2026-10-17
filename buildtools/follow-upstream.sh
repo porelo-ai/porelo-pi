@@ -4,7 +4,7 @@
 # every one with a release old enough, one commit each, so the update job verifies them together and
 # opens one pull request. A person who wants one of them out drops its commit.
 #
-# Sokar's release tool answers and moves; this only walks the list, commits, and writes down what it
+# Porelo's release tool answers and moves; this only walks the list, commits, and writes down what it
 # found. What upstream is asked, how old a release must be and which properties a move writes are all
 # in pom.xml.
 #
@@ -12,7 +12,7 @@
 #   WHAT     all (default), or one of the names in ITEMS
 #   VERSION  a version to take instead of asking upstream; only with one name in WHAT
 #   CHANNEL  the npm dist-tag the CLI follows (default: latest)
-#   SOKAR_RELEASE  an absolute path to a command running the release tool, for a run on a
+#   PORELO_RELEASE  an absolute path to a command running the release tool, for a run on a
 #            workstation; unset, it runs from the classpath in target/cp.txt, as CI resolves it
 #
 # Writes target/update/summary.md, and these outputs to GITHUB_OUTPUT (or stdout without one):
@@ -44,9 +44,9 @@ CHANNEL="${CHANNEL:-latest}"
 [[ "$CHANNEL" =~ ^[a-z0-9][a-z0-9.-]*$ ]] || refuse "CHANNEL='$CHANNEL' is not a dist-tag"
 # One version for all of them would pin each of them to it.
 [[ -z "$VERSION" || "$WHAT" != all ]] || refuse "a version is taken for one of them - set WHAT to one of: ${ITEMS[*]}"
-if [ -n "${SOKAR_RELEASE:-}" ]; then
-    [[ "$SOKAR_RELEASE" == /* && -x "$SOKAR_RELEASE" ]] \
-        || refuse "SOKAR_RELEASE='$SOKAR_RELEASE' is not an absolute path to an executable"
+if [ -n "${PORELO_RELEASE:-}" ]; then
+    [[ "$PORELO_RELEASE" == /* && -x "$PORELO_RELEASE" ]] \
+        || refuse "PORELO_RELEASE='$PORELO_RELEASE' is not an absolute path to an executable"
 fi
 # Every move is committed, so a change already in the tree would be committed with the first one.
 if ! git diff --quiet || ! git diff --cached --quiet; then
@@ -54,10 +54,10 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
 fi
 
 release() {
-    if [ -n "${SOKAR_RELEASE:-}" ]; then
-        "$SOKAR_RELEASE" "$@"
+    if [ -n "${PORELO_RELEASE:-}" ]; then
+        "$PORELO_RELEASE" "$@"
     else
-        java -cp "$(cat target/cp.txt)" org.fuin.sokar.release.Main "$@"
+        java -cp "$(cat target/cp.txt)" org.fuin.porelo.release.Main "$@"
     fi
 }
 

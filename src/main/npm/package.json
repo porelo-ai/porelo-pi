@@ -1,7 +1,7 @@
 {
-  "name": "sokar-agent-pi-tree",
+  "name": "porelo-agent-pi-tree",
   "private": true,
-  "description": "Pins the Pi coding agent and its dependencies for the sokar-agent-pi package.",
+  "description": "Pins the Pi coding agent and its dependencies for the porelo-agent-pi package.",
   "dependencies": {
     "@earendil-works/pi-coding-agent": "0.85.0"
   }

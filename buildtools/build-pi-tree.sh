@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 #
-# Builds what the sokar-agent-pi package ships: the Pi coding agent with its dependencies, and
+# Builds what the porelo-agent-pi package ships: the Pi coding agent with its dependencies, and
 # the Node runtime it needs. Both end up inside the package, so a task image is built with no
 # network access at all - see the 'packaged' section of pi.yaml.
 #
 # Everything runs in a pinned container rather than on the build machine, so no Node toolchain
-# has to be installed to build Sokar, and the toolchain itself is a stated version rather than
+# has to be installed to build Porelo, and the toolchain itself is a stated version rather than
 # whatever the machine happens to have.
 #
-# Skipped, with a message, when there is no container runtime: the rest of Sokar still builds.
+# Skipped, with a message, when there is no container runtime: the rest of Porelo still builds.
 #
 # Every container maps the build user in, so what it writes belongs to the build user. Without
 # that, the tree is written as root and the next build cannot even delete it.
 set -euo pipefail
 
 MODULE="$(cd "$(dirname "$0")/.." && pwd)"
-# Sokar's release tool, on the classpath Maven passes as the only argument; it records Node below.
+# Porelo's release tool, on the classpath Maven passes as the only argument; it records Node below.
 RELEASE_CLASSPATH="${1:-}"
 TARGET="$MODULE/target/tree"
 # The pins - the Node runtime, the builder image it is built in by digest, fd and ripgrep - come from
@@ -52,7 +52,7 @@ JAVA_CMD="${JAVA_CMD:-$(command -v java || true)}"
     || refuse "PI_BUILDER_IMAGE must be pinned by an @sha256: digest - '$BUILDER' is not"
 
 if ! command -v podman >/dev/null 2>&1; then
-    echo "build-pi-tree: no podman, so the Pi tree is not built; sokar-agent-pi will be incomplete"
+    echo "build-pi-tree: no podman, so the Pi tree is not built; porelo-agent-pi will be incomplete"
     exit 0
 fi
 
@@ -164,16 +164,16 @@ podman run --rm --userns=keep-id -v "$TARGET:/out:z" "$BUILDER" sh -c '
 # with the digest this script already verifies, rather than a digest computed after the fact -
 # what is recorded is what was checked.
 [ -n "$RELEASE_CLASSPATH" ] \
-    || refuse "no classpath for Sokar's release tool - run this from Maven, which passes it"
-"$JAVA_CMD" -cp "$RELEASE_CLASSPATH" org.fuin.sokar.release.Main add-component \
+    || refuse "no classpath for Porelo's release tool - run this from Maven, which passes it"
+"$JAVA_CMD" -cp "$RELEASE_CLASSPATH" org.fuin.porelo.release.Main add-component \
     "$TARGET/pi/sbom.cdx.json" --name node --version "$NODE_VERSION" \
     --url "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
     --sha256 "$NODE_SHA256" --license MIT
-"$JAVA_CMD" -cp "$RELEASE_CLASSPATH" org.fuin.sokar.release.Main add-component \
+"$JAVA_CMD" -cp "$RELEASE_CLASSPATH" org.fuin.porelo.release.Main add-component \
     "$TARGET/pi/sbom.cdx.json" --name fd --version "$FD_VERSION" \
     --url "https://github.com/sharkdp/fd/releases/download/v$FD_VERSION/fd-v$FD_VERSION-x86_64-unknown-linux-musl.tar.gz" \
     --sha256 "$FD_SHA256" --license "MIT OR Apache-2.0"
-"$JAVA_CMD" -cp "$RELEASE_CLASSPATH" org.fuin.sokar.release.Main add-component \
+"$JAVA_CMD" -cp "$RELEASE_CLASSPATH" org.fuin.porelo.release.Main add-component \
     "$TARGET/pi/sbom.cdx.json" --name ripgrep --version "$RG_VERSION" \
     --url "https://github.com/BurntSushi/ripgrep/releases/download/$RG_VERSION/ripgrep-$RG_VERSION-x86_64-unknown-linux-musl.tar.gz" \
     --sha256 "$RG_SHA256" --license "Unlicense OR MIT"
