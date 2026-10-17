@@ -4,20 +4,20 @@ import org.fuin.porelo.wire.Json;
 
 /**
  * The extension that lets the host see whether Pi is working, idle, or waiting for a person.
- * <p>
- * <strong>Why this exists at all.</strong> Whether an agent is blocked on a question nobody
+ *
+ * <p><strong>Why this exists at all.</strong> Whether an agent is blocked on a question nobody
  * noticed is the one thing about a task that cannot be observed from outside: output stops either
  * way. Pi knows the answer exactly - it emits an event when it puts a prompt to somebody and
  * another when that prompt closes - but those events reach extensions only. They are not on the
  * stream its machine-readable modes serialize, so nothing outside the process can see them.
- * <p>
- * <strong>Why a file rather than a message.</strong> The agent must not gain a way to write to the
- * host: that would be a third path out of the container beside the vault socket and the gate, and
- * the first one pointing outwards. So this writes a file <em>inside</em>
- * the container, and the host reads it when it wants to know. The direction of the boundary is
- * unchanged - nothing is pushed, something is offered.
- * <p>
- * The file is replaced atomically, because a reader that catches a half-written file would see a
+ *
+ * <p><strong>Why a file rather than a message.</strong> The agent must not gain a way to write to
+ * the host: that would be a third path out of the container beside the vault socket and the gate,
+ * and the first one pointing outwards. So this writes a file <em>inside</em> the container, and the
+ * host reads it when it wants to know. The direction of the boundary is unchanged - nothing is
+ * pushed, something is offered.
+ *
+ * <p>The file is replaced atomically, because a reader that catches a half-written file would see a
  * state that never existed.
  */
 final class PiStatusExtension {
@@ -88,6 +88,7 @@ final class PiStatusExtension {
                     pi.on("ui_prompt_end", () => { prompts.pop(); write(); });
                     pi.on("session_shutdown", () => { base = "gone"; prompts.length = 0; write(); });
                 }
-                """.formatted(Json.write(STATE_FILE));
+                """
+                .formatted(Json.write(STATE_FILE));
     }
 }

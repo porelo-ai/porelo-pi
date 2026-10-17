@@ -8,9 +8,9 @@ import org.fuin.porelo.agent.api.SetupContext;
 
 /**
  * What Pi needs in a fresh container before it will run unattended.
- * <p>
- * Two files. One carries both halves of the wiring - where to send requests, and what to present -
- * and neither can be an environment variable here: Pi has no variable for an endpoint, and this
+ *
+ * <p>Two files. One carries both halves of the wiring - where to send requests, and what to present
+ * - and neither can be an environment variable here: Pi has no variable for an endpoint, and this
  * agent's broker starts after the container exists, so its environment is already fixed. The other
  * records what the agent is doing, for a host that cannot otherwise tell thinking from waiting.
  */
@@ -34,12 +34,15 @@ public class PiContainerSetup implements ContainerSetup {
         if (context.provider().isBlank()) {
             // Porelo sends a provider with every endpoint; a blank one is a regression on that
             // side, and a file naming "" would override nothing and fail as a wrong credential.
-            throw new AgentException("Porelo sent an empty provider for a brokered task - a bug in"
-                    + " Porelo, not in the operator's setup: no routing file can be written");
+            throw new AgentException(
+                    "Porelo sent an empty provider for a brokered task - a bug in"
+                            + " Porelo, not in the operator's setup: no routing file can be written");
         }
-        files.add(ContainerFile.secret(PiRoutingExtension.FILE,
-                PiRoutingExtension.document(context.provider(), context.endpoint(),
-                        context.token())));
+        files.add(
+                ContainerFile.secret(
+                        PiRoutingExtension.FILE,
+                        PiRoutingExtension.document(
+                                context.provider(), context.endpoint(), context.token())));
         return List.copyOf(files);
     }
 

@@ -8,16 +8,14 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Pi.
- * <p>
- * Two overrides: the endpoint and the token go into an extension Pi discovers, because it has no
+ *
+ * <p>Two overrides: the endpoint and the token go into an extension Pi discovers, because it has no
  * variable for either; and its JSON events are rendered for the log, because a raw one can hold a
  * whole file. Everything else is {@code pi.yaml}.
  */
 public final class PiAgent extends YamlAgent {
 
-    /**
-     * Constructor.
-     */
+    /** Constructor. */
     public PiAgent() {
         super("pi");
     }

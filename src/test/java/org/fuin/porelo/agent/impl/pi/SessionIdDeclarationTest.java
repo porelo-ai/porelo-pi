@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Where Pi names its session, read against what 0.85.0 wrote.
- * <p>
- * That the id is still where this says at the version the package pins is the acceptance suite's
+ *
+ * <p>That the id is still where this says at the version the package pins is the acceptance suite's
  * question; this one fails when the declaration stops fitting what was measured.
  */
 class SessionIdDeclarationTest {
@@ -18,10 +18,13 @@ class SessionIdDeclarationTest {
     private static final String ID = "01a0edd8-d083-7050-b048-8f504281b118";
 
     /** The first record of an unattended run, as it wrote it. */
-    private static final List<Object> RECORDS = List.of(
-            Json.parse("{\"type\":\"session\",\"version\":3,\"id\":\"" + ID
-                    + "\",\"timestamp\":\"2026-09-29T15:46:51.580Z\",\"cwd\":\"/workspace\"}"),
-            Json.parse("{\"type\":\"agent_start\"}"));
+    private static final List<Object> RECORDS =
+            List.of(
+                    Json.parse(
+                            "{\"type\":\"session\",\"version\":3,\"id\":\""
+                                    + ID
+                                    + "\",\"timestamp\":\"2026-09-29T15:46:51.580Z\",\"cwd\":\"/workspace\"}"),
+                    Json.parse("{\"type\":\"agent_start\"}"));
 
     private SessionIds ids() {
         final SessionIds ids = new PiAgent().definition().sessionIds();
@@ -39,14 +42,21 @@ class SessionIdDeclarationTest {
     void findsNoSessionWhereNoRecordNamesOne() {
 
         // The other half: a declaration that took any record's id would pass the test above.
-        assertThat(ids().of(List.of(Json.parse("{\"type\":\"message_start\",\"id\":\"not-a-session\"}")))).isNull();
+        assertThat(
+                        ids().of(
+                                        List.of(
+                                                Json.parse(
+                                                        "{\"type\":\"message_start\",\"id\":\"not-a-session\"}"))))
+                .isNull();
     }
 
     @Test
     void looksForAnAttendedSessionInItsSessionFiles() {
 
-        // Measured: ~/.pi/agent/sessions/--workspace--/<timestamp>_<id>.jsonl. Its name is not the id, but its
-        // first record is the same {"type":"session"} this declares, and Porelo reads the id from inside it.
+        // Measured: ~/.pi/agent/sessions/--workspace--/<timestamp>_<id>.jsonl. Its name is not the
+        // id, but its
+        // first record is the same {"type":"session"} this declares, and Porelo reads the id from
+        // inside it.
         assertThat(ids().directory()).isEqualTo(".pi/agent/sessions/--workspace--");
         assertThat(ids().suffix()).isEqualTo(".jsonl");
         assertThat(ids().of(RECORDS)).isEqualTo(ID);

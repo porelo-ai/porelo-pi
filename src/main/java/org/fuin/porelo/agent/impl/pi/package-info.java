@@ -1,6 +1,4 @@
-/**
- * The Porelo adapter for Pi.
- */
+/** The Porelo adapter for Pi. */
 @NullMarked
 package org.fuin.porelo.agent.impl.pi;
 

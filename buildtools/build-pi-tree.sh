@@ -22,7 +22,10 @@ TARGET="$MODULE/target/tree"
 # pom.xml, which Maven passes in; this script keeps no default of its own, so nothing here can drift
 # from what the release tool moves. Run it from Maven.
 for pin in NODE_VERSION NODE_SHA256 NODE_IMAGE_DIGEST FD_VERSION FD_SHA256 RG_VERSION RG_SHA256; do
-    [ -n "${!pin:-}" ] || { echo "build-pi-tree: $pin is not set - run this from Maven, which passes the pins from pom.xml" >&2; exit 2; }
+    [ -n "${!pin:-}" ] || {
+        echo "build-pi-tree: $pin is not set - run this from Maven, which passes the pins from pom.xml" >&2
+        exit 2
+    }
 done
 BUILDER="${PI_BUILDER_IMAGE:-docker.io/library/node:${NODE_VERSION}-slim@${NODE_IMAGE_DIGEST}}"
 
@@ -30,13 +33,16 @@ BUILDER="${PI_BUILDER_IMAGE:-docker.io/library/node:${NODE_VERSION}-slim@${NODE_
 # runs inside a build container with the shipped tree mounted writable. Checked against a strict
 # shape here, so a value carrying shell syntax is refused rather than executed - and a mistyped
 # version fails now rather than as a confusing error inside the container.
-refuse() { echo "build-pi-tree: $1" >&2; exit 2; }
-[[ "$NODE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] \
-    || refuse "NODE_VERSION='$NODE_VERSION' is not a version"
-[[ "$NODE_SHA256" =~ ^[0-9a-f]{64}$ ]] \
-    || refuse "NODE_SHA256 is not a 64-character lowercase digest"
-[[ "$NODE_IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] \
-    || refuse "NODE_IMAGE_DIGEST is not sha256: and a 64-character lowercase digest"
+refuse() {
+    echo "build-pi-tree: $1" >&2
+    exit 2
+}
+[[ "$NODE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] ||
+    refuse "NODE_VERSION='$NODE_VERSION' is not a version"
+[[ "$NODE_SHA256" =~ ^[0-9a-f]{64}$ ]] ||
+    refuse "NODE_SHA256 is not a 64-character lowercase digest"
+[[ "$NODE_IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] ||
+    refuse "NODE_IMAGE_DIGEST is not sha256: and a 64-character lowercase digest"
 for v in FD_VERSION RG_VERSION; do
     [[ "${!v}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || refuse "$v='${!v}' is not a version"
 done
@@ -45,11 +51,11 @@ for d in FD_SHA256 RG_SHA256; do
 done
 # Maven passes the JVM it runs on; anything else from the environment must still be one binary.
 JAVA_CMD="${JAVA_CMD:-$(command -v java || true)}"
-[[ "$JAVA_CMD" == /* && -x "$JAVA_CMD" ]] \
-    || refuse "JAVA_CMD='$JAVA_CMD' is not an absolute path to an executable"
+[[ "$JAVA_CMD" == /* && -x "$JAVA_CMD" ]] ||
+    refuse "JAVA_CMD='$JAVA_CMD' is not an absolute path to an executable"
 # A digest, not a tag alone: npm ci and every checksum run inside this image, and a tag can be repointed.
-[[ "$BUILDER" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*(:[A-Za-z0-9._-]+)?@sha256:[0-9a-f]{64}$ ]] \
-    || refuse "PI_BUILDER_IMAGE must be pinned by an @sha256: digest - '$BUILDER' is not"
+[[ "$BUILDER" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*(:[A-Za-z0-9._-]+)?@sha256:[0-9a-f]{64}$ ]] ||
+    refuse "PI_BUILDER_IMAGE must be pinned by an @sha256: digest - '$BUILDER' is not"
 
 if ! command -v podman >/dev/null 2>&1; then
     echo "build-pi-tree: no podman, so the Pi tree is not built; porelo-agent-pi will be incomplete"
@@ -105,7 +111,7 @@ rm -rf "$TARGET/sbom-tool"
 # node's own fetch rather than curl: the container runs as the build user, so it cannot install
 # packages, and the builder image already has the one tool needed.
 podman run --rm --userns=keep-id --env "NODE_VERSION=$NODE_VERSION" \
-        --env "NODE_SHA256=$NODE_SHA256" -v "$TARGET:/out:z" "$BUILDER" sh -c "
+    --env "NODE_SHA256=$NODE_SHA256" -v "$TARGET:/out:z" "$BUILDER" sh -c "
     set -eu
     node -e \"
         const { writeFileSync } = require('fs');
@@ -125,8 +131,8 @@ podman run --rm --userns=keep-id --env "NODE_VERSION=$NODE_VERSION" \
 # fd and rg, checked against the pinned digests, the binary and its licenses kept and nothing else.
 # Fetched with node's fetch like the runtime above; it follows GitHub's redirect to its storage.
 podman run --rm --userns=keep-id --env "FD_VERSION=$FD_VERSION" --env "FD_SHA256=$FD_SHA256" \
-        --env "RG_VERSION=$RG_VERSION" --env "RG_SHA256=$RG_SHA256" \
-        -v "$TARGET:/out:z" "$BUILDER" sh -c "
+    --env "RG_VERSION=$RG_VERSION" --env "RG_SHA256=$RG_SHA256" \
+    -v "$TARGET:/out:z" "$BUILDER" sh -c "
     set -eu
     node -e \"
         const { writeFileSync } = require('fs');
@@ -163,8 +169,8 @@ podman run --rm --userns=keep-id -v "$TARGET:/out:z" "$BUILDER" sh -c '
 # Node is in the tree and is not an npm package, so nothing above can have listed it. Added
 # with the digest this script already verifies, rather than a digest computed after the fact -
 # what is recorded is what was checked.
-[ -n "$RELEASE_CLASSPATH" ] \
-    || refuse "no classpath for Porelo's release tool - run this from Maven, which passes it"
+[ -n "$RELEASE_CLASSPATH" ] ||
+    refuse "no classpath for Porelo's release tool - run this from Maven, which passes it"
 "$JAVA_CMD" -cp "$RELEASE_CLASSPATH" org.fuin.porelo.release.Main add-component \
     "$TARGET/pi/sbom.cdx.json" --name node --version "$NODE_VERSION" \
     --url "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
@@ -184,6 +190,6 @@ cp "$TARGET/pi/sbom.cdx.json" "$MODULE/target/pi-tree-sbom.cdx.json"
 # operator to check, and one unpack instead of copying tens of thousands of files per task.
 tar -czf "$MODULE/target/pi-tree.tar.gz" -C "$TARGET" pi node tools
 
-echo "build-pi-tree: pi $(du -sh "$TARGET/pi" | cut -f1), node $(du -sh "$TARGET/node" | cut -f1),"\
-     "tools $(du -sh "$TARGET/tools" | cut -f1),"\
-     "packaged $(du -h "$MODULE/target/pi-tree.tar.gz" | cut -f1)"
+echo "build-pi-tree: pi $(du -sh "$TARGET/pi" | cut -f1), node $(du -sh "$TARGET/node" | cut -f1)," \
+    "tools $(du -sh "$TARGET/tools" | cut -f1)," \
+    "packaged $(du -h "$MODULE/target/pi-tree.tar.gz" | cut -f1)"

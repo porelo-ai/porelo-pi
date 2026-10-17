@@ -4,14 +4,14 @@ import org.fuin.porelo.wire.Json;
 
 /**
  * The extension that points Pi at Porelo's broker.
- * <p>
- * Pi cannot be redirected with an environment variable: only Azure has one, and every other
+ *
+ * <p>Pi cannot be redirected with an environment variable: only Azure has one, and every other
  * provider's endpoint is fixed unless an extension overrides it. Extensions are auto-discovered
  * from {@code ~/.pi/agent/extensions}, so this is a file to place rather than a command to run.
- * <p>
- * <strong>Neither the provider's name nor its path is written here any more.</strong> Both were
- * constants, and changing them meant rebuilding this binary - which is exactly what pointing Pi
- * at a second provider once cost. The name arrives with the task and the path is already on the
+ *
+ * <p><strong>Neither the provider's name nor its path is written here any more.</strong> Both were
+ * constants, and changing them meant rebuilding this binary - which is exactly what pointing Pi at
+ * a second provider once cost. The name arrives with the task and the path is already on the
  * endpoint Porelo hands over.
  */
 final class PiRoutingExtension {
@@ -27,8 +27,8 @@ final class PiRoutingExtension {
      * Returns the extension that sends Pi's requests to the broker instead of the provider.
      *
      * @param provider Name of the provider, as Pi already knows it.
-     * @param endpoint Base URL Porelo is listening on, inside this container's namespace, with
-     *        the dialect's path already on it.
+     * @param endpoint Base URL Porelo is listening on, inside this container's namespace, with the
+     *     dialect's path already on it.
      * @param token Task-scoped token to present, standing in for the real credential.
      * @return File content.
      */
@@ -41,6 +41,7 @@ final class PiRoutingExtension {
                 export default function (pi) {
                     pi.registerProvider(%s, { baseUrl: %s, apiKey: %s });
                 }
-                """.formatted(Json.write(provider), Json.write(endpoint), Json.write(token));
+                """
+                .formatted(Json.write(provider), Json.write(endpoint), Json.write(token));
     }
 }
