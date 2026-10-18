@@ -68,11 +68,6 @@ skills are applied, not only named.
   reason, or opened as an issue named here.
 - Unit tests, the native build and the acceptance suite green on the commit handed over.
 
-## To be checked
-
-- Whether the workflows under `.github/workflows` changed since `fd8a2ec` are read as well, against
-  `security-audit`: the reading of 2026-09-27 left them out, and they hold the release and update jobs.
-
 ## Findings, read on 2026-10-17
 
 Read on `e1b6b9f` with the skills above, `SKILL.md` read from outside the repository. **The scope** is 31 files whose
