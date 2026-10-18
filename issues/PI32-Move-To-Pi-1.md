@@ -78,3 +78,23 @@ Read in the published packages of `@earendil-works/pi-coding-agent` and `@earend
 - The VM suite and both legs are green on it.
 - OSV lists none of the 13 advisories above against the new shipped tree.
 - Every "measured on" in `pi.yaml` names the version it was measured on.
+
+## Measured
+
+- **OSV, 2026-10-18,** on the new `src/main/npm/package-lock.json` (118 packages, from 167): no advisory, so
+  none of the 13 above.
+- **The tree's bill** needed porelo-buildtools [BT19](https://github.com/porelo-ai/porelo-buildtools/blob/main/issues/README.md#bt19):
+  Pi 1.3.0 brings `@types/node` through `protobufjs`, and `add-component` had taken it for the Node runtime the
+  script adds. With that fix's snapshot both stand in the bill, as two components.
+- **On `ubuntu26.04`, account `smith`,** porelo `0.5.1~snapshot.307`, the adapter and the tree of `3bc78b2`
+  in `smith`'s agents directory: **23 of 24 scenarios green.** Among them:
+  - the brokered answers, so the routing extension still routes;
+  - "reaches work without being asked anything", so the ready marker still shows;
+  - both session scenarios, so `session_id` still finds the session;
+  - Pi shown as one Porelo cannot say is waiting, and a message reaching it at rest with nothing typed.
+- **The one red is the machine's, not the tree's:** "the adapter ships the Pi its bill names" reads the
+  machine-wide package's bill, `/usr/share/porelo/sbom/`, which on that VM is still the 0.85.0 package, while
+  the agent it checks is the account's own and said 1.3.0. The legs install the package itself, so they
+  answer it.
+- **Not measured again on 1.3.0:** the screen claims behind `at_rest` and the missing `waiting` (Pi is never
+  woken, so no scenario types into it). `pi.yaml` says which version each claim was measured on.
