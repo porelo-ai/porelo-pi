@@ -1,6 +1,6 @@
 # PI32 — Move To Pi 1
 
-**Status:** Implementing.
+**Status:** Review.
 **Size:** M - the pin and its lockfile, the definition's measured claims checked again on 1.3.0, both
 extensions run against Pi 1's API, and the VM suite; a major version the weekly update stops on by design.
 
@@ -95,6 +95,6 @@ Read in the published packages of `@earendil-works/pi-coding-agent` and `@earend
 - **The one red is the machine's, not the tree's:** "the adapter ships the Pi its bill names" reads the
   machine-wide package's bill, `/usr/share/porelo/sbom/`, which on that VM is still the 0.85.0 package, while
   the agent it checks is the account's own and said 1.3.0. The legs install the package itself, so they
-  answer it.
+  answer it: **Build 39152826235 on `bf6d763` is green on both legs**, that scenario included.
 - **Not measured again on 1.3.0:** the screen claims behind `at_rest` and the missing `waiting` (Pi is never
   woken, so no scenario types into it). `pi.yaml` says which version each claim was measured on.
