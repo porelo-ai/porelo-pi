@@ -1,6 +1,6 @@
 # PI32 — Move To Pi 1
 
-**Status:** Analyzed.
+**Status:** Implementing.
 **Size:** M - the pin and its lockfile, the definition's measured claims checked again on 1.3.0, both
 extensions run against Pi 1's API, and the VM suite; a major version the weekly update stops on by design.
 
@@ -51,7 +51,7 @@ Read in the published packages of `@earendil-works/pi-coding-agent` and `@earend
       `@earendil-works/chord` is gone. The bill changes, and `compare-bills` says by how much.
   - **New, maybe of use:** OSC 7501 program status (`PI_PROGRAM_STATUS`): Pi reports whether it is working,
     blocked on a dialog, done or failed. That could give Pi the `waiting` declaration 0.85.0 could not have.
-    It is a later issue, not this one.
+    That is [PI33](README.md#pi33), not this issue.
   - **The screen:** the "Working ─" line `at_rest` lacks, and the session file layout (`session_id`), are
     measured claims; both are measured again at a terminal.
   - **No `npm-shrinkwrap.json`** in 1.3.0's package (0.85.0 had one). The lockfile here pins by integrity
