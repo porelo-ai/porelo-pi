@@ -142,6 +142,25 @@ jobs:
                   fi
 
             # Without it the credential scenarios skip and the legs below pass on less than they claim.
+            # The tree these legs verify, named by an artifact only this run can make, so the Build of the same
+            # tree on main takes these legs (porelo-release proven-legs) instead of renting them again.
+            - name: Name the tree this run verifies
+              id: tree
+              if: steps.follow.outputs.moved == 'yes' && !env.STOP
+              run: |
+                  set -eu
+                  # Every move is committed by now, and the request pushes this commit.
+                  TREE="$(git rev-parse 'HEAD^{tree}')"
+                  echo "$TREE" > "$RUNNER_TEMP/verified-tree"
+                  echo "tree=$TREE" >> "$GITHUB_OUTPUT"
+
+            - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+              if: steps.tree.outputs.tree
+              with:
+                  name: porelo-verified-tree-${{ steps.tree.outputs.tree }}
+                  path: ${{ runner.temp }}/verified-tree
+                  retention-days: 2
+
             - name: The provider key is there
               if: steps.follow.outputs.moved == 'yes' && !env.STOP
               env:
