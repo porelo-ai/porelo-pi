@@ -86,7 +86,7 @@ it; requiring one is Porelo's changelog check - see [`doc/decisions.md`](doc/dec
 
 ## Following Pi without watching it
 
-`.github/workflows/update.yml` runs once a week, on Monday. It asks the npm registry what
+`.github/workflows/update.yml` runs once a week, on Tuesday at 05:17 UTC. It asks the npm registry what
 `latest` points at and, if that is not what this module ships, does what a person would:
 the release tool's `update`, rebuild, and prove the result on a real Ubuntu machine and a real Fedora one
 **before anything is published**.
