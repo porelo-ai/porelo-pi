@@ -16,7 +16,8 @@
 #            workstation; unset, it runs from the classpath in target/cp.txt, as CI resolves it
 #
 # Writes target/update/summary.md, and these outputs to GITHUB_OUTPUT (or stdout without one):
-#   moved=yes|no, title, components (bill names of what moved), cli (the CLI's new version, or empty),
+#   moved=yes|no, title, components (bill names of what moved), cli (the Pi version the tree pins
+#   after this run, which the acceptance expects),
 #   stop (why the result is not for automation to decide, or empty)
 #
 # Exit 2 on a refused input, 1 when something went wrong, 0 whenever the answers were written -
@@ -160,6 +161,11 @@ for item in "${ITEMS[@]}"; do
     esac
 done
 
+# Pi stays where it was when only a pin of the tree moved, and the acceptance still asks for its
+# version: empty, that scenario is skipped while the run is called green.
+if [ -z "$cli" ]; then
+    cli="$(sed -n 's:.*<agent.cli.version>\(.*\)</agent.cli.version>.*:\1:p' pom.xml | head -n 1)"
+fi
 title=""
 if [ "${#moved[@]}" -gt 0 ]; then
     title="Update $(printf '%s, ' "${moved[@]}")"
