@@ -11,6 +11,12 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi27"></a>[PI27](PI27-Declare-The-App-Copilot-Is-Granted-Through.md) | S |  | the app `vault authorize github-copilot` signs in through for Pi |
 | <a id="pi31"></a>[PI31](PI31-Take-The-Legs-From-A-Run-That-Proved-The-Same-Tree.md) | S | — | a Build on `main` takes its legs from a run that proved the same tree within a day |
 
+## Analyzed
+
+| # | Size | Blocked by | What it covers |
+|---|---|---|---|
+| <a id="pi32"></a>[PI32](PI32-Move-To-Pi-1.md) | M | — | the package ships Pi 1, without the advisories Pi 0.85.0's tree carries |
+
 ## Estimated
 
 | # | Size | Blocked by | What it covers |
