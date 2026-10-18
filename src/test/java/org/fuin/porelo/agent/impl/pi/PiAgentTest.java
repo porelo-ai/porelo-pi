@@ -7,7 +7,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import org.fuin.porelo.agent.api.Agent;
+import org.fuin.porelo.agent.api.AgentGrant;
 import org.fuin.porelo.agent.api.AgentRegistry;
 import org.fuin.porelo.agent.api.PackagedTree;
 import org.fuin.porelo.agent.api.RunRequest;
@@ -25,6 +27,18 @@ class PiAgentTest {
         // it.
         assertThat(agent.definition().ready()).isNotNull();
         assertThat(agent.definition().ready().text()).isEqualTo("Pi can explain its own features");
+    }
+
+    @Test
+    void grantsGitHubCopilotThroughTheAppPiSignsInWith() {
+
+        // Without it 'porelo vault authorize github-copilot' refuses Pi as an agent that signs in
+        // nowhere, so a Copilot task cannot be given its credential at all.
+        final AgentGrant grant = agent.definition().grantFor("github-copilot");
+        assertThat(grant).as("the GitHub Copilot grant pi.yaml declares").isNotNull();
+        assertThat(Objects.requireNonNull(grant).clientIdFor("github.com"))
+                .as("the client id Pi itself signs in with, on github.com")
+                .isEqualTo("Iv1.b507a08c87ecfe98");
     }
 
     @Test

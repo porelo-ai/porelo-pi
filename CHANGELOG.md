@@ -10,6 +10,10 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 
 ## [Unreleased]
 
+### Added
+
+- `porelo vault authorize github-copilot` grants GitHub Copilot through the OAuth app Pi itself signs in with, and the build stops when the pinned Pi signs in with another.
+
 ### Security
 
 - The log formatter drops terminal control characters but newline and tab from what it shows and from how a run ended, so an escape sequence in Pi's output, a provider's error or a tool's name no longer reaches the terminal.

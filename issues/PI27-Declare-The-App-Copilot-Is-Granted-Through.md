@@ -1,6 +1,6 @@
 # PI27 — Declare the app Copilot is granted through
 
-**Status:** Estimated.
+**Status:** Implementing.
 **Size:** S - a `login.grants` block in `pi.yaml`, its test, a check in the weekly update and a paragraph in
 `doc/`; Porelo's side is built.
 
@@ -31,8 +31,10 @@ none, so the command refuses as for an agent that does not sign in.
   verified.
 - **Red first:** `PiAgentTest` reads the definition through the API and expects that grant; it fails on
   today's `pi.yaml`.
-- **The weekly update** (`.github/workflows/update.yml`) checks that the new pinned tree's
-  `github-copilot.js` still holds that id, and stops the pin move when it does not.
+- **The pinned tree is held to that id** by `BuiltTreeCheck`, against the built tree's `github-copilot.js`, plain
+  or base64. It runs in every Build and in the weekly update's "Native binary and packages", so a pin move to a
+  Pi that signs in with another app stops there. That is in place of a step of its own in `update.yml`; seen red
+  with the id in `pi.yaml` changed.
 - **`doc/index.md`:** the GitHub Copilot sign-in is the one command. It says plainly that the grant goes
   through the app cited as GitHub's own for its editor plugin, as Pi does without Porelo, that Pi presents
   itself to GitHub as that editor, that the app's owner is not verified, and where a person revokes it
@@ -48,7 +50,11 @@ none, so the command refuses as for an agent that does not sign in.
 - `doc/index.md` names the app, says Pi presents itself as that editor, and that the app's owner is not
   verified.
 
-## To be checked
+## Measured
 
-- Whether GitHub's device flow answers that id from Porelo's `vault authorize`, which sends none of Pi's
-  editor headers - measured on the VM up to the device code.
+- **On `ubuntu26.04`, 2026-10-18**, the adapter of this commit in `smith`'s agents directory, porelo 0.5.0, a
+  vault of the run's own: `porelo vault authorize github-copilot` answered "entry github-copilot (oauth-device),
+  with the app pi signs in with: Iv1.b507a08c87ecfe98, not named in Pi's source; …", then "open
+  https://github.com/login/device" and a code. So GitHub's device flow takes that id from Porelo, which sends
+  none of Pi's editor headers. The run was left unfinished and the vault removed; a full grant needs an account
+  with Copilot.

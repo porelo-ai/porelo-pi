@@ -89,6 +89,18 @@ provider:
     # path. Porelo answers that by binding a relay inside this task's own network namespace.
     endpoint: url
 
+# The OAuth app 'porelo vault authorize github-copilot' grants, the one Pi signs in with without Porelo.
+# Read in the shipped tree, @earendil-works/pi-ai's dist/auth/oauth/github-copilot.js: one client id on
+# every host, kept base64-encoded, asking for read:user. BuiltTreeCheck holds the tree to this id.
+login:
+    grants:
+        github-copilot:
+            hosts:
+                "*": Iv1.b507a08c87ecfe98
+            owner: >-
+                not named in Pi's source; widely cited as GitHub's own Copilot app for editors, which Pi
+                presents itself as - not verified
+
 # Pi's install ping and its update check go to pi.dev. Refused rather than merely absent, so a test can
 # tell a policy from an oversight.
 refused_domains:

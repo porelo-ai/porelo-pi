@@ -7,13 +7,17 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
+import org.fuin.porelo.agent.api.AgentGrant;
 import org.fuin.porelo.wire.Json;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -54,6 +58,36 @@ class BuiltTreeCheck {
                                 PinAgreementTest.pinned(
                                         PinAgreementTest.pom(), "pin.node.version")))
                 .isEmpty();
+    }
+
+    @Test
+    void theCopilotAppPoreloGrantsIsTheOneTheShippedPiSignsInWith() throws IOException {
+
+        // A Pi that moved to another app would be handed a token for an app it does not use: the
+        // grant succeeds, and every Copilot task is then refused.
+        final AgentGrant grant =
+                Objects.requireNonNull(new PiAgent().definition().grantFor("github-copilot"));
+        final String id = Objects.requireNonNull(grant.clientIdFor("github.com"));
+        final Path file;
+        try (Stream<Path> files = Files.walk(TREE.resolve("pi/node_modules"))) {
+            file =
+                    files.filter(
+                                    path ->
+                                            path.endsWith(
+                                                    Path.of(
+                                                            "pi-ai/dist/auth/oauth/github-copilot.js")))
+                            .findFirst()
+                            .orElseThrow(
+                                    () ->
+                                            new AssertionError(
+                                                    "no pi-ai github-copilot.js in the tree"));
+        }
+        final String source = Files.readString(file);
+        final String encoded =
+                Base64.getEncoder().encodeToString(id.getBytes(StandardCharsets.UTF_8));
+        assertThat(source.contains(id) || source.contains(encoded))
+                .as("%s holds the client id pi.yaml grants, %s, plain or base64", file, id)
+                .isTrue();
     }
 
     @Test
