@@ -89,6 +89,8 @@ class WorkflowRulesTest {
         assertThat(steps).as("the acceptance step of build.yml").hasSize(1);
         Files.createDirectories(dir.resolve("target"));
         Files.writeString(dir.resolve("target/cp.txt"), "cp");
+        // The leg reads the pin it tells the suite to expect from the pom it is run beside.
+        Files.writeString(dir.resolve("pom.xml"), "<agent.cli.version>1.0.0</agent.cli.version>\n");
         final Path stubs = dir.resolve("stubs");
         WorkflowSteps.stub(stubs, "java", "exit 0");
 

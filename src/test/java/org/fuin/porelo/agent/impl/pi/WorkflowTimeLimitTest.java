@@ -47,6 +47,7 @@ class WorkflowTimeLimitTest {
                 .containsExactly(
                         "artifactory-smoke.yml smoke",
                         "build.yml build",
+                        "build.yml proof",
                         "build.yml acceptance",
                         "build.yml release",
                         "delete-runs.yml delete",
