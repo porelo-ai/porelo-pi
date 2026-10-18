@@ -86,6 +86,24 @@ class UpdateRequestTest {
         assertThat(request.output()).as("the step's log").doesNotContain("a-token");
     }
 
+    @Test
+    void aBranchLeftByAClosedRequestGetsAFreshRequest(@TempDir final Path dir) throws Exception {
+
+        // Measured on 2026-10-18: update/pi still held the closed #4, so the run edited and
+        // commented that closed request, opened none, and its green result reached nobody. Moving
+        // that branch would also move the older main's workflows, which GitHub refuses the token.
+        final Path stubs = stubs(dir);
+        WorkflowSteps.stub(stubs, "gh", "exit 0");
+        final Processes.Result request = run(dir, stubs, REQUEST, "success");
+
+        assertThat(request.exit()).as("exit of the request:%n%s", request.output()).isZero();
+        assertThat(WorkflowSteps.calls(stubs, "gh"))
+                .as("gh calls with a closed request on the branch")
+                .contains("api -X DELETE repos/porelo-ai/porelo-pi/git/refs/heads/update/pi")
+                .anyMatch(call -> call.startsWith("pr create"))
+                .noneMatch(call -> call.startsWith("pr edit") || call.startsWith("pr comment"));
+    }
+
     /** {@code x-access-token:a-token} in base64, as GitHub takes a token over https. */
     private static final String BASIC =
             java.util.Base64.getEncoder()
@@ -120,6 +138,9 @@ class UpdateRequestTest {
         env.put("GH_TOKEN", "a-token");
         env.put("TITLE", "Move Pi to 1.0.1");
         env.put("RUN_NUMBER", "7");
+        env.put("GITHUB_REPOSITORY", "porelo-ai/porelo-pi");
+        env.put("GITHUB_SHA", "the-checked-out-commit");
+        env.put("GITHUB_RUN_NUMBER", "7");
         env.put("RUNNER_TEMP", dir.toString());
         env.put("GITHUB_OUTPUT", dir.resolve("output").toString());
         env.put("JOB_STATUS", status);
