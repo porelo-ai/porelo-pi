@@ -22,12 +22,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
 | <a id="pi34"></a>[PI34](PI34-Publish-Without-A-Downloaded-Client.md) | S | — | the Build publishes with curl and porelo's script, with no client downloaded beside the token |
-
-## Accepted
-
-| # | Size | Blocked by | What it covers |
-|---|---|---|---|
-| <a id="pi35"></a>[PI35](PI35-The-Tree-Builds-Without-A-Container.md) |  | — | Pi's tree builds inside a Porelo task, with no nested container, the same as in its pinned Node image |
+| <a id="pi35"></a>[PI35](PI35-The-Tree-Builds-Without-A-Container.md) | S | — | Pi's tree builds inside a Porelo task, with no nested container, the same as in its pinned Node image |
 
 ## Idea
 
