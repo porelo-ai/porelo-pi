@@ -1,6 +1,6 @@
 # PI27 — Declare the app Copilot is granted through
 
-**Status:** Implementing.
+**Status:** Review.
 **Size:** S - a `login.grants` block in `pi.yaml`, its test, a check in the weekly update and a paragraph in
 `doc/`; Porelo's side is built.
 
@@ -58,3 +58,9 @@ none, so the command refuses as for an agent that does not sign in.
   https://github.com/login/device" and a code. So GitHub's device flow takes that id from Porelo, which sends
   none of Pi's editor headers. The run was left unfinished and the vault removed; a full grant needs an account
   with Copilot.
+- **A full grant, on `ubuntu26.04` on 2026-10-19,** in Agent Core's run for porelo's B31, as `core`: the
+  machine-wide `porelo-agent-pi` `0.5.3~snapshot.126` (Pi 1.3.0), and `porelo vault authorize github-copilot
+  --agent pi`, which the operator finished with their own GitHub account. The entry was written with
+  `Iv1.b507a08c87ecfe98` and `scopes = read:user`, and the token it holds was accepted by GitHub: through
+  Porelo's broker, GitHub's MCP server answered `initialize`, `tools/list` and `get_me` for that account. The
+  task held no GitHub token of its own. Whether the account's Copilot answers through Pi was not asked.
