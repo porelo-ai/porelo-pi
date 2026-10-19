@@ -11,9 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
- * Runs both "Publish the packages" steps of the build workflow on a release, with {@code curl} and
- * {@code jf} stubbed: a published release is never replaced, and a question about it that gets no
- * answer must stop the upload rather than read as "not published".
+ * Runs both "Publish the packages" steps of the build workflow on a release, with {@code curl}
+ * stubbed and the repository's own {@code artifactory.sh} beside them: a published release is never
+ * replaced, and a question about it that gets no answer must stop the upload rather than read as
+ * "not published".
  */
 class PublishReleaseTest {
 
@@ -22,21 +23,24 @@ class PublishReleaseTest {
     private static final String RPM = "porelo-agent-pi-0.5.0-1.x86_64.rpm";
 
     /**
-     * {@code curl}: the deb index from {@code $INDEX}, the rpm's storage status from {@code
-     * $RPM_CODE}.
+     * {@code curl}: an upload ({@code -T}, as {@code art_put} sends one) accepted, the deb index
+     * from {@code $INDEX}, the rpm's storage status from {@code $RPM_CODE}.
      */
     private static final String CURL =
             """
             [ -n "${CURL_EXIT:-}" ] && exit "$CURL_EXIT"
             out=/dev/stdout
             url=
+            upload=
             while [ $# -gt 0 ]; do
                 case "$1" in
                     -o) out="$2"; shift ;;
+                    -T) upload="$2"; shift ;;
                     http*) url="$1" ;;
                 esac
                 shift
             done
+            [ -n "$upload" ] && exit 0
             case "$url" in
                 */Packages) printf '%s' "$INDEX" > "$out" ;;
                 */api/storage/*) printf '%s' "$RPM_CODE" ;;
@@ -114,17 +118,20 @@ class PublishReleaseTest {
             }
             final Path stubs = work.resolve("stubs");
             WorkflowSteps.stub(stubs, "curl", CURL);
-            WorkflowSteps.stub(stubs, "jf", "exit 0");
+            final Path scripts = Files.createDirectories(work.resolve(".github/scripts"));
+            Files.copy(
+                    Path.of(".github/scripts/artifactory.sh"), scripts.resolve("artifactory.sh"));
             final Map<String, String> env = new HashMap<>(answers);
             env.put("JF_URL", "https://artifactory.invalid");
+            env.put("JF_ACCESS_TOKEN", "not-a-token");
             env.put("CHANNEL", "releases");
             final Processes.Result result = WorkflowSteps.run(steps.get(i), work, stubs, env);
             runs.add(
                     new Run(
                             result.exit(),
                             result.output(),
-                            WorkflowSteps.calls(stubs, "jf").stream()
-                                    .filter(call -> call.startsWith("rt upload"))
+                            WorkflowSteps.calls(stubs, "curl").stream()
+                                    .filter(call -> call.contains("-T "))
                                     .toList()));
         }
         return runs;

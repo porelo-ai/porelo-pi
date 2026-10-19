@@ -52,7 +52,7 @@ class PackageIndexedTest {
         }
     }
 
-    /** Runs each step in a directory of its own, the index served by a {@code jf} stub. */
+    /** Runs each step in a directory of its own, the index served by a {@code curl} stub. */
     private static List<Processes.Result> run(final Path dir, final String index) throws Exception {
         final List<String> steps = WorkflowSteps.scripts("build.yml", STEP);
         assertThat(steps)
@@ -64,7 +64,7 @@ class PackageIndexedTest {
             Files.createDirectories(work.resolve("target"));
             Files.writeString(work.resolve("target/porelo-agent-pi_" + VERSION + "_amd64.deb"), "");
             final Path stubs = work.resolve("stubs");
-            WorkflowSteps.stub(stubs, "jf", "printf '%s' \"$INDEX\"");
+            WorkflowSteps.stub(stubs, "curl", "printf '%s' \"$INDEX\"");
             WorkflowSteps.stub(
                     stubs, "dpkg-deb", "[ \"$1 $3\" = \"-f Version\" ] && echo '" + VERSION + "'");
             // Twenty tries six seconds apart would make a test of two minutes.
