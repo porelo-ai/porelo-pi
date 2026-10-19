@@ -92,7 +92,9 @@ in_builder() {
         for value in "${values[@]}"; do
             envs+=(--env "$value")
         done
-        podman run --rm --userns=keep-id --env OUT=/out --env WORK=/tmp "${envs[@]}" \
+        # HOME too: the build user is the runner's uid, which the image does not know, so podman would
+        # give it / and npm could not write its cache. /tmp is outside the tree, as the direct way's is.
+        podman run --rm --userns=keep-id --env HOME=/tmp --env OUT=/out --env WORK=/tmp "${envs[@]}" \
             -v "$TARGET:/out:z" "$BUILDER" sh -c "$1"
     fi
 }
@@ -132,9 +134,8 @@ in_builder -- "
         --omit dev --spec-version 1.6 --output-format JSON \
         --output-file \"\$OUT/pi/sbom.cdx.json\"
 
-    # npm falls back to the working directory for its cache, because the mapped build user has no
-    # writable home in this image. Measured: 40 MB of downloaded tarballs that would otherwise be
-    # shipped to every installation, plus whatever the generator pulled before this was fixed.
+    # npm's cache is in HOME, outside the tree; once it fell back to the working directory, which
+    # shipped 40 MB of downloaded tarballs to every installation. Never again.
     rm -rf .npm
 
     rm -f package.json package-lock.json
