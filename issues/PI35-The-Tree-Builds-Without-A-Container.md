@@ -1,6 +1,6 @@
 # PI35 — The Tree Builds Without A Container
 
-**Status:** Analyzed.
+**Status:** Backlog.
 **Size:** S - `build-pi-tree.sh` runs its four builder steps either in the pinned image, as today, or
 directly with the pinned Node; `porelo.yml` installs that Node; one refusal test. No change to what ships.
 
