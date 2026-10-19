@@ -40,7 +40,8 @@ Open the link it shows in any browser and enter the code. **Whose app you grant:
 signs in with, `Iv1.b507a08c87ecfe98`, as its source holds it. Pi's source does not name the app's owner;
 it is widely cited as GitHub's own Copilot app for editors, and Pi presents itself to GitHub as that
 editor (`Editor-Version: vscode/…`, `Copilot-Integration-Id: vscode-chat`). Neither is verified. A grant is
-withdrawn on GitHub under Settings → Applications → Authorized OAuth Apps. Porelo keeps the token on the machine; Pi's
+withdrawn on GitHub under Settings → Applications → Authorized GitHub Apps, where it is listed as "GitHub
+Copilot Plugin": the id is a GitHub App's, not an OAuth App's. Porelo keeps the token on the machine; Pi's
 own `/login` is never run. Start the task with `--provider github-copilot` and a model Pi's catalogue
 lists for Copilot, such as `--model gpt-5-mini`; a model it does not list is answered with `400`.
 These two are the providers measured with Pi.
