@@ -1,6 +1,6 @@
 # PI35 — The Tree Builds Without A Container
 
-**Status:** Idea.
+**Status:** Accepted.
 
 **What must be true.** The package's whole build, Pi's tree included, runs green inside a Porelo task, where no
 nested container starts, and makes the same tree as the build that runs it in its pinned Node image.
