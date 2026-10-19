@@ -17,11 +17,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 |---|---|---|---|
 | <a id="pi31"></a>[PI31](PI31-Take-The-Legs-From-A-Run-That-Proved-The-Same-Tree.md) | S | — | a Build on `main` takes its legs from a run that proved the same tree within a day |
 | <a id="pi34"></a>[PI34](PI34-Publish-Without-A-Downloaded-Client.md) | S | — | the Build publishes with curl and porelo's script, with no client downloaded beside the token |
-
-## Backlog
-
-| # | Size | Blocked by | What it covers |
-|---|---|---|---|
 | <a id="pi35"></a>[PI35](PI35-The-Tree-Builds-Without-A-Container.md) | S | — | Pi's tree builds inside a Porelo task, with no nested container, the same as in its pinned Node image |
 
 ## Idea
