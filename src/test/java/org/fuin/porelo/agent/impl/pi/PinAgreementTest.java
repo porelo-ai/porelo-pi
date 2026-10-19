@@ -41,6 +41,15 @@ class PinAgreementTest {
 
     private static final Path BUILD_SCRIPT = Path.of("buildtools/build-pi-tree.sh");
 
+    /** The image a Porelo task on this repository is built in, which builds the tree directly. */
+    private static final Path TASK_IMAGE = Path.of("porelo.yml");
+
+    private static final Pattern TASK_NODE_VERSION =
+            Pattern.compile("nodejs\\.org/dist/v([0-9.]+)/node-v\\1-linux-x64\\.tar\\.gz");
+
+    private static final Pattern TASK_NODE_SHA256 =
+            Pattern.compile("\"([0-9a-f]{64})  /tmp/node\\.tar\\.gz\"");
+
     private static final List<String> TREE_PINS =
             List.of(
                     "pin.node.version",
@@ -206,6 +215,48 @@ class PinAgreementTest {
     }
 
     @Test
+    void theTaskImageBuildsTheTreeWithThePinnedNode() throws IOException {
+
+        assertThat(taskImageDisagreements(pom(), Files.readString(TASK_IMAGE))).isEmpty();
+    }
+
+    @Test
+    void refusesATaskImageWithAnotherNode() throws IOException {
+
+        // A task builds the tree with the Node its image holds, so another one there makes another
+        // tree than the Build's, unseen until something breaks.
+        final String other =
+                Files.readString(TASK_IMAGE)
+                        .replace("node-v22.23.3", "node-v22.99.0")
+                        .replace("/v22.23.3/", "/v22.99.0/");
+
+        assertThat(taskImageDisagreements(pom(), other))
+                .singleElement()
+                .asString()
+                .contains("22.99.0");
+    }
+
+    @Test
+    void aDirectBuildRefusesAnotherNode(@TempDir final Path dir) throws Exception {
+
+        // Built directly, the tree is only the image's tree when the Node is the image's: another
+        // one is refused before anything is built, not found out by a bill that differs later.
+        final Processes.Result other =
+                buildTree(
+                        dir,
+                        "docker.io/library/node:22-slim@sha256:" + "a".repeat(64),
+                        Map.of("PI_TREE_DIRECT", "1"),
+                        "echo v23.0.0");
+
+        assertThat(other.exit()).as("exit with another node:%n%s", other.output()).isEqualTo(2);
+        assertThat(other.output()).contains("builds with the pinned Node", "'v23.0.0'");
+        assertThat(dir.resolve("target/tree")).as("a tree begun").doesNotExist();
+        assertThat(WorkflowSteps.calls(dir.resolve("stubs"), "podman"))
+                .as("podman calls of a direct build")
+                .isEmpty();
+    }
+
+    @Test
     void refusesABuilderImageNamedByTagAlone(@TempDir final Path dir) throws Exception {
 
         // A tag is a name its owner may repoint, and npm ci, the Node download and its checksum all
@@ -237,6 +288,19 @@ class PinAgreementTest {
      */
     private static Processes.Result buildTree(final Path module, final String builder)
             throws IOException, InterruptedException {
+        return buildTree(module, builder, Map.of(), null);
+    }
+
+    /**
+     * Runs a copy of the build script as above, with more environment and, unless null, a node stub
+     * of that body.
+     */
+    private static Processes.Result buildTree(
+            final Path module,
+            final String builder,
+            final Map<String, String> more,
+            final String node)
+            throws IOException, InterruptedException {
         Files.createDirectories(module.resolve("buildtools"));
         Files.copy(BUILD_SCRIPT, module.resolve(BUILD_SCRIPT));
         Files.createDirectories(module.resolve("src/main/npm"));
@@ -250,6 +314,9 @@ class PinAgreementTest {
                 module.resolve(sbom).resolve("package-lock.json"));
         final Path stubs = module.resolve("stubs");
         WorkflowSteps.stub(stubs, "podman", "exit 0");
+        if (node != null) {
+            WorkflowSteps.stub(stubs, "node", node);
+        }
         final String pom = pom();
         final ProcessBuilder run =
                 new ProcessBuilder("bash", module.resolve(BUILD_SCRIPT).toString())
@@ -263,6 +330,9 @@ class PinAgreementTest {
         env.put("PI_BUILDER_IMAGE", builder);
         env.put("JAVA_CMD", Path.of(System.getProperty("java.home"), "bin", "java").toString());
         env.put("PATH", stubs + ":" + System.getenv("PATH"));
+        // A task's image sets it for every build; here the test says which way it builds.
+        env.remove("PI_TREE_DIRECT");
+        env.putAll(more);
         return Processes.run(run, Duration.ofSeconds(60));
     }
 
@@ -369,6 +439,35 @@ class PinAgreementTest {
                                 + relock
                                 + ", build-pi-tree.sh builds in "
                                 + builder);
+    }
+
+    /**
+     * Returns every way the Node the task's image installs differs from the pom's pin.
+     *
+     * @param pom Content of {@code pom.xml}.
+     * @param image Content of {@code porelo.yml}.
+     * @return One sentence per disagreement; empty when the image takes the pinned Node.
+     */
+    static List<String> taskImageDisagreements(final String pom, final String image) {
+
+        final List<String> problems = new ArrayList<>();
+        final Matcher version = TASK_NODE_VERSION.matcher(image);
+        final String pinnedVersion = pinned(pom, "pin.node.version");
+        if (!version.find()) {
+            problems.add("porelo.yml installs no Node from nodejs.org");
+        } else if (!version.group(1).equals(pinnedVersion)) {
+            problems.add(
+                    "porelo.yml installs Node "
+                            + version.group(1)
+                            + ", pom.xml pins "
+                            + pinnedVersion);
+        }
+        final Matcher sha = TASK_NODE_SHA256.matcher(image);
+        final String pinnedSha = pinned(pom, "pin.node.sha256");
+        if (!sha.find() || !sha.group(1).equals(pinnedSha)) {
+            problems.add("porelo.yml checks Node against another digest than pom.xml's");
+        }
+        return problems;
     }
 
     /**

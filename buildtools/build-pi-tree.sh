@@ -13,6 +13,9 @@
 # Every container maps the build user in, so what it writes belongs to the build user. Without
 # that, the tree is written as root and the next build cannot even delete it.
 set -euo pipefail
+# The modes the tree ships with are the build's, not those of whoever runs it: a host's 002 made pi/ and
+# node/ group-writable in the package, measured on 2026-10-19.
+umask 022
 
 MODULE="$(cd "$(dirname "$0")/.." && pwd)"
 # Porelo's release tool, on the classpath Maven passes as the only argument; it records Node below.
@@ -57,10 +60,42 @@ JAVA_CMD="${JAVA_CMD:-$(command -v java || true)}"
 [[ "$BUILDER" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*(:[A-Za-z0-9._-]+)?@sha256:[0-9a-f]{64}$ ]] ||
     refuse "PI_BUILDER_IMAGE must be pinned by an @sha256: digest - '$BUILDER' is not"
 
-if ! command -v podman >/dev/null 2>&1; then
+if [ "${PI_TREE_DIRECT:-}" != 1 ] && ! command -v podman >/dev/null 2>&1; then
     echo "build-pi-tree: no podman, so the Pi tree is not built; porelo-agent-pi will be incomplete"
     exit 0
 fi
+
+# Each builder step runs in the pinned image, as it always has, or - with PI_TREE_DIRECT=1, where no
+# container can start, as in a Porelo task - directly, with the very Node that image holds. Measured on
+# 2026-10-19: both ways make the same tree, all 15003 files byte for byte and every mode and link,
+# once the direct way takes the image's umask. A step names its paths by $OUT and $WORK and gets what
+# it needs as named values, never as text pasted into it.
+if [ "${PI_TREE_DIRECT:-}" = 1 ]; then
+    [ "$(node --version 2>/dev/null)" = "v$NODE_VERSION" ] ||
+        refuse "PI_TREE_DIRECT=1 builds with the pinned Node v$NODE_VERSION, but 'node' here is '$(node --version 2>/dev/null || echo none)'"
+fi
+in_builder() {
+    local values=()
+    while [ "$1" != -- ]; do
+        values+=("$1")
+        shift
+    done
+    shift
+    if [ "${PI_TREE_DIRECT:-}" = 1 ]; then
+        rm -rf "$TARGET/.home" "$TARGET/.work"
+        mkdir -p "$TARGET/.home" "$TARGET/.work"
+        (env -i PATH="$PATH" HOME="$TARGET/.home" OUT="$TARGET" WORK="$TARGET/.work" \
+            "${values[@]}" sh -c "$1")
+        rm -rf "$TARGET/.home" "$TARGET/.work"
+    else
+        local envs=()
+        for value in "${values[@]}"; do
+            envs+=(--env "$value")
+        done
+        podman run --rm --userns=keep-id --env OUT=/out --env WORK=/tmp "${envs[@]}" \
+            -v "$TARGET:/out:z" "$BUILDER" sh -c "$1"
+    fi
+}
 
 rm -rf "$TARGET"
 mkdir -p "$TARGET/pi" "$TARGET/node"
@@ -80,8 +115,9 @@ cp "$MODULE/buildtools/sbom/package.json" "$MODULE/buildtools/sbom/package-lock.
 # Pi needs none. Of the three packages that declare one, @google/genai's preinstall is a no-op,
 # protobufjs's postinstall prints a warning, and esbuild's postinstall copies a binary its JS API
 # finds without it.
-podman run --rm --userns=keep-id -v "$TARGET:/out:z" -w /out/pi "$BUILDER" sh -c "
+in_builder -- "
     set -eu
+    cd \"\$OUT/pi\"
     npm ci --omit=dev --ignore-scripts --no-audit --no-fund
 
     # The bill, generated here and nowhere else: this is the only moment the lockfile and the
@@ -91,10 +127,10 @@ podman run --rm --userns=keep-id -v "$TARGET:/out:z" -w /out/pi "$BUILDER" sh -c
     # Installed from the lockfile beside it, so every byte of the generator is checked against an
     # integrity hash, and with scripts disabled: it runs with the shipped tree mounted writable,
     # and an install script is the shortest path from a registry account to that tree.
-    (cd /out/sbom-tool && npm ci --ignore-scripts --no-audit --no-fund)
-    /out/sbom-tool/node_modules/.bin/cyclonedx-npm \
+    (cd \"\$OUT/sbom-tool\" && npm ci --ignore-scripts --no-audit --no-fund)
+    \"\$OUT/sbom-tool/node_modules/.bin/cyclonedx-npm\" \
         --omit dev --spec-version 1.6 --output-format JSON \
-        --output-file /out/pi/sbom.cdx.json
+        --output-file \"\$OUT/pi/sbom.cdx.json\"
 
     # npm falls back to the working directory for its cache, because the mapped build user has no
     # writable home in this image. Measured: 40 MB of downloaded tarballs that would otherwise be
@@ -110,29 +146,26 @@ rm -rf "$TARGET/sbom-tool"
 # The published runtime, checked against the digest nodejs.org publishes beside it. Fetched with
 # node's own fetch rather than curl: the container runs as the build user, so it cannot install
 # packages, and the builder image already has the one tool needed.
-podman run --rm --userns=keep-id --env "NODE_VERSION=$NODE_VERSION" \
-    --env "NODE_SHA256=$NODE_SHA256" -v "$TARGET:/out:z" "$BUILDER" sh -c "
+in_builder "NODE_VERSION=$NODE_VERSION" "NODE_SHA256=$NODE_SHA256" -- "
     set -eu
     node -e \"
         const { writeFileSync } = require('fs');
         const version = process.env.NODE_VERSION;
         fetch('https://nodejs.org/dist/v' + version + '/node-v' + version + '-linux-x64.tar.gz')
             .then(r => { if (!r.ok) { throw new Error('HTTP ' + r.status); } return r.arrayBuffer(); })
-            .then(b => writeFileSync('/tmp/node.tar.gz', Buffer.from(b)));
+            .then(b => writeFileSync(process.env.WORK + '/node.tar.gz', Buffer.from(b)));
     \"
-    echo \"\$NODE_SHA256  /tmp/node.tar.gz\" | sha256sum -c -
-    tar -xzf /tmp/node.tar.gz -C /out/node --strip-components=1
+    echo \"\$NODE_SHA256  \$WORK/node.tar.gz\" | sha256sum -c -
+    tar -xzf \"\$WORK/node.tar.gz\" -C \"\$OUT/node\" --strip-components=1
     # Only the runtime is used: Pi is started as 'node <cli.js>'. npm, npx and the headers are
     # build-time tools that would otherwise ride along in every installation.
-    rm -rf /out/node/include /out/node/share /out/node/lib/node_modules
-    rm -f /out/node/bin/npm /out/node/bin/npx /out/node/bin/corepack
+    rm -rf \"\$OUT/node/include\" \"\$OUT/node/share\" \"\$OUT/node/lib/node_modules\"
+    rm -f \"\$OUT/node/bin/npm\" \"\$OUT/node/bin/npx\" \"\$OUT/node/bin/corepack\"
 "
 
 # fd and rg, checked against the pinned digests, the binary and its licenses kept and nothing else.
 # Fetched with node's fetch like the runtime above; it follows GitHub's redirect to its storage.
-podman run --rm --userns=keep-id --env "FD_VERSION=$FD_VERSION" --env "FD_SHA256=$FD_SHA256" \
-    --env "RG_VERSION=$RG_VERSION" --env "RG_SHA256=$RG_SHA256" \
-    -v "$TARGET:/out:z" "$BUILDER" sh -c "
+in_builder "FD_VERSION=$FD_VERSION" "FD_SHA256=$FD_SHA256" "RG_VERSION=$RG_VERSION" "RG_SHA256=$RG_SHA256" -- "
     set -eu
     node -e \"
         const { writeFileSync } = require('fs');
@@ -142,28 +175,30 @@ podman run --rm --userns=keep-id --env "FD_VERSION=$FD_VERSION" --env "FD_SHA256
             .then(b => writeFileSync(file, Buffer.from(b)));
         Promise.all([
             get('https://github.com/sharkdp/fd/releases/download/v' + e.FD_VERSION + '/fd-v' + e.FD_VERSION
-                + '-x86_64-unknown-linux-musl.tar.gz', '/tmp/fd.tar.gz'),
+                + '-x86_64-unknown-linux-musl.tar.gz', e.WORK + '/fd.tar.gz'),
             get('https://github.com/BurntSushi/ripgrep/releases/download/' + e.RG_VERSION + '/ripgrep-'
-                + e.RG_VERSION + '-x86_64-unknown-linux-musl.tar.gz', '/tmp/rg.tar.gz'),
+                + e.RG_VERSION + '-x86_64-unknown-linux-musl.tar.gz', e.WORK + '/rg.tar.gz'),
         ]).catch(err => { console.error(err.message); process.exit(1); });
     \"
-    echo \"\$FD_SHA256  /tmp/fd.tar.gz\" | sha256sum -c -
-    echo \"\$RG_SHA256  /tmp/rg.tar.gz\" | sha256sum -c -
-    mkdir -p /out/tools/bin /out/tools/licenses/fd /out/tools/licenses/ripgrep /tmp/fd /tmp/rg
-    tar -xzf /tmp/fd.tar.gz -C /tmp/fd --strip-components=1
-    tar -xzf /tmp/rg.tar.gz -C /tmp/rg --strip-components=1
-    cp /tmp/fd/fd /tmp/rg/rg /out/tools/bin/
-    cp /tmp/fd/LICENSE-APACHE /tmp/fd/LICENSE-MIT /out/tools/licenses/fd/
-    cp /tmp/rg/LICENSE-MIT /tmp/rg/UNLICENSE /tmp/rg/COPYING /out/tools/licenses/ripgrep/
+    echo \"\$FD_SHA256  \$WORK/fd.tar.gz\" | sha256sum -c -
+    echo \"\$RG_SHA256  \$WORK/rg.tar.gz\" | sha256sum -c -
+    cd \"\$WORK\"
+    mkdir -p \"\$OUT/tools/bin\" \"\$OUT/tools/licenses/fd\" \"\$OUT/tools/licenses/ripgrep\" fd rg
+    tar -xzf fd.tar.gz -C fd --strip-components=1
+    tar -xzf rg.tar.gz -C rg --strip-components=1
+    cp fd/fd rg/rg \"\$OUT/tools/bin/\"
+    cp fd/LICENSE-APACHE fd/LICENSE-MIT \"\$OUT/tools/licenses/fd/\"
+    cp rg/LICENSE-MIT rg/UNLICENSE rg/COPYING \"\$OUT/tools/licenses/ripgrep/\"
 "
 
 # Prebuilt binaries for platforms a Linux container will never run. Dead weight in a package
 # that is already large, and confusing to anyone auditing what is shipped.
-podman run --rm --userns=keep-id -v "$TARGET:/out:z" "$BUILDER" sh -c '
+# shellcheck disable=SC2016 # $OUT is the step's own, expanded where it runs.
+in_builder -- '
     set -eu
-    find /out/pi -type d \( -name darwin -o -name win32 -o -name "darwin-*" -o -name "win32-*" \) \
+    find "$OUT/pi" -type d \( -name darwin -o -name win32 -o -name "darwin-*" -o -name "win32-*" \) \
         -prune -exec rm -rf {} + 2>/dev/null || true
-    find /out/pi -type d -name examples -prune -exec rm -rf {} + 2>/dev/null || true
+    find "$OUT/pi" -type d -name examples -prune -exec rm -rf {} + 2>/dev/null || true
 '
 
 # Node is in the tree and is not an npm package, so nothing above can have listed it. Added

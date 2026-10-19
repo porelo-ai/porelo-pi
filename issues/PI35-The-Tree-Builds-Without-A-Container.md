@@ -35,6 +35,21 @@ Both report Node `v22.23.3` and npm `10.9.9`. The trees:
   direct way sets `umask 022`, as the image's default is.
 - **The bills** are equal but for `serialNumber` and `timestamp`, as between any two builds.
 
+**Built, measured on the whole build, 2026-10-19:**
+
+- **In the `porelo.yml` image as a task runs it** (plain uid, `no-new-privileges`, no podman in the image, the pinned
+  Node from `nodejs.org`, `PI_TREE_DIRECT=1`): `-Pnative,dist verify` is green, and the tree is built directly.
+- **The same commit on this machine through podman**, as the Build does: the tree from both is the same, **all
+  14873 files byte for byte and all 16295 entries with their modes and links**.
+- That last needed `umask 022` at the script's start: `pi/` and `node/` themselves were made with the caller's
+  umask, so a host with `002` shipped them group-writable. The GitHub runner's is `022`, so the published package
+  is unchanged.
+- **`compare-bills`** of the direct build's package bill against the published one: "the same 126 components,
+  unchanged licenses".
+- `PinAgreementTest` gained three tests, seen red on the old script and `porelo.yml`: the task's image takes the
+  pinned Node by version and digest, another one there is named, and `PI_TREE_DIRECT=1` with another `node` is
+  refused before anything is built.
+
 ## Plan
 
 - **`buildtools/build-pi-tree.sh`:** each of its four builder steps (the tree and its bill, Node, fd and ripgrep,

@@ -3,13 +3,14 @@
 #
 # The pins are those the Build takes: the GraalVM and the Ubuntu image from porelo-machines' own pins
 # (machines.properties), shfmt from build.yml. A move there is not followed here by itself.
-# podman builds Pi's tree in its pinned Node image (buildtools/build-pi-tree.sh); whether it can run inside a
-# task's container is not yet measured.
+# Pi's tree is built with the pinned Node directly (PI_TREE_DIRECT), since no container starts inside a task's
+# own; that Node is pom.xml's pin.node.version, checked against pin.node.sha256, and PinAgreementTest keeps the
+# two the same.
 image:
     base_image: "docker.io/library/ubuntu:24.04@sha256:534baea6a22c03a63003dbc8dbe78fe34bc0d7e595d9a9dc9834884ff530eb55"
     snippet: |
         RUN apt-get update \
-            && apt-get install -y --no-install-recommends build-essential zlib1g-dev ca-certificates curl git unzip podman \
+            && apt-get install -y --no-install-recommends build-essential zlib1g-dev ca-certificates curl git unzip \
             && rm -rf /var/lib/apt/lists/*
         RUN curl -fsSL -o /tmp/graalvm.tar.gz \
                 https://github.com/graalvm/graalvm-ce-builds/releases/download/graal-25.4.4.1.1/graalvm-community-jdk-25i4-25.0.4.1.1_linux-x64_bin.tar.gz \
@@ -17,9 +18,15 @@ image:
             && mkdir -p /opt/graalvm && tar -xzf /tmp/graalvm.tar.gz -C /opt/graalvm --strip-components=1 \
             && rm /tmp/graalvm.tar.gz \
             && for tool in java javac jar native-image; do ln -s /opt/graalvm/bin/$tool /usr/local/bin/$tool; done
+        RUN curl -fsSL -o /tmp/node.tar.gz https://nodejs.org/dist/v22.23.3/node-v22.23.3-linux-x64.tar.gz \
+            && echo "1084aa36196bba4c3a5e69a1ee388a6e4ff729dad09445fbcd434b28fe3c24af  /tmp/node.tar.gz" | sha256sum -c - \
+            && mkdir -p /opt/node && tar -xzf /tmp/node.tar.gz -C /opt/node --strip-components=1 \
+            && rm /tmp/node.tar.gz \
+            && for tool in node npm; do ln -s /opt/node/bin/$tool /usr/local/bin/$tool; done
         RUN curl -fsSL -o /usr/local/bin/shfmt https://github.com/mvdan/sh/releases/download/v3.12.0/shfmt_v3.12.0_linux_amd64 \
             && echo "d9fbb2a9c33d13f47e7618cf362a914d029d02a6df124064fff04fd688a745ea  /usr/local/bin/shfmt" | sha256sum -c - \
             && chmod 0755 /usr/local/bin/shfmt
     env:
         JAVA_HOME: /opt/graalvm
         GRAALVM_HOME: /opt/graalvm
+        PI_TREE_DIRECT: "1"
