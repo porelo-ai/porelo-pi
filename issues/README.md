@@ -19,6 +19,12 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi34"></a>[PI34](PI34-Publish-Without-A-Downloaded-Client.md) | S | — | the Build publishes with curl and porelo's script, with no client downloaded beside the token |
 | <a id="pi35"></a>[PI35](PI35-The-Tree-Builds-Without-A-Container.md) | S | — | Pi's tree builds inside a Porelo task, with no nested container, the same as in its pinned Node image |
 
+## Analyzed
+
+| # | Size | Blocked by | What it covers | Open questions |
+|---|---|---|---|---|
+| <a id="pi36"></a>[PI36](PI36-Import-And-Report-Pi-s-Sign-Ins-On-The-Host.md) | M | porelo [B224](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b224), [B225](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b225), [B226](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b226) | `vault import` takes Pi's sign-in for the provider asked for, and Pi's sign-ins on the host are reported by kind, provider and path, for [PJ53](https://github.com/porelo-ai/porelo-project/blob/main/issues/README.md#pj53) | 0 |
+
 ## Idea
 
 | # | Size | Blocked by | What it covers |
