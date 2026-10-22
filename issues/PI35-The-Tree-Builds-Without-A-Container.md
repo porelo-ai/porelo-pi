@@ -1,6 +1,6 @@
 # PI35 — The Tree Builds Without A Container
 
-**Status:** Implementing.
+**Status:** Review.
 **Size:** S - `build-pi-tree.sh` runs its four builder steps either in the pinned image, as today, or
 directly with the pinned Node; `porelo.yml` installs that Node; one refusal test. No change to what ships.
 
@@ -72,3 +72,7 @@ Both report Node `v22.23.3` and npm `10.9.9`. The trees:
   the published bill.
 - On a machine with podman and without `PI_TREE_DIRECT`, the tree is built in the image as today.
 - The whole VM suite green on the commit, then both legs.
+
+## Measured after the push
+
+- The Build of `ef8d0de` on `main` built the tree through podman as before, and both legs were green on it.

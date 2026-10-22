@@ -1,6 +1,6 @@
 # PI34 — Publish Without A Downloaded Client
 
-**Status:** Implementing.
+**Status:** Review.
 **Size:** S - the two Publish steps of `build.yml` and the smoke workflow move from the JFrog CLI to porelo's
 `artifactory.sh`; the packages, their channels and the index read-back stay as they are.
 
@@ -39,3 +39,9 @@ bill, and the index read-back. A downloaded client is one more thing that runs b
 - The first Publish on `main` after it is green, and its read-back finds every package in the index.
 - `artifactory-smoke.yml`, started by hand, is green through the script.
 - The `bash -x` trace of a Publish holds no token.
+
+## Measured after the push
+
+- The Build of `ef8d0de` on `main` published with the script and *The package is indexed, not merely stored* found
+  every package. Under `.github/`, `jf` is left only in a comment of `artifactory.sh` saying what it replaces.
+- Not yet: `artifactory-smoke.yml` by hand, which only the operator can start.
