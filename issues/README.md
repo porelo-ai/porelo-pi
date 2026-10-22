@@ -19,6 +19,12 @@ Within a group, the order is the priority. The number is identity, not sequence.
 |---|---|---|---|
 | <a id="pi31"></a>[PI31](PI31-Take-The-Legs-From-A-Run-That-Proved-The-Same-Tree.md) | S | — | a Build on `main` takes its legs from a run that proved the same tree within a day |
 
+## Backlog
+
+| # | Size | Blocked by | What it covers |
+|---|---|---|---|
+| <a id="pi21"></a>[PI21](PI21-A-Login-Inside-A-Brokered-Task-Fails.md) | M |  | a person cannot put a provider key into a task |
+
 ## Analyzed
 
 | # | Size | Blocked by | What it covers | Open questions |
@@ -30,12 +36,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
 | <a id="pi33"></a>[PI33](PI33-Tell-Waiting-From-Pi-s-Program-Status.md) |  | [PI32](#pi32) | Porelo tells a waiting Pi from one at rest by what Pi 1 reports of itself |
-
-## Estimated
-
-| # | Size | Blocked by | What it covers |
-|---|---|---|---|
-| <a id="pi21"></a>[PI21](PI21-A-Login-Inside-A-Brokered-Task-Fails.md) | M |  | a person cannot put a provider key into a task |
 
 ## Finished
 
