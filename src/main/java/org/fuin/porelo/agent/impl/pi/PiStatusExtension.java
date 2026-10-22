@@ -23,7 +23,7 @@ import org.fuin.porelo.wire.Json;
 final class PiStatusExtension {
 
     /** Auto-discovered by Pi; the name only has to be unique and end in {@code .ts}. */
-    static final String FILE = "/home/agent/.pi/agent/extensions/porelo-status.ts";
+    static final String FILE = "/var/lib/pi/agent/extensions/porelo-status.ts";
 
     /** Where the state is offered. Inside the container, and read by the host, never written. */
     static final String STATE_FILE = "/home/agent/.porelo/agent-state.json";

@@ -7,7 +7,8 @@ import org.fuin.porelo.wire.Json;
  *
  * <p>Pi cannot be redirected with an environment variable: only Azure has one, and every other
  * provider's endpoint is fixed unless an extension overrides it. Extensions are auto-discovered
- * from {@code ~/.pi/agent/extensions}, so this is a file to place rather than a command to run.
+ * from the {@code extensions} of Pi's directory, so this is a file to place rather than a command
+ * to run.
  *
  * <p><strong>Neither the provider's name nor its path is written here any more.</strong> Both were
  * constants, and changing them meant rebuilding this binary - which is exactly what pointing Pi at
@@ -17,7 +18,7 @@ import org.fuin.porelo.wire.Json;
 final class PiRoutingExtension {
 
     /** Auto-discovered by Pi; the name only has to be unique and end in {@code .ts}. */
-    static final String FILE = "/home/agent/.pi/agent/extensions/porelo-route.ts";
+    static final String FILE = "/var/lib/pi/agent/extensions/porelo-route.ts";
 
     private PiRoutingExtension() {
         throw new UnsupportedOperationException("Utility class");

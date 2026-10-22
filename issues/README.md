@@ -17,13 +17,8 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
+| <a id="pi21"></a>[PI21](PI21-A-Login-Inside-A-Brokered-Task-Fails.md) | L | — | a `/login` leaves no key in Pi's stores: Pi's directory outside the home |
 | <a id="pi31"></a>[PI31](PI31-Take-The-Legs-From-A-Run-That-Proved-The-Same-Tree.md) | S | — | a Build on `main` takes its legs from a run that proved the same tree within a day |
-
-## Backlog
-
-| # | Size | Blocked by | What it covers |
-|---|---|---|---|
-| <a id="pi21"></a>[PI21](PI21-A-Login-Inside-A-Brokered-Task-Fails.md) | M |  | a person cannot put a provider key into a task |
 
 ## Analyzed
 
@@ -35,6 +30,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
+| <a id="pi37"></a>[PI37](PI37-Nothing-The-Agent-Writes-Reaches-The-Next-Pi.md) |  | [PI21](#pi21) | nothing the agent writes in a task reaches a later Pi: its settings, models, MCP servers, extensions, `PATH` |
 | <a id="pi33"></a>[PI33](PI33-Tell-Waiting-From-Pi-s-Program-Status.md) |  | [PI32](#pi32) | Porelo tells a waiting Pi from one at rest by what Pi 1 reports of itself |
 
 ## Finished

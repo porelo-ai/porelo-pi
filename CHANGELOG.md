@@ -16,6 +16,8 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 
 ### Security
 
+- A `/login` in a task leaves no key in Pi's stores: its directory is `/var/lib/pi/agent`, outside the home, and its `auth.json` and `mcp-auth.json` are root's and read-only.
+- The packages need porelo 0.5.1~snapshot.317 or later, the first whose definition reader takes Pi's session directory outside the home.
 - The log formatter drops terminal control characters but newline and tab from what it shows and from how a run ended, so an escape sequence in Pi's output, a provider's error or a tool's name no longer reaches the terminal.
 - No checkout leaves the job's token in `.git/config`, where the build, the bill check and both acceptance legs could read it; the update job's push alone gets the token, through git's environment in that one step.
 

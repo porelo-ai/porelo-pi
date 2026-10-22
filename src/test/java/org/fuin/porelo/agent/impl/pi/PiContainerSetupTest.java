@@ -33,23 +33,24 @@ class PiContainerSetupTest {
     }
 
     private static ContainerFile routing(List<ContainerFile> files) {
-        return at(files, "/home/agent/.pi/agent/extensions/porelo-route.ts");
+        return at(files, "/var/lib/pi/agent/extensions/porelo-route.ts");
     }
 
     private static ContainerFile status(List<ContainerFile> files) {
-        return at(files, "/home/agent/.pi/agent/extensions/porelo-status.ts");
+        return at(files, "/var/lib/pi/agent/extensions/porelo-status.ts");
     }
 
     @Test
     void writesExtensionsPiDiscoversOnItsOwn() {
 
-        // Auto-discovered from ~/.pi/agent/extensions, which is why these are files rather than
+        // Auto-discovered from the extensions of Pi's directory, which is why these are files
+        // rather than
         // install commands.
         assertThat(files("http://127.0.0.1:9419"))
                 .extracting(ContainerFile::path)
                 .containsExactlyInAnyOrder(
-                        "/home/agent/.pi/agent/extensions/porelo-route.ts",
-                        "/home/agent/.pi/agent/extensions/porelo-status.ts");
+                        "/var/lib/pi/agent/extensions/porelo-route.ts",
+                        "/var/lib/pi/agent/extensions/porelo-status.ts");
     }
 
     @Test
@@ -80,7 +81,7 @@ class PiContainerSetupTest {
         // does not exist, which fails later and further away.
         assertThat(files(""))
                 .extracting(ContainerFile::path)
-                .containsExactly("/home/agent/.pi/agent/extensions/porelo-status.ts");
+                .containsExactly("/var/lib/pi/agent/extensions/porelo-status.ts");
     }
 
     @Test
@@ -116,7 +117,7 @@ class PiContainerSetupTest {
                                                 "http://127.0.0.1:9419",
                                                 "openrouter")))
                 .extracting(ContainerFile::path)
-                .containsExactly("/home/agent/.pi/agent/extensions/porelo-status.ts");
+                .containsExactly("/var/lib/pi/agent/extensions/porelo-status.ts");
     }
 
     @Test

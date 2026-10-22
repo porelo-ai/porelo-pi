@@ -53,11 +53,9 @@ class SessionIdDeclarationTest {
     @Test
     void looksForAnAttendedSessionInItsSessionFiles() {
 
-        // Measured: ~/.pi/agent/sessions/--workspace--/<timestamp>_<id>.jsonl. Its name is not the
-        // id, but its
-        // first record is the same {"type":"session"} this declares, and Porelo reads the id from
-        // inside it.
-        assertThat(ids().directory()).isEqualTo(".pi/agent/sessions/--workspace--");
+        // Measured: <directory>/<timestamp>_<id>.jsonl. Its name is not the id, but its first
+        // record is the same {"type":"session"} this declares, and Porelo reads the id from it.
+        assertThat(ids().directory()).isEqualTo("/var/lib/pi/agent/sessions/--workspace--");
         assertThat(ids().suffix()).isEqualTo(".jsonl");
         assertThat(ids().of(RECORDS)).isEqualTo(ID);
     }

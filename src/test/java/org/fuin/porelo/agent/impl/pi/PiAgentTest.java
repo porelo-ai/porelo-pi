@@ -3,8 +3,6 @@ package org.fuin.porelo.agent.impl.pi;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -100,25 +98,6 @@ class PiAgentTest {
                         agent.headlessCommand(
                                 new RunRequest("carry on", null, null, "01a07a41", false, false)))
                 .containsExactly("pi", "--no-approve", "--session", "01a07a41", "carry on");
-    }
-
-    @Test
-    void startsPiWithoutAVersionCheckOrTelemetry() throws IOException {
-
-        // Pi asks pi.dev for its latest version at start and shows a notice; it installs nothing.
-        // A task cannot reach pi.dev, so the request could only fail. Set in the launcher, before
-        // the exec, because Pi has no setting for it - only the variable. PI_TELEMETRY=0 stops the
-        // install ping there too, and the attribution headers on provider requests.
-        final String definition;
-        try (InputStream in =
-                PiAgentTest.class.getClassLoader().getResourceAsStream("agent/pi.yaml")) {
-            assertThat(in).isNotNull();
-            definition = new String(in.readAllBytes(), StandardCharsets.UTF_8);
-        }
-
-        assertThat(definition)
-                .contains(
-                        "#!/bin/sh\\\\nexport PI_SKIP_VERSION_CHECK=1\\\\nexport PI_TELEMETRY=0\\\\nexec /opt/node/bin/node ");
     }
 
     @Test

@@ -18,6 +18,7 @@ Ordered by what each decision covers; when one was taken, `git log` answers.
 | The agent in a task | [Reaching work is checked by what the screen shows, not by the dialogs known](#reaching-work-is-checked-by-what-the-screen-shows-not-by-the-dialogs-known) - a declared marker, waited for attended; Pi draws it only after a question |
 | The agent in a task | [Waiting for a person is declared as unknown, because it is](#waiting-for-a-person-is-declared-as-unknown-because-it-is) - Pi's screen does not tell a question from idle, so Porelo says "cannot say" |
 | The agent in a task | [A task that comes back continues its conversation](#a-task-that-comes-back-continues-its-conversation) - the session id read from Pi's first record, unattended or attached |
+| The agent in a task | [Pi's directory is outside the home, its sign-in stores root's](#pis-directory-is-outside-the-home-its-sign-in-stores-roots) - a `/login` leaves no key in Pi's stores |
 | Which project this is | [Three projects, two names](#three-projects-two-names) - Pi, and the different Pi that Oh My Pi forks |
 | The build | [The release tooling is Porelo's, configured from the pom](#the-release-tooling-is-porelos-configured-from-the-pom) - data beside the pin, the relock image kept equal to the builder's by a test |
 | The build | [A release is built from releases only](#a-release-is-built-from-releases-only) - on a tag nothing from Central's snapshots, and a tag on a Porelo snapshot refused by the step itself |
@@ -28,6 +29,7 @@ Ordered by what each decision covers; when one was taken, `git log` answers.
 | The build | [The bill generator is installed from its own lockfile, not resolved at build time](#the-bill-generator-is-installed-from-its-own-lockfile-not-resolved-at-build-time) - and neither it nor npm's cache is shipped |
 | The build | [NullAway comes from `porelo-parent`](#nullaway-comes-from-porelo-parent) - one compiler configuration for every repository; `.mvn/jvm.config` stays here |
 | The build | [No check requires a changelog entry](#no-check-requires-a-changelog-entry) - requiring one belongs to Porelo's changelog check, on logchange |
+| Accepted risk | [A key typed into `/login` in a task is the agent's](#pis-directory-is-outside-the-home-its-sign-in-stores-roots) - Pi receives it in memory before its store refuses it |
 | Accepted risk | [The Node runtime digest was first read from the service that serves it](#accepted-risk-the-node-runtime-digest-was-first-read-from-the-service-that-serves-it) - reviewed and pinned, and the built runtime is asked its version |
 
 ## The endpoint is set by a file, not a variable
@@ -40,14 +42,14 @@ makes for every agent because of this one.
 Verified against OpenRouter and against GitHub Copilot, whose models use three APIs under one base
 (below).
 
-**What the container gets is one file**, `/home/agent/.pi/agent/extensions/porelo-route.ts`, written
+**What the container gets is one file**, `/var/lib/pi/agent/extensions/porelo-route.ts`, written
 by `PiRoutingExtension`: a `pi.registerProvider(<provider>, { baseUrl, apiKey })` call whose key is
 the task's token, not the credential. No environment variable carries either. Three things about it
 are load-bearing:
 
 - **It is a file, not a variable.** Only Azure has a base-URL variable in Pi; every other provider's
   endpoint is fixed unless an extension overrides it. Extensions are auto-discovered from
-  `~/.pi/agent/extensions/*.ts`, so this is something to place rather than something to run. It is
+  the `extensions/*.ts` of Pi's directory, so this is something to place rather than something to run. It is
   also written after the container exists, by which time its environment is already fixed.
 - **The dialect's path belongs to the provider, not to Pi.** OpenRouter serves the OpenAI dialect
   under `/api/v1`; a base URL without it answers 404, and one ending in `/v1` answers "model not
@@ -180,12 +182,38 @@ different author, published as `@oh-my-pi/pi-coding-agent` and run as `omp`. The
 confusing them, and work done against one is not work done against the other - so a requirement,
 an issue or a measurement names which one it means.
 
+## Pi's directory is outside the home, its sign-in stores root's
+
+Pi has no switch to turn `/login` off, and an entry in its `auth.json` wins over the key the task is given.
+So a person who signs in inside a task, with a browser on their side, would leave a key there that the agent
+can read and use past the broker.
+
+**How it is stopped:** a `/login` leaves no key in Pi's stores. The image's root steps make `/var/lib/pi`
+root's, `/var/lib/pi/agent` root's and sticky (`1777`), and its two stores, `auth.json` and `mcp-auth.json`, root's and read-only, holding `{}`. The
+root-owned wrapper `/usr/local/bin/pi` names that directory in `PI_CODING_AGENT_DIR`. The agent still writes
+its sessions, settings and extensions there, but cannot write, remove or replace root's files.
+
+- **Not under the home:** measured with `~/.pi` and `~/.pi/agent` root's and the stores read-only, the agent
+  could still move `~/.pi` aside, since it owns `/home/agent`, and write a new `auth.json` where Pi reads it.
+- **What moved with it:** the two extension files and `session.session_id.directory`. An absolute
+  `session.session_id.directory` needs a Porelo that reads one; an older one refuses the definition whole.
+
+**Accepted risk: a key typed into `/login` in a task is the agent's.** Pi takes the key, or finishes the OAuth
+exchange, in its own process's memory before the store refuses it, and Pi is the agent; an extension cannot
+replace the built-in `/login`. So a person who signs in inside a task hands that key to the agent, which can use
+it past the broker. It stays because Pi has no switch to turn `/login` off, and a sign-in belongs on the host,
+through Porelo's broker (`porelo vault`), never in a task. What would change the answer: a Pi that lets `/login`
+be switched off or replaced.
+
+**Not yet stopped:** the agent can write the rest of Pi's directory - settings, models, MCP servers, extensions -
+which the next Pi loads, and can put a `pi` of its own first on `PATH`.
+
 ## A task that comes back continues its conversation
 
 Porelo records the session a task's agent ran and passes it back with `--session` when the task starts
 again. Where the id is, `pi.yaml` declares under `session.session_id`. Measured on 0.85.0: an unattended
 run's first record, `{"type":"session"}`, carries it as `id`, and `--session <id>` continues it. An
-attached session is kept as `~/.pi/agent/sessions/--workspace--/<timestamp>_<id>.jsonl`. Its name is not
+attached session is kept as `/var/lib/pi/agent/sessions/--workspace--/<timestamp>_<id>.jsonl`. Its name is not
 the id, and `--session` does not find the session by it; its first record is the same `{"type":"session"}`,
 and Porelo reads the id from inside the newest session file.
 

@@ -44,12 +44,12 @@ session:
     # Where it names the session it runs. Measured on 0.85.0, and on 1.3.0 by the VM suite's two session
     # scenarios: an unattended run's first record,
     # {"type":"session"}, carries the id, and '--session <id>' continues it. An attended session is kept as
-    # ~/.pi/agent/sessions/--workspace--/<timestamp>_<id>.jsonl, whose name '--session' does not find - but
+    # /var/lib/pi/agent/sessions/--workspace--/<timestamp>_<id>.jsonl (Pi's directory, outside the home), whose name '--session' does not find - but
     # its first record is the same {"type":"session"}, and Porelo reads the id from inside the newest file.
     session_id:
         record: { type: session }
         key: id
-        directory: ".pi/agent/sessions/--workspace--"
+        directory: "/var/lib/pi/agent/sessions/--workspace--"
         suffix: ".jsonl"
     # What the agent shows once it is at work, attended, having asked nothing - the acceptance kit
     # waits for it without typing. Measured at a terminal: on screen at the prompt, absent while
@@ -126,7 +126,14 @@ install:
         - "# No version check and no telemetry: both ask pi.dev, which a task cannot reach. PI_TELEMETRY=0"
         - "# also drops the attribution headers Pi would add to provider requests."
         - "RUN ln -sf /opt/node/bin/node /usr/local/bin/node \\"
-        - "    && printf '#!/bin/sh\\nexport PI_SKIP_VERSION_CHECK=1\\nexport PI_TELEMETRY=0\\nexec /opt/node/bin/node /opt/pi/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js \"$@\"\\n' > /usr/local/bin/pi \\"
+        - "    && printf '#!/bin/sh\\nexport PI_SKIP_VERSION_CHECK=1\\nexport PI_TELEMETRY=0\\nexport PI_CODING_AGENT_DIR=/var/lib/pi/agent\\nexec /opt/node/bin/node /opt/pi/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js \"$@\"\\n' > /usr/local/bin/pi \\"
         - "    && chmod 0755 /usr/local/bin/pi \\"
         - "    && ln -sf /opt/tools/bin/fd /usr/local/bin/fd \\"
         - "    && ln -sf /opt/tools/bin/rg /usr/local/bin/rg"
+        - "# No sign-in can be stored in the task: an entry in auth.json wins over the broker, and /login cannot"
+        - "# be switched off. Pi's directory is outside the home, where the agent could move even a root-owned one"
+        - "# aside; sticky and root's, it takes the agent's sessions, settings and extensions, but not its stores."
+        - "RUN mkdir -p /var/lib/pi/agent \\"
+        - "    && chmod 0755 /var/lib/pi && chmod 1777 /var/lib/pi/agent \\"
+        - "    && printf '{}' > /var/lib/pi/agent/auth.json && printf '{}' > /var/lib/pi/agent/mcp-auth.json \\"
+        - "    && chmod 0444 /var/lib/pi/agent/auth.json /var/lib/pi/agent/mcp-auth.json"
