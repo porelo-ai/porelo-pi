@@ -1,6 +1,6 @@
 # PI21 — A login inside a brokered Pi task fails
 
-**Status:** Implementing.
+**Status:** Review.
 **Size:** L - Pi's directory moves out of the home: root steps in the image, the wrapper, both extension files,
 `session.session_id.directory`, an acceptance scenario; and porelo [B247](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b247), a session directory outside the home.
 
@@ -69,7 +69,13 @@ then be written where Pi reads it. So Pi's directory leaves the home.
   passed with `a187266`'s build. The whole suite with it: 24 of 25 green, credential and wake scenarios included. The
   one red is the attended resume, "has a session to continue", since Porelo looks for the session under the home
   until porelo [B247](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b247).
+- On the VM, published porelo `0.5.1~snapshot.323` per account in `smith`, which carries
+  [B247](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b247), with the adapter built
+  from `485df85`: the whole suite green, 25 of 25, none skipped, in 7 min. Both session scenarios pass with Pi's
+  sessions kept under `/var/lib/pi/agent/sessions/`: the attended agent stopped and started again continues its
+  conversation, and the unattended task started again continues its session.
 
 ## To be checked
 
-- How a refused `/login` reports itself, and that attended and resumed sessions hold, measured on the VM.
+- How a refused `/login` reports itself to the person. It takes a person's approval in a browser at the provider's
+  sign-in, so it waits for an attended run with the operator.
