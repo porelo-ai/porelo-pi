@@ -23,6 +23,7 @@ Ordered by what each decision covers; when one was taken, `git log` answers.
 | The build | [The release tooling is Porelo's, configured from the pom](#the-release-tooling-is-porelos-configured-from-the-pom) - data beside the pin, the relock image kept equal to the builder's by a test |
 | The build | [A release is built from releases only](#a-release-is-built-from-releases-only) - on a tag nothing from Central's snapshots, and a tag on a Porelo snapshot refused by the step itself |
 | The build | [`build-pi-tree.sh` stays a shell script](#build-pi-treesh-stays-a-shell-script) - it orchestrates podman and npm, and Java would be the same calls in more lines |
+| The build | [The tree builds without a container where none can start](#the-tree-builds-without-a-container-where-none-can-start) - `PI_TREE_DIRECT=1` runs the builder steps with the pinned Node under `umask 022`, making the same tree byte for byte |
 | The build | [`follow-upstream.sh` is a shell script for the same reason](#follow-upstreamsh-is-a-shell-script-for-the-same-reason) - process calls and `git`, with no decision of its own |
 | The build | [Actions run from a commit, and Dependabot moves them](#actions-run-from-a-commit-and-dependabot-moves-them) - every `uses:` by commit, GraalVM by Porelo's pin, checked by `check-actions` |
 | The build | [What an update takes, and when](#what-an-update-takes-and-when) - three days old and still the newest, one pull request per run, a real model call |
@@ -300,8 +301,9 @@ the one tool `curl` downloads, shfmt, is taken by its version and checked agains
 the step. The setup actions download their tools themselves:
 
 - **Publishing downloads no client.** `.github/scripts/artifactory.sh`, taken byte for byte from porelo,
-  speaks to Artifactory's REST interface with `curl`; the token goes into a curl config file of mode
-  600, so neither `set -x` nor a process listing shows it. The JFrog CLI and its setup action are gone.
+  speaks to Artifactory's REST interface with `curl`; the token reaches each call as its config on standard
+  input, so neither `set -x` nor a process listing shows it and nothing is left on the runner's disk. The JFrog CLI
+  and its setup action are gone.
 - **GraalVM is the one Porelo pins, checked against its digest.** `setup-graalvm` with `'25'` resolves
   the newest 25.x at run time and checks nothing for community builds - and that JDK compiles the
   native binary this repository publishes. So every job uses `./.github/actions/pinned-jdk`: the
@@ -382,6 +384,22 @@ with more lines and hide them behind a process API. What matters in it is its in
 
 **What would change the answer:** the tree build needing logic that is not a process call - parsing,
 merging, deciding - which belongs in Java rather than grown into this file.
+
+## The tree builds without a container where none can start
+
+Inside a Porelo task (plain uid, default seccomp, `no-new-privileges`), `podman run` cannot start a
+nested container: the task has no `newuidmap` and no subordinate ids of its own.
+
+So `buildtools/build-pi-tree.sh` runs its four builder steps either in the pinned Node image through
+podman, or - with `PI_TREE_DIRECT=1`, as `porelo.yml` sets it - directly under `env -i` with the
+pinned Node on `PATH`. It refuses a direct build unless `node --version` is `v$NODE_VERSION`, and
+`PinAgreementTest` holds `porelo.yml` to `pom.xml`'s `pin.node.version` and `pin.node.sha256`.
+
+**Both ways make the same tree.** The script sets `umask 022` at its start so the modes are the
+build's rather than the caller's (a host's `002` otherwise leaves directories and files `775`/`664`
+instead of `755`/`644`, `pi/` and `node/` included). Measured with the same lockfiles: all files are
+identical by SHA-256, all entries carry the same modes and links, and the bill has the same components
+and licenses.
 
 ## `follow-upstream.sh` is a shell script for the same reason
 
