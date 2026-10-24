@@ -52,7 +52,8 @@ class WorkflowTimeLimitTest {
                         "build.yml release",
                         "delete-runs.yml delete",
                         "shared-rules.yml check-shared",
-                        "update.yml update");
+                        "update.yml update",
+                        "workflows.yml check");
         assertThat(jobs.entrySet().stream().filter(job -> !job.getValue()).map(Map.Entry::getKey))
                 .as("jobs without timeout-minutes")
                 .isEmpty();
