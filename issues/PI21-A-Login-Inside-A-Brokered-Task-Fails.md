@@ -74,6 +74,10 @@ then be written where Pi reads it. So Pi's directory leaves the home.
   from `485df85`: the whole suite green, 25 of 25, none skipped, in 7 min. Both session scenarios pass with Pi's
   sessions kept under `/var/lib/pi/agent/sessions/`: the attended agent stopped and started again continues its
   conversation, and the unattended task started again continues its session.
+- On the VM, porelo `0.5.1~snapshot.323` per account in `smith` with the published `porelo-agent-pi 0.5.5~snapshot.137`
+  (Pi 1.4.0), the attended scenario walked as an operator test, through Porelo with a throwaway vault and project:
+  passed. In the task, as `agent`, Pi reads `/var/lib/pi/agent`, every try on both stores, on Pi's directory and on
+  its parent is refused, both stores still hold `{}`, nothing is left after it, and no provider admitted anything.
 
 ## To be checked
 
