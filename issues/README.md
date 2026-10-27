@@ -8,7 +8,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
-| <a id="pi31"></a>[PI31](PI31-Take-The-Legs-From-A-Run-That-Proved-The-Same-Tree.md) | S | — | a Build on `main` takes its legs from a run that proved the same tree within a day |
 | <a id="pi21"></a>[PI21](PI21-A-Login-Inside-A-Brokered-Task-Fails.md) | L | — | a `/login` leaves no key in Pi's stores: Pi's directory outside the home |
 
 ## Analyzed
@@ -28,6 +27,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 | # | Title | What was built |
 |---|---|---|
+| <a id="pi31"></a>[PI31](README.md#pi31) | Take The Legs From A Run That Proved The Same Tree | A Build on `main` asks `porelo-release proven-legs` whether a Build or an update run already proved the pushed tree on both legs within a day and takes those legs instead of renting again, while a tag always runs its own. |
 | <a id="pi34"></a>[PI34](README.md#pi34) | Publish Without A Downloaded Client | Both Publish steps and the Artifactory smoke workflow talk to Artifactory through `.github/scripts/artifactory.sh` with `curl`, with no JFrog CLI or action left under `.github/`. |
 | <a id="pi35"></a>[PI35](README.md#pi35) | The Tree Builds Without A Container | `build-pi-tree.sh` builds Pi's tree either in the pinned Node container or, with `PI_TREE_DIRECT=1` in `porelo.yml`, directly with the pinned Node under `umask 022`, producing the same tree byte for byte where no nested container can start. |
 | <a id="pi32"></a>[PI32](README.md#pi32) | Move To Pi 1 | The package ships Pi 1.3.0, dropping the 13 advisories in Pi 0.85.0's dependencies, with each measured claim in `pi.yaml` naming the version it was checked on. |
