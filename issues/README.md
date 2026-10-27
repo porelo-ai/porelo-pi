@@ -4,12 +4,6 @@ What is open in this repository, grouped by state in the order Review, Rework, I
 Analyzed, Accepted, Idea, Estimated, Finished and Rejected; a group with nothing in it is left out.
 Within a group, the order is the priority. The number is identity, not sequence.
 
-## Review
-
-| # | Size | Blocked by | What it covers |
-|---|---|---|---|
-| <a id="pi21"></a>[PI21](PI21-A-Login-Inside-A-Brokered-Task-Fails.md) | L | — | a `/login` leaves no key in Pi's stores: Pi's directory outside the home |
-
 ## Analyzed
 
 | # | Size | Blocked by | What it covers | Open questions |
@@ -22,13 +16,14 @@ Within a group, the order is the priority. The number is identity, not sequence.
 |---|---|---|---|
 | <a id="pi38"></a>[PI38](PI38-The-Build-Runs-On-The-Local-Forge-As-On-The-Central-One.md) |  | porelo-buildtools [BT25](https://github.com/porelo-ai/porelo-buildtools/blob/main/issues/README.md#bt25) | the workflows run 1:1 on the local Forgejo and the central forge, machines asked by kind, for the move |
 | <a id="pi39"></a>[PI39](PI39-The-Repository-s-Agent-Works-In-A-Porelo-Task.md) |  | [PJ59](https://github.com/porelo-ai/porelo-project/blob/main/issues/README.md#pj59), [PI38](#pi38) | the repository's agent moves into its own Porelo task, wave 7a of the move |
-| <a id="pi37"></a>[PI37](PI37-Nothing-The-Agent-Writes-Reaches-The-Next-Pi.md) |  | [PI21](#pi21) | nothing the agent writes in a task reaches a later Pi: its settings, models, MCP servers, extensions, `PATH` |
+| <a id="pi37"></a>[PI37](PI37-Nothing-The-Agent-Writes-Reaches-The-Next-Pi.md) |  | — | nothing the agent writes in a task reaches a later Pi: its settings, models, MCP servers, extensions, `PATH` |
 | <a id="pi33"></a>[PI33](PI33-Tell-Waiting-From-Pi-s-Program-Status.md) |  | — | Porelo tells a waiting Pi from one at rest by what Pi 1 reports of itself |
 
 ## Finished
 
 | # | Title | What was built |
 |---|---|---|
+| <a id="pi21"></a>[PI21](README.md#pi21) | A Login Inside A Brokered Task Fails | Finished 2026-10-27: Pi's directory is `/var/lib/pi/agent`, outside the home, with `auth.json` and `mcp-auth.json` root's and read-only, so a `/login` in a task leaves no key where Pi reads one and the agent cannot write, remove or replace either store. |
 | <a id="pi31"></a>[PI31](README.md#pi31) | Take The Legs From A Run That Proved The Same Tree | A Build on `main` asks `porelo-release proven-legs` whether a Build or an update run already proved the pushed tree on both legs within a day and takes those legs instead of renting again, while a tag always runs its own. |
 | <a id="pi34"></a>[PI34](README.md#pi34) | Publish Without A Downloaded Client | Both Publish steps and the Artifactory smoke workflow talk to Artifactory through `.github/scripts/artifactory.sh` with `curl`, with no JFrog CLI or action left under `.github/`. |
 | <a id="pi35"></a>[PI35](README.md#pi35) | The Tree Builds Without A Container | `build-pi-tree.sh` builds Pi's tree either in the pinned Node container or, with `PI_TREE_DIRECT=1` in `porelo.yml`, directly with the pinned Node under `umask 022`, producing the same tree byte for byte where no nested container can start. |

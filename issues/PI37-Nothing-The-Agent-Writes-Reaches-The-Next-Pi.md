@@ -1,6 +1,6 @@
 # PI37 — Nothing The Agent Writes Reaches The Next Pi
 
-**Status:** Idea; blocked by [PI21](README.md#pi21).
+**Status:** Idea.
 
 **What must be true.** Nothing the agent writes in a task reaches a later Pi in it: not Pi's settings, models,
 MCP servers or extensions, and not a `pi` or a variable that comes before the root-owned wrapper. So code the
@@ -8,7 +8,7 @@ agent prepared cannot run inside the Pi a person later signs in with.
 
 ## Why
 
-Found by the skill reading of [PI21](README.md#pi21), each read in Pi 1.3.0's code:
+Found by the skill reading of the move of Pi's directory out of the home, each read in Pi 1.3.0's code:
 
 - **The rest of Pi's directory is the agent's.** `/var/lib/pi/agent` is `1777`, and only `auth.json` and
   `mcp-auth.json` are root's. The agent can write `settings.json`, `models.json`, `mcp.json` and
