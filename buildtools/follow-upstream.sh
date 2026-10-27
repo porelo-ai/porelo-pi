@@ -65,6 +65,33 @@ release() {
     fi
 }
 
+# The task image (porelo.yml) builds Pi's tree with Node written out, since a project file is not
+# filtered; it takes the pom's Node pin along, or the move stops. PinAgreementTest holds them equal.
+task_image_node() {
+    local version sha
+    version="$(sed -n 's:.*<pin.node.version>\(.*\)</pin.node.version>.*:\1:p' pom.xml | head -n 1)"
+    sha="$(sed -n 's:.*<pin.node.sha256>\(.*\)</pin.node.sha256>.*:\1:p' pom.xml | head -n 1)"
+    [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+        echo "pom.xml pins Node as '$version'" >&2
+        return 1
+    }
+    [[ "$sha" =~ ^[0-9a-f]{64}$ ]] || {
+        echo "pom.xml pins Node's digest as '$sha'" >&2
+        return 1
+    }
+    # Occurrences, not lines: sed below rewrites only the first one on a line.
+    [ "$({ grep -oE 'nodejs\.org/dist/v[0-9.]+/node-v[0-9.]+-linux-x64\.tar\.gz' porelo.yml || true; } | wc -l)" = 1 ] &&
+        [ "$({ grep -oE '"[0-9a-f]{64}  /tmp/node\.tar\.gz"' porelo.yml || true; } | wc -l)" = 1 ] ||
+        {
+            echo "porelo.yml installs Node not exactly once from nodejs.org, checked against one digest" >&2
+            return 1
+        }
+    sed -i -E \
+        -e "s:nodejs\.org/dist/v[0-9.]+/node-v[0-9.]+-linux-x64\.tar\.gz:nodejs.org/dist/v$version/node-v$version-linux-x64.tar.gz:" \
+        -e "s:\"[0-9a-f]{64}  /tmp/node\.tar\.gz\":\"$sha  /tmp/node.tar.gz\":" \
+        porelo.yml
+}
+
 OUT=target/update
 mkdir -p "$OUT"
 SUMMARY="$OUT/summary.md"
@@ -127,7 +154,8 @@ for item in "${ITEMS[@]}"; do
 
     case "$update" in
     yes)
-        if ! release update "$upstream" "${move[@]}" >"$OUT/$item.log" 2>&1; then
+        if ! release update "$upstream" "${move[@]}" >"$OUT/$item.log" 2>&1 ||
+            { [ "$item" = node ] && ! task_image_node >>"$OUT/$item.log" 2>&1; }; then
             cat "$OUT/$item.log" >&2
             git checkout -q -- .
             stops+=("$label $upstream could not be pinned - see the run log")

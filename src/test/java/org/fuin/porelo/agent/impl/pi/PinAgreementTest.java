@@ -225,10 +225,13 @@ class PinAgreementTest {
 
         // A task builds the tree with the Node its image holds, so another one there makes another
         // tree than the Build's, unseen until something breaks.
+        // The pinned version read, not written here, so the update that moves Node leaves this
+        // green.
+        final String pinned = pinned(pom(), "pin.node.version");
         final String other =
                 Files.readString(TASK_IMAGE)
-                        .replace("node-v22.23.3", "node-v22.99.0")
-                        .replace("/v22.23.3/", "/v22.99.0/");
+                        .replace("node-v" + pinned, "node-v22.99.0")
+                        .replace("/v" + pinned + "/", "/v22.99.0/");
 
         assertThat(taskImageDisagreements(pom(), other))
                 .singleElement()
