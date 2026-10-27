@@ -18,8 +18,8 @@ image:
             && mkdir -p /opt/graalvm && tar -xzf /tmp/graalvm.tar.gz -C /opt/graalvm --strip-components=1 \
             && rm /tmp/graalvm.tar.gz \
             && for tool in java javac jar native-image; do ln -s /opt/graalvm/bin/$tool /usr/local/bin/$tool; done
-        RUN curl -fsSL -o /tmp/node.tar.gz https://nodejs.org/dist/v22.23.3/node-v22.23.3-linux-x64.tar.gz \
-            && echo "1084aa36196bba4c3a5e69a1ee388a6e4ff729dad09445fbcd434b28fe3c24af  /tmp/node.tar.gz" | sha256sum -c - \
+        RUN curl -fsSL -o /tmp/node.tar.gz https://nodejs.org/dist/v22.23.4/node-v22.23.4-linux-x64.tar.gz \
+            && echo "b8492284c76a54baf58d61668dd0e41ee0fc98adabf9503d30f05d08f55b4406  /tmp/node.tar.gz" | sha256sum -c - \
             && mkdir -p /opt/node && tar -xzf /tmp/node.tar.gz -C /opt/node --strip-components=1 \
             && rm /tmp/node.tar.gz \
             && for tool in node npm; do ln -s /opt/node/bin/$tool /usr/local/bin/$tool; done
