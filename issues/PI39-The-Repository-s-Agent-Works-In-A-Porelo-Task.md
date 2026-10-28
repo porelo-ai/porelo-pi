@@ -2,8 +2,7 @@
 
 **Status:** Analyzed; blocked by [PI38](README.md#pi38), porelo-project
 [PJ59](https://github.com/porelo-ai/porelo-project/blob/main/issues/README.md#pj59) (the move's procedure and check)
-porelo [B298](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b298), and for the registry
-porelo-project [PJ75](https://github.com/porelo-ai/porelo-project/blob/main/issues/README.md#pj75).
+and porelo [B298](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b298).
 **Size:** S - no code here beyond `porelo.yml`, the move itself done by the procedure; about 2 hours of the agent's
 work, plus the operator's attended start of the task.
 
@@ -23,11 +22,15 @@ image*) and `doc/running.md` (the agent's layer), and porelo-project's `project.
   ([CX02](https://github.com/porelo-ai/porelo-codex/blob/main/issues/README.md#cx02)). The agent's
   CLI comes from its package's own layer, not from `porelo.yml`. The acceptance legs do not run in a task (no container
   inside it, no rented machine); they run in the forge's Build ([PI38](README.md#pi38)).
-- **What the task reaches while it runs:** Maven Central, Sonatype or the forge's registry, the npm registry for Pi's tree (`PI_TREE_DIRECT`), `fuinorg.jfrog.io` for
-  the skills, `github.com` for `check-citations`, and the forge's address as a host service. That egress is the
-  project's, in porelo-project's `project.yml`; the image, the agent's CLI with it, is built on the host outside the
-  task's firewall. The forge's registry refuses a task today (the organization is private, porelo-project [PJ75](https://github.com/porelo-ai/porelo-project/blob/main/issues/README.md#pj75)), so
-  until then the task's build reads Sonatype's snapshots.
+- **What the task reaches while it runs:** Maven Central, Sonatype or the forge's registry, `fuinorg.jfrog.io` for
+  the skills, `github.com` for `check-citations`, and the forge's address as a host service. Pi's tree
+  (`buildtools/build-pi-tree.sh`, `PI_TREE_DIRECT` in a task) adds `registry.npmjs.org` for `npm ci`, `nodejs.org` for
+  the runtime, and `github.com`'s releases of fd and rg with the storage hosts they redirect to
+  (`objects.githubusercontent.com`, `release-assets.githubusercontent.com`). That egress is the project's, in
+  porelo-project's `project.yml`; the image, the agent's CLI with it, is built on the host outside the task's firewall.
+  The task's build reads Sonatype's snapshots: the forge's registry refuses a task today (the organization is private,
+  porelo-project [PJ75](https://github.com/porelo-ai/porelo-project/blob/main/issues/README.md#pj75)), and nothing sets
+  `MAVEN_SNAPSHOTS_URL` in a task yet, so the `forge` profile stays off there until both are in.
 - **The sub-agent reading:** no sub-agent CLI is in the task's image, since a project file names one
   agent per repository and porelo describes no second sign-in inside a task. Until porelo
   [B172](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b172)'s reviewer task is built, an agent
@@ -57,7 +60,9 @@ image*) and `doc/running.md` (the agent's layer), and porelo-project's `project.
 - Its build runs on the local forge as on the central one, [PI38](README.md#pi38).
 - The room shows it as `Agent Pi`, from the nickname `Pi` in porelo-project's `project.yml`, set once porelo
   [B298](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b298) is published.
-- The build in the task takes porelo's snapshots from the local forge's registry, once porelo-project [PJ75](https://github.com/porelo-ai/porelo-project/blob/main/issues/README.md#pj75) is in.
+- The build in the task passes on Sonatype's snapshots; it takes them from the local forge's registry only once
+  porelo-project [PJ75](https://github.com/porelo-ai/porelo-project/blob/main/issues/README.md#pj75) is in and the
+  task sets `MAVEN_SNAPSHOTS_URL`, which is not this move's.
 - [PJ59](https://github.com/porelo-ai/porelo-project/blob/main/issues/README.md#pj59)'s move check is red for `porelo-pi` before the move and green after it; the agent's session on this machine and its
   VM accounts are no longer used, and the way back [PJ59](https://github.com/porelo-ai/porelo-project/blob/main/issues/README.md#pj59) describes is open.
 
@@ -71,7 +76,8 @@ image*) and `doc/running.md` (the agent's layer), and porelo-project's `project.
 
 ## To be checked
 
-- That porelo-project's `project.yml` lets the task reach the hosts named under *Plan*.
+- That porelo-project's `project.yml` lets the task reach the hosts named under *Plan*, Pi's tree's download hosts
+  among them.
 - Where the task's agent finds what `.AGENTS.md` gives it here (its name, the room in place of the channel, the
   operator's language and time zone): `.AGENTS.md` is not committed, so it is not in the task.
 - That the outside reader can fetch `porelo/<task>` from the host's forge, not only from GitHub.
