@@ -3,8 +3,8 @@
 **Status:** Analyzed; blocked by porelo-buildtools [BT25](https://github.com/porelo-ai/porelo-buildtools/blob/main/issues/README.md#bt25)
 and [BT24](https://github.com/porelo-ai/porelo-buildtools/blob/main/issues/README.md#bt24), porelo-host
 [HO12](https://github.com/porelo-ai/porelo-host/blob/main/issues/README.md#ho12) and
-[HO27](https://github.com/porelo-ai/porelo-host/blob/main/issues/README.md#ho27), and Porelo's snapshots in the forge's
-registry (*Plan*).
+[HO27](https://github.com/porelo-ai/porelo-host/blob/main/issues/README.md#ho27), and porelo
+[B306](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b306), Porelo's snapshots in the forge's registry.
 **Size:** S - the workflows and `settings.xml` of this one repository, no contract another repository reads; about
 2 hours of work once porelo-claude-code
 [CC38](https://github.com/porelo-ai/porelo-claude-code/blob/main/issues/README.md#cc38) has set the shape, plus the runs
@@ -38,8 +38,10 @@ porelo-project [PJ60](https://github.com/porelo-ai/porelo-project/blob/main/issu
     reads the published bill from Artifactory's fixed address.
 - **Where Porelo's snapshots come from on the local forge:** the `forge` profile replaces Sonatype, so the forge's
   registry must hold `porelo`'s Maven snapshots before this Build resolves there, while `porelo` itself moves last.
-  `porelo`'s Build on the host's forge deploys them there (`forge-release`, as porelo-parent and porelo-buildtools
-  do), its legs not moved yet, so a Porelo change made in a task can be built against before it reaches GitHub.
+  `porelo`'s Build on the host's forge deploys them there (porelo
+  [B306](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b306), `forge-release`, as porelo-parent
+  and porelo-buildtools do), its legs not moved yet, so a Porelo change made in a task can be built against before it
+  reaches GitHub.
 - **Steps:**
   1. `settings.xml` gains the `forge` profile and the `porelo-forge` server as porelo-message-sluice has them
      (activated by `MAVEN_SNAPSHOTS_URL`, the token from `PORELO_PUBLISHER_TOKEN`), and `standard` stays off where

@@ -36,6 +36,9 @@ image*) and `doc/running.md` (the agent's layer), and porelo-project's `project.
   [B172](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b172)'s reviewer task is built, an agent
   outside the task reads the pull request's diff against the skills, as today's sub-agent reading does, and posts its
   findings in the room.
+- **The CLI:** Claude Code runs the agent in the task, as it runs this repository's agent today: woken by a
+  message, its subscription brokered from the vault. Pi itself runs it in an issue of its own, once [PI33](README.md#pi33) is in,
+  since Pi is never woken by a message before.
 - **Steps:**
   0. *A dry run on this machine first*, as for porelo-message-sluice: the task online with GitHub as upstream, its
      Build read through the `github` reader, snapshots from Sonatype; it shows the image, the room, the wake and the
@@ -63,16 +66,9 @@ image*) and `doc/running.md` (the agent's layer), and porelo-project's `project.
 - The build in the task passes on Sonatype's snapshots; it takes them from the local forge's registry only once
   porelo-project [PJ75](https://github.com/porelo-ai/porelo-project/blob/main/issues/README.md#pj75) is in and the
   task sets `MAVEN_SNAPSHOTS_URL`, which is not this move's.
+- Claude Code works in the task with the operator's subscription from the vault.
 - [PJ59](https://github.com/porelo-ai/porelo-project/blob/main/issues/README.md#pj59)'s move check is red for `porelo-pi` before the move and green after it; the agent's session on this machine and its
   VM accounts are no longer used, and the way back [PJ59](https://github.com/porelo-ai/porelo-project/blob/main/issues/README.md#pj59) describes is open.
-
-## Open questions
-
-- **Which CLI runs this repository's agent in its task.** (a) Claude Code, as for every one of this agent's
-  repositories today: woken by a message, its subscription brokered; (b) Pi itself, so the adapter is used daily where
-  it is built: Pi declares no waiting screen, so it is never woken by a message until [PI33](README.md#pi33) is
-  built, and it needs a model provider's key in the host's vault. **Recommended: (a)** for the move, one new thing at a
-  time; (b) as an issue of its own once [PI33](README.md#pi33) is in.
 
 ## To be checked
 
