@@ -4,7 +4,7 @@
 and [BT24](https://github.com/porelo-ai/porelo-buildtools/blob/main/issues/README.md#bt24), porelo-host
 [HO12](https://github.com/porelo-ai/porelo-host/blob/main/issues/README.md#ho12) and
 [HO27](https://github.com/porelo-ai/porelo-host/blob/main/issues/README.md#ho27), and Porelo's snapshots in the forge's
-registry (*Open questions*).
+registry (*Plan*).
 **Size:** S - the workflows and `settings.xml` of this one repository, no contract another repository reads; about
 2 hours of work once porelo-claude-code
 [CC38](https://github.com/porelo-ai/porelo-claude-code/blob/main/issues/README.md#cc38) has set the shape, plus the runs
@@ -36,6 +36,10 @@ porelo-project [PJ60](https://github.com/porelo-ai/porelo-project/blob/main/issu
   - `delete-runs.yml` calls `gh api`. In `update.yml`, *Open the pull request* pushes with GitHub's extra header and
     runs `gh pr` and `gh api`, *Merge, or say why not* runs `gh pr merge`, and *What else changed in the shipped tree*
     reads the published bill from Artifactory's fixed address.
+- **Where Porelo's snapshots come from on the local forge:** the `forge` profile replaces Sonatype, so the forge's
+  registry must hold `porelo`'s Maven snapshots before this Build resolves there, while `porelo` itself moves last.
+  `porelo`'s Build on the host's forge deploys them there (`forge-release`, as porelo-parent and porelo-buildtools
+  do), its legs not moved yet, so a Porelo change made in a task can be built against before it reaches GitHub.
 - **Steps:**
   1. `settings.xml` gains the `forge` profile and the `porelo-forge` server as porelo-message-sluice has them
      (activated by `MAVEN_SNAPSHOTS_URL`, the token from `PORELO_PUBLISHER_TOKEN`), and `standard` stays off where
@@ -61,16 +65,6 @@ porelo-project [PJ60](https://github.com/porelo-ai/porelo-project/blob/main/issu
 - The same commit's Build green on the local Forgejo (legs on the host's pool, nothing published) and on GitHub (legs
   rented, published as today).
 - The kinds' check finds no provider's name in this repository's workflows.
-
-## Open questions
-
-- **Where Porelo's snapshots come from on the local forge.** The `forge` profile replaces Sonatype, so the forge's
-  registry must hold `porelo`'s Maven snapshots before this Build resolves there, while `porelo` itself moves last.
-  (a) `porelo`'s Build on the host's forge deploys its snapshots there (`forge-release`, as porelo-parent and
-  porelo-buildtools do), its legs not moved yet; (b) a job on the host copies `porelo`'s Sonatype snapshots into the
-  registry; (c) this repository's `forge` profile reads the forge's registry and then Sonatype. **Recommended: (a)**,
-  the only one where a Porelo change made in a task can be built against before it reaches GitHub; (c) would let a
-  forge Build pass on central snapshots without saying so.
 
 ## To be checked
 
