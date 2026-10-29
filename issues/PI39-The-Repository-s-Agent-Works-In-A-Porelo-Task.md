@@ -1,6 +1,6 @@
 # PI39 — The Repository's Agent Works In A Porelo Task
 
-**Status:** Analyzed; blocked by [PI38](README.md#pi38); waits for its turn in the project's procedure for an agent's move.
+**Status:** Backlog; blocked by [PI38](README.md#pi38); waits for its turn in the project's procedure for an agent's move.
 **Size:** S - no code here beyond `porelo.yml`, the move itself done by the procedure; about 2 hours of the agent's
 work, plus the operator's attended start of the task.
 

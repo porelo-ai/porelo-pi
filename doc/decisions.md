@@ -21,7 +21,7 @@ Ordered by what each decision covers; when one was taken, `git log` answers.
 | The agent in a task | [Pi's directory is outside the home, its sign-in stores root's](#pis-directory-is-outside-the-home-its-sign-in-stores-roots) - a `/login` leaves no key in Pi's stores |
 | Which project this is | [Three projects, two names](#three-projects-two-names) - Pi, and the different Pi that Oh My Pi forks |
 | The build | [The release tooling is Porelo's, configured from the pom](#the-release-tooling-is-porelos-configured-from-the-pom) - data beside the pin, the relock image kept equal to the builder's by a test |
-| The build | [A release is built from releases only](#a-release-is-built-from-releases-only) - on a tag nothing from Central's snapshots, and a tag on a Porelo snapshot refused by the step itself |
+| The build | [A release is built from releases only](#a-release-is-built-from-releases-only) - on a tag no snapshot repository, Central's or the forge's, and a tag on a Porelo snapshot refused by the step itself |
 | The build | [`build-pi-tree.sh` stays a shell script](#build-pi-treesh-stays-a-shell-script) - it orchestrates podman and npm, and Java would be the same calls in more lines |
 | The build | [The tree builds without a container where none can start](#the-tree-builds-without-a-container-where-none-can-start) - `PI_TREE_DIRECT=1` runs the builder steps with the pinned Node under `umask 022`, making the same tree byte for byte |
 | The build | [`follow-upstream.sh` is a shell script for the same reason](#follow-upstreamsh-is-a-shell-script-for-the-same-reason) - process calls and `git`, with no decision of its own |
@@ -253,20 +253,21 @@ itself is not measured this way - it needs podman.
 Between releases everything is built on snapshots: `porelo.version`, the parent, and with the parent the release
 tooling. A tag's build takes none of them.
 
-- **Nothing from Central's snapshots on a tag.** The snapshot repository is a profile in `settings.xml` that
-  switches itself off when `porelo.release` is set, and `build.yml` sets `MAVEN_ARGS` to `-Dporelo.release` on a tag
-  and to `-U` elsewhere. Measured: with it, a build from an empty local repository cannot resolve the snapshot
-  parent; without it, it does. Not `-P!standard`: Maven then lists the profile as inactive and still takes the
-  parent from its repository, also measured.
+- **No snapshot repository on a tag.** The snapshot repositories are two profiles in `settings.xml`, `standard`
+  (Central's snapshots) where no forge names its own and `forge` where `MAVEN_SNAPSHOTS_URL` does; a profile's
+  activation takes one property only, so `build.yml` sets `MAVEN_ARGS` to `-P!standard,!forge` on a tag and to `-U`
+  elsewhere. Measured: with it, a build from an empty local repository cannot resolve the snapshot parent, with
+  `MAVEN_SNAPSHOTS_URL` set and without; without it, it does in both cases.
 - **Nothing asked for again on a tag.** `-U` is in no command; `MAVEN_ARGS` carries it where it belongs, also into
   the `pinned-jdk` action.
 - **A tag on a snapshot is refused.** "Which channel" refuses a `porelo.version` that names a snapshot, in the build
   job and in the release job. `ReleaseChannelTest` runs both steps as a tag's run would, sees the refusal, and sees
   a released Porelo let through; it was seen to fail with the refusal taken out. `check-releases` then refuses any
   snapshot left in the effective pom.
-- **Secrets only where a tool needs them.** The tooling is resolved and the channel decided in steps that hold no
-  secret. The steps that hold one run only what needs it: the acceptance legs and their clean-up the cloud's key and
-  the provider's, publishing the repository's token.
+- **Secrets only where a tool needs them.** The channel is decided in a step that holds no secret, and the tooling
+  is resolved in steps that hold only the token that reads the forge's snapshots, as every step that calls Maven
+  does. The other steps that hold one run only what needs it: the acceptance legs and their clean-up the cloud's key
+  and the provider's, publishing the repository's token.
 ## Actions run from a commit, and Dependabot moves them
 
 Every `uses:` names a full commit with its release beside it, `@<commit> # vX.Y.Z`. A tag is a name its
