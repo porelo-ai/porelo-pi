@@ -1,7 +1,7 @@
 # PI38 — The Build Runs On The Local Forge As On The Central One
 
-**Status:** Implementing; the GitHub side first, the Forgejo half waits for a host and for Porelo's and the build
-tools' snapshots in the forge's registry.
+**Status:** Backlog; the GitHub side is built, the Forgejo half waits for a host and for Porelo's and the build
+tools' snapshots in the forge's registry, and moves to Implementing when it starts.
 **Size:** S - the workflows and `settings.xml` of this one repository, no contract another repository reads; about
 2 hours of work once porelo-claude-code has set the shape, plus the runs
 on the host's forge.
