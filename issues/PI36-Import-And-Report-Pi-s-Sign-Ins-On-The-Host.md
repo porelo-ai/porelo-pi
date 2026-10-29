@@ -1,7 +1,7 @@
 # PI36 — Import And Report Pi's Sign-Ins On The Host
 
-**Status:** Analyzed; blocked by porelo [B224](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b224),
-[B225](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b225) and [B226](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b226).
+**Status:** Analyzed; waits for the agent API's findings method and for the provider asked for reaching
+an agent's `ExtractCredential`.
 **Size:** M - a new credential extractor and the findings in this module, the definition's `config_dir`, and an
 acceptance step on the VM; it depends on a contract change in porelo that this issue does not make.
 
@@ -11,8 +11,7 @@ with the path, and never a credential's value.
 
 ## Why
 
-[PJ53](https://github.com/porelo-ai/porelo-project/blob/main/issues/README.md#pj53) makes the agent already on the
-machine the default and offers `vault import` for what it finds. Today Pi's definition has no `config_dir` and no
+Porelo makes the agent already on the machine the default and offers `vault import` for what it finds. Today Pi's definition has no `config_dir` and no
 extractor, so `vault import` answers that Pi does not say where it keeps its credentials.
 
 ## Plan
@@ -22,8 +21,8 @@ extractor, so `vault import` answers that Pi does not say where it keeps its cre
   source, `coding-agent/src/core/auth-storage.ts`.
 - **One file, several providers.** `CredentialExtractor.extract(configDirectory)` returns one credential, and
   `CredentialImport` stores it under the agent's default provider. So Pi's import needs the provider passed in, an
-  optional parameter of `ExtractCredential` under the rule of
-  [B224](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b224); that is porelo's [B226](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b226).
+  optional parameter of `ExtractCredential` under the agent API's rule for a
+  compatible change; that is Porelo's change.
 - **`PiCredentialExtractor`**: the entry for the provider asked for, Pi's provider id mapped to Porelo's provider name
   (Porelo declares `openrouter`, `anthropic` and `github-copilot`); an OAuth entry keeps `refresh` and `expires` as
   attributes, as Claude's does.

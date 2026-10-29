@@ -1,26 +1,21 @@
 # PI38 — The Build Runs On The Local Forge As On The Central One
 
-**Status:** Analyzed; blocked by porelo-buildtools [BT25](https://github.com/porelo-ai/porelo-buildtools/blob/main/issues/README.md#bt25)
-and [BT24](https://github.com/porelo-ai/porelo-buildtools/blob/main/issues/README.md#bt24), porelo-host
-[HO12](https://github.com/porelo-ai/porelo-host/blob/main/issues/README.md#ho12) and
-[HO27](https://github.com/porelo-ai/porelo-host/blob/main/issues/README.md#ho27), and porelo
-[B306](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b306), Porelo's snapshots in the forge's registry.
+**Status:** Analyzed; waits for the build tools asking for a machine by kind, the host's pool file and a
+forge job learning where that pool is, and Porelo's snapshots in the forge's registry.
 **Size:** S - the workflows and `settings.xml` of this one repository, no contract another repository reads; about
-2 hours of work once porelo-claude-code
-[CC38](https://github.com/porelo-ai/porelo-claude-code/blob/main/issues/README.md#cc38) has set the shape, plus the runs
+2 hours of work once porelo-claude-code has set the shape, plus the runs
 on the host's forge.
 
 **What must be true.** `porelo-pi`'s workflows run green on the local Forgejo and on the central forge on the same
 commit, with no edit between them: the machines its legs rent are asked for by kind, and the registry and the
 provider are variables of the setup.
 
-From porelo-project [PJ60](https://github.com/porelo-ai/porelo-project/blob/main/issues/README.md#pj60), for the move's wave 7a; the kinds come from porelo-buildtools [BT25](https://github.com/porelo-ai/porelo-buildtools/blob/main/issues/README.md#bt25).
+The machine kinds are porelo-buildtools' (`porelo-machines acceptance --kind amd64`).
 
 ## Plan
 
-Read in today's `.github/workflows/`, `settings.xml` and `pom.xml`. The shape is porelo-message-sluice
-[SL33](https://github.com/porelo-ai/porelo-message-sluice/blob/main/issues/README.md#sl33)'s, the variables those of
-porelo-project [PJ60](https://github.com/porelo-ai/porelo-project/blob/main/issues/README.md#pj60)'s table.
+Read in today's `.github/workflows/`, `settings.xml` and `pom.xml`. The shape is the one porelo-message-sluice's workflows have, the
+variables those of porelo-host's `doc/local-forge.md`, *The local registry and publication settings*.
 
 - **What ties the Build to GitHub today:**
   - `settings.xml` reads snapshots from Sonatype only, through the `standard` profile, active unless
@@ -38,9 +33,8 @@ porelo-project [PJ60](https://github.com/porelo-ai/porelo-project/blob/main/issu
     reads the published bill from Artifactory's fixed address.
 - **Where Porelo's snapshots come from on the local forge:** the `forge` profile replaces Sonatype, so the forge's
   registry must hold `porelo`'s Maven snapshots before this Build resolves there, while `porelo` itself moves last.
-  `porelo`'s Build on the host's forge deploys them there (porelo
-  [B306](https://github.com/porelo-ai/porelo/blob/main/issues/base/README.md#b306), `forge-release`, as porelo-parent
-  and porelo-buildtools do), its legs not moved yet, so a Porelo change made in a task can be built against before it
+  `porelo`'s Build on the host's forge deploys them there (`forge-release`, as porelo-parent and
+  porelo-buildtools do), its legs not moved yet, so a Porelo change made in a task can be built against before it
   reaches GitHub.
 - **Steps:**
   1. `settings.xml` gains the `forge` profile and the `porelo-forge` server as porelo-message-sluice has them
@@ -57,7 +51,8 @@ porelo-project [PJ60](https://github.com/porelo-ai/porelo-project/blob/main/issu
      this run built (the `packages` artifact, as a tag does today), so a leg never tests what Artifactory held before.
   3. The legs ask `porelo-machines acceptance --kind amd64` with `PORELO_MACHINES_API` and `PORELO_MACHINES_SSH`.
      Today the host's pool answers only to `--pool <file>` with `PORELO_POOL_SSH`, and `sweep --mine` asks the cloud
-     provider alone; the job learns where the pool is from the forge's runner (porelo-host [HO27](https://github.com/porelo-ai/porelo-host/blob/main/issues/README.md#ho27)), so the same lines take a pool
+     provider alone; the job learns where the pool is from the forge's runner (`PORELO_MACHINES_POOL`, as porelo-host
+     proposes it), so the same lines take a pool
      account on the forge and rent on GitHub.
   4. `porelo-release check-providers` joins the Build's checks in the same commit; the provider's names leave
      `build.md` and the machine type in `pi.yaml`'s comment too.
@@ -75,7 +70,7 @@ porelo-project [PJ60](https://github.com/porelo-ai/porelo-project/blob/main/issu
 
 - That the host's Forgejo runner serves `actions/upload-artifact` v7, `actions/download-artifact` v8 and
   `actions/cache` v6, and that the `pinned-jdk` action (`JAVA_HOME_25_X64`, `porelo-machines jdk --github`) works there.
-- That the host's VM pool is larger than none: the rented server of the 6e round reported a pool of 0 KiB.
+- That the host's VM pool is larger than none: a rented server once reported a pool of 0 KiB.
 - That a pool VM reaches the package and CLI download hosts a leg installs from.
 - That `OPEN_ROUTER_API_KEY` is set on the forge, verified by the operator, as the shared rule on separate access
   lists asks.
