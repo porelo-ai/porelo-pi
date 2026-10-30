@@ -1,24 +1,27 @@
 # PI42 — The Sign-In Says How It Is Answered
 
-**Status:** Accepted; waits for a Porelo release whose agent API takes `login.flow`.
-**Size:** XS - one key in `pi.yaml`, no contract another repository reads.
+**Status:** Accepted.
+**Size:** XS - the key in `pi.yaml` and the Porelo version in `pom.xml`, under an hour.
 
-**What must be true.** A person signing in to Pi from a host is told whether to paste a code or to confirm a
-device page, because the agent definition names its sign-in's flow, `login.flow: device-code`.
+**What must be true.** A person granting Pi's GitHub Copilot sign-in from a host, at a terminal or in the GUI, is told
+to confirm the code on GitHub's device page.
 
 ## Plan
 
 - **The contract built against:** Porelo's agent API takes `login.flow` with the values `paste-code`, `device-code`
   and `loopback`, refuses a `loopback` flow on a remote account by naming the agent, and never sets a browser opener for
   a login on a host; the agent listing it gives the frontend names the flow.
-- **`src/main/resources/agent/pi.yaml`** gains `login.flow: device-code`.
-  Its sign-in is Porelo's own `vault authorize github-copilot`, GitHub's device flow.
-- **`porelo.version`** moves to the release that has the key.
-- No test: a wrong flow only shows the wrong hint, which reads wrong and is fixed.
+- **`src/main/resources/agent/pi.yaml`** names the flow `device-code` as `login.flow`, on the definition or on
+  its `github-copilot` grant, wherever Porelo's agent API places it: its sign-in is Porelo's own
+  `vault authorize github-copilot`, GitHub's device flow.
+- **`pom.xml`:** `porelo.version` moves to the Porelo version whose agent API takes the key.
+- No test: a wrong value either shows the wrong hint, which only reads wrong, or, as `loopback`, is refused by name
+  at once; neither does harm.
 
 ## Acceptance
 
-- The definition loads with the new Porelo release, and the agent listing names `device-code` for Pi.
+- Seen to fail first: the agent listing for today's definition names no flow.
+- With the change, the definition loads and the agent listing names `device-code`.
 
 ## To be checked
 

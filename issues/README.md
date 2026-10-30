@@ -27,7 +27,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
-| <a id="pi42"></a>[PI42](PI42-The-Sign-In-Says-How-It-Is-Answered.md) | XS | — | the definition names its sign-in's flow, `device-code`, so the person is told to paste a code or confirm a device page; waits for Porelo's agent API with `login.flow` |
+| <a id="pi42"></a>[PI42](PI42-The-Sign-In-Says-How-It-Is-Answered.md) | XS | — | a person granting Pi's GitHub Copilot sign-in from a host is told to confirm the code on GitHub's device page |
 
 ## Idea
 
