@@ -12,6 +12,7 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 
 ### Added
 
+- The definition names how its sign-in is answered, `login.flow: device-code`, so a person granting GitHub Copilot on a host over SSH can be told to confirm the code on GitHub's page; Porelo 0.5.0, which this builds against, ignores the key, and a later Porelo reads it.
 - `porelo vault authorize github-copilot` grants GitHub Copilot through the OAuth app Pi itself signs in with, and the build stops when the pinned Pi signs in with another.
 
 ### Security

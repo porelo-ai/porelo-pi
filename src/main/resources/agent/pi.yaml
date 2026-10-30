@@ -95,6 +95,8 @@ provider:
 # Read in the shipped tree, @earendil-works/pi-ai's dist/auth/oauth/github-copilot.js: one client id on
 # every host, kept base64-encoded, asking for read:user. BuiltTreeCheck holds the tree to this id.
 login:
+    # 'porelo vault authorize github-copilot' takes GitHub's device flow: a code confirmed on GitHub's page.
+    flow: device-code
     grants:
         github-copilot:
             hosts:
