@@ -9,11 +9,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
 | <a id="pi41"></a>[PI41](PI41-Snapshots-Resolved-With-A-Read-Only-Token.md) | S | — | on a forge other than the central one, snapshots resolved with the runner's read-only token, the publisher's token in no step, since nothing here deploys to the registry, and a Build without `MAVEN_SNAPSHOTS_URL` refused at its start |
-
-## Implementing
-
-| # | Size | Blocked by | What it covers |
-|---|---|---|---|
 | <a id="pi42"></a>[PI42](PI42-The-Sign-In-Says-How-It-Is-Answered.md) | XS | — | a person granting Pi's GitHub Copilot sign-in from a host is told to confirm the code on GitHub's device page |
 
 ## Backlog

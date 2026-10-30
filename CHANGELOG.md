@@ -12,7 +12,7 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 
 ### Added
 
-- The definition names how its sign-in is answered, `login.flow: device-code`, so a person granting GitHub Copilot on a host over SSH can be told to confirm the code on GitHub's page; Porelo 0.5.0, which this builds against, ignores the key, and a later Porelo reads it.
+- The definition names how its sign-in is answered, `login.flow: device-code`, so a person granting GitHub Copilot on a host over SSH can be told to confirm the code on GitHub's page; the Porelo it builds against reads the key, and its agent listing names the flow.
 - `porelo vault authorize github-copilot` grants GitHub Copilot through the OAuth app Pi itself signs in with, and the build stops when the pinned Pi signs in with another.
 
 ### Security
@@ -34,7 +34,7 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 - A publish is believed only once the Debian index lists the exact version built, not merely the package's name.
 - Every job that validates installs shfmt 3.12.0, checked against its release's digest, since Spotless checks the shell scripts with it.
 - The update job fails when deleting its rented machines fails, instead of going on as if they were gone.
-- Built on the snapshot of `porelo-parent` (0.2.1-SNAPSHOT, with the release tooling 0.5.1-SNAPSHOT), against Porelo 0.5.0.
+- Built on the snapshot of `porelo-parent` (0.2.1-SNAPSHOT, with the release tooling 0.5.1-SNAPSHOT), against Porelo 0.5.1-SNAPSHOT.
 
 ## [0.5.0] - 2026-10-17
 
