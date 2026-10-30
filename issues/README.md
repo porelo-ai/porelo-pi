@@ -23,6 +23,12 @@ Within a group, the order is the priority. The number is identity, not sequence.
 |---|---|---|---|---|
 | <a id="pi36"></a>[PI36](PI36-Import-And-Report-Pi-s-Sign-Ins-On-The-Host.md) | M | — | `vault import` takes Pi's sign-in for the provider asked for, and Pi's sign-ins on the host are reported by kind, provider and path | 0 |
 
+## Accepted
+
+| # | Size | Blocked by | What it covers |
+|---|---|---|---|
+| <a id="pi42"></a>[PI42](PI42-The-Sign-In-Says-How-It-Is-Answered.md) | XS | — | the definition names its sign-in's flow, `device-code`, so the person is told to paste a code or confirm a device page; waits for Porelo's agent API with `login.flow` |
+
 ## Idea
 
 | # | Size | Blocked by | What it covers |
