@@ -37,7 +37,7 @@ extractor, so `vault import` answers that Pi does not say where it keeps its cre
 
 ## Acceptance
 
-- On the VM's `smith`, with Pi signed in to OpenRouter by API key, `porelo vault import --agent pi` stores it under
+- On a VM, with Pi signed in to OpenRouter by API key, `porelo vault import --agent pi` stores it under
   `openrouter`, and the findings name OpenRouter, an API key, from `~/.pi/agent/auth.json`.
 - A command key is reported and never run, seen with a command that would write a marker file.
 

@@ -194,8 +194,8 @@ root's, `/var/lib/pi/agent` root's and sticky (`1777`), and its two stores, `aut
 root-owned wrapper `/usr/local/bin/pi` names that directory in `PI_CODING_AGENT_DIR`. The agent still writes
 its sessions, settings and extensions there, but cannot write, remove or replace root's files.
 
-- **Not under the home:** measured with `~/.pi` and `~/.pi/agent` root's and the stores read-only, the agent
-  could still move `~/.pi` aside, since it owns `/home/agent`, and write a new `auth.json` where Pi reads it.
+- **Not under the home:** measured with `.pi` and `.pi/agent` in the home root's and the stores read-only, the agent
+  could still move `.pi` aside, since it owns the home, and write a new `auth.json` where Pi reads it.
 - **What moved with it:** the two extension files and `session.session_id.directory`. An absolute
   `session.session_id.directory` needs a Porelo that reads one; an older one refuses the definition whole.
 

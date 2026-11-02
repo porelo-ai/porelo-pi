@@ -15,7 +15,7 @@ Found by the skill reading of the move of Pi's directory out of the home, each r
   `extensions/*.ts`. Pi loads them at its next start as its user scope, which `--no-approve` does not refuse;
   only a workspace's `.pi/` is refused. An extension the agent wrote runs inside the next Pi and can copy a
   later `/login` out of it.
-- **`PATH` and the environment are the agent's.** The image puts `/home/agent/.local/bin` first on `PATH`, and
+- **`PATH` and the environment are the agent's.** The image puts `.local/bin` in the agent's home first on `PATH`, and
   the agent owns it and its shell's start files. A `pi` of its own, or `PI_PACKAGE_DIR` pointing at a package
   whose `piConfig` renames the directory variable, comes before the wrapper's `PI_CODING_AGENT_DIR`.
 - **Not this issue's:** a key a person types into `/login` is in the Pi process's memory before any store refuses
