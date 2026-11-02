@@ -9,12 +9,12 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
 | <a id="pi41"></a>[PI41](PI41-Snapshots-Resolved-With-A-Read-Only-Token.md) | S | — | on a forge other than the central one, snapshots resolved with the runner's read-only token, the publisher's token in no step, since nothing here deploys to the registry, and a Build without `MAVEN_SNAPSHOTS_URL` refused at its start |
+| <a id="pi36"></a>[PI36](PI36-Import-And-Report-Pi-s-Sign-Ins-On-The-Host.md) | M | — | `vault import` takes Pi's sign-in for the provider asked for, and Pi's sign-ins on the host are reported by kind, provider and path |
 
 ## Implementing
 
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
-| <a id="pi36"></a>[PI36](PI36-Import-And-Report-Pi-s-Sign-Ins-On-The-Host.md) | M | — | `vault import` takes Pi's sign-in for the provider asked for, and Pi's sign-ins on the host are reported by kind, provider and path |
 
 ## Backlog
 

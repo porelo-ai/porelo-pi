@@ -19,6 +19,22 @@ class PiAgentTest {
     private final Agent agent = new PiAgent();
 
     @Test
+    void declaresWhereItKeepsItsCredentialsAndFindsThem() {
+
+        // Prevents the question never being asked: Porelo asks no agent that declares no directory.
+        final PiAgent pi = new PiAgent();
+        assertThat(pi.definition().configDirectory())
+                .as("the directory Porelo passes to the findings")
+                .isEqualTo("~/.pi/agent");
+        assertThat(pi.finder())
+                .as("the finder that answers instead of the agent API's default")
+                .isInstanceOf(PiFindings.class);
+        assertThat(pi.credentialExtractor())
+                .as("the extractor 'vault import' asks")
+                .isInstanceOf(PiCredentialExtractor.class);
+    }
+
+    @Test
     void declaresWhatItShowsOnceAtWork() {
 
         // The kit's check waits for this text and types nothing; a dialog before the prompt hides
@@ -37,6 +53,15 @@ class PiAgentTest {
         assertThat(Objects.requireNonNull(grant).clientIdFor("github.com"))
                 .as("the client id Pi itself signs in with, on github.com")
                 .isEqualTo("Iv1.b507a08c87ecfe98");
+    }
+
+    @Test
+    void namesNoLoginOfItsOwnThoughItNamesWhereItKeepsItsFiles() {
+
+        // Prevents 'vault login' starting a container that leaves nothing Porelo can collect.
+        assertThat(new PiAgent().definition().loginArguments())
+                .as("a login section holding only its flow and grants")
+                .isNull();
     }
 
     @Test
