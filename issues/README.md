@@ -9,7 +9,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
 | <a id="pi41"></a>[PI41](PI41-Snapshots-Resolved-With-A-Read-Only-Token.md) | S | — | on a forge other than the central one, snapshots resolved with the runner's read-only token, the publisher's token in no step, since nothing here deploys to the registry, and a Build without `MAVEN_SNAPSHOTS_URL` refused at its start |
-| <a id="pi42"></a>[PI42](PI42-The-Sign-In-Says-How-It-Is-Answered.md) | XS | — | a person granting Pi's GitHub Copilot sign-in from a host is told to confirm the code on GitHub's device page |
 
 ## Backlog
 
@@ -36,6 +35,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 | # | Title | What was built |
 |---|---|---|
+| <a id="pi42"></a>[PI42](README.md#pi42) | The Sign-In Says How It Is Answered | `pi.yaml` declares `login.flow: device-code`, so a person granting Pi's GitHub Copilot sign-in from a host is told to confirm the code on GitHub's device page; tested in sprint 6m: passed. |
 | <a id="pi21"></a>[PI21](README.md#pi21) | A Login Inside A Brokered Task Fails | Finished 2026-10-27: Pi's directory is `/var/lib/pi/agent`, outside the home, with `auth.json` and `mcp-auth.json` root's and read-only, so a `/login` in a task leaves no key where Pi reads one and the agent cannot write, remove or replace either store. |
 | <a id="pi31"></a>[PI31](README.md#pi31) | Take The Legs From A Run That Proved The Same Tree | A Build on `main` asks `porelo-release proven-legs` whether a Build or an update run already proved the pushed tree on both legs within a day and takes those legs instead of renting again, while a tag always runs its own. |
 | <a id="pi34"></a>[PI34](README.md#pi34) | Publish Without A Downloaded Client | Both Publish steps and the Artifactory smoke workflow talk to Artifactory through `.github/scripts/artifactory.sh` with `curl`, with no JFrog CLI or action left under `.github/`. |
