@@ -599,6 +599,15 @@
                                     <group>root</group>
                                     <license>true</license>
                                 </entry>
+                                <!-- The classes of porelo-wire in the executable are under this one. -->
+                                <entry>
+                                    <name>/usr/share/licenses/${project.artifactId}/LICENSE.Apache-2.0</name>
+                                    <file>${project.basedir}/LICENSE-Apache-2.0</file>
+                                    <mode>0644</mode>
+                                    <user>root</user>
+                                    <group>root</group>
+                                    <license>true</license>
+                                </entry>
                             </entries>
                         </configuration>
                     </plugin>

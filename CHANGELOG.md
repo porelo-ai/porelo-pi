@@ -26,6 +26,8 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 
 ### Changed
 
+- The package says that the `porelo-wire` classes in its executable are under Apache-2.0, in its
+  Debian copyright and its RPM license, with the license's text beside the GPL's in the RPM.
 - Pi pinned to 1.4.0 (was 0.85.0).
 - Node pinned to 22.23.4 (was 22.20.0).
 - The code is in the shared style, google-java-format in its AOSP variant, with YAML and Gherkin at four spaces, and `validate` refuses code that is not; `.git-blame-ignore-revs` lets `git blame` skip the commit that reformatted it.
