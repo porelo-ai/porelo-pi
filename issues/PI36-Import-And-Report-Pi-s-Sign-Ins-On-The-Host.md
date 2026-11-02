@@ -1,6 +1,6 @@
 # PI36 — Import And Report Pi's Sign-Ins On The Host
 
-**Status:** Analyzed; waits for the agent API's findings method and for the provider asked for reaching
+**Status:** Implementing; it waits for the agent API's findings method and for the provider asked for reaching
 an agent's `ExtractCredential`.
 **Size:** M - a new credential extractor and the findings in this module, the definition's `config_dir`, and an
 acceptance step on the VM; it depends on a contract change in porelo that this issue does not make.
