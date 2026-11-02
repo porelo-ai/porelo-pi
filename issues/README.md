@@ -23,6 +23,12 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi38"></a>[PI38](PI38-The-Build-Runs-On-The-Local-Forge-As-On-The-Central-One.md) | S | — | the workflows run 1:1 on the local Forgejo and the central forge: snapshots from `MAVEN_SNAPSHOTS_URL`, publishing switched by `PORELO_PUBLISH`, legs asked by kind; the GitHub side built, the Forgejo half once a host exists |
 | <a id="pi39"></a>[PI39](PI39-The-Repository-s-Agent-Works-In-A-Porelo-Task.md) | S | [PI38](#pi38) | the repository's agent moves into its own Porelo task, after a dry run on this machine |
 
+## Accepted
+
+| # | Size | Blocked by | What it covers |
+|---|---|---|---|
+| <a id="pi43"></a>[PI43](PI43-Mutation-Testing-With-PIT.md) |  | — | mutation testing by hand: a `pit` profile outside CI with no threshold, and a report sorting survivors into real gaps and harmless ones |
+
 ## Idea
 
 | # | Size | Blocked by | What it covers |
