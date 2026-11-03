@@ -19,6 +19,7 @@ Ordered by what each decision covers; when one was taken, `git log` answers.
 | The agent in a task | [Waiting for a person is declared as unknown, because it is](#waiting-for-a-person-is-declared-as-unknown-because-it-is) - Pi's screen does not tell a question from idle, so Porelo says "cannot say" |
 | The agent in a task | [A task that comes back continues its conversation](#a-task-that-comes-back-continues-its-conversation) - the session id read from Pi's first record, unattended or attached |
 | The agent in a task | [Pi's directory is outside the home, its sign-in stores root's](#pis-directory-is-outside-the-home-its-sign-in-stores-roots) - a `/login` leaves no key in Pi's stores |
+| On the host | [What the adapter finds of Pi on the host](#what-the-adapter-finds-of-pi-on-the-host) - files only, never a value; which entry is importable, and what Pi says of each |
 | Which project this is | [Three projects, two names](#three-projects-two-names) - Pi, and the different Pi that Oh My Pi forks |
 | The build | [The release tooling is Porelo's, configured from the pom](#the-release-tooling-is-porelos-configured-from-the-pom) - data beside the pin, the relock image kept equal to the builder's by a test |
 | The build | [A release is built from releases only](#a-release-is-built-from-releases-only) - on a tag no snapshot repository, Central's or the forge's, and a tag on a Porelo snapshot refused by the step itself |
@@ -100,6 +101,8 @@ too:
 - **The model has to be one Pi lists for Copilot.** A bare id picks the provider the task is
   authenticated for, so `gpt-5-mini` alone works. `gpt-4.1` is not in 0.85.0's Copilot catalogue: Pi
   then guesses `/responses` for it, and Copilot answers 400.
+- **A sign-in imported from Pi on the host serves a task** as a grant does, measured on 1.4.0 with a real account:
+  `vault import pi --provider github-copilot`, then a start naming neither agent nor provider, `--model gpt-5.6-terra`.
 
 ## Pi does not check for a newer version in a task
 
@@ -222,6 +225,49 @@ and Porelo reads the id from inside the newest session file.
 records. `session.feature` drives it through Porelo on a VM: unattended, a word to remember in one run and
 given back in the next although the second prompt never names it; attended, a message, the task stopped
 and started again, and the earlier message back on its screen.
+
+## What the adapter finds of Pi on the host
+
+The adapter reads Pi's `auth.json` and `models.json` and nothing else: it runs no command a key names, resolves no
+variable, reads no environment, and only names and kinds go out. `vault import` takes the entry for the provider asked for,
+as the findings report it importable; Copilot stores `refresh`, the GitHub token, as `access-token`, the type `vault
+authorize` keeps it under.
+
+| Entry | Finding |
+|---|---|
+| `auth.json`, `api_key` with a literal key | `SIGNED_IN`, importable, `API_KEY` |
+| `auth.json`, `oauth` for `anthropic` or `github-copilot` | `SIGNED_IN`, importable, `SUBSCRIPTION` |
+| `auth.json`, `oauth` for `openrouter` | `SIGNED_IN`, importable, `API_KEY`: OpenRouter's flow ends in a key |
+| `auth.json`, `oauth` for `github-copilot` without `refresh` | `SIGNED_IN`, not importable: `refresh` is the GitHub token Porelo keeps |
+| `auth.json`, `oauth` for `github-copilot` with `enterpriseUrl` | `SIGNED_IN`, not importable, no `provider`: another host than Porelo's Copilot |
+| a key `!command` | `SIGNED_IN`, not importable; never run |
+| a key with `$`, a missing key, a shape not understood | `CANNOT_SAY`: it depends on Pi's environment, or cannot be told |
+| a provider Porelo does not declare | `SIGNED_IN`, not importable, no `provider`; `kind` only for an API key |
+| `models.json`, an `apiKey` for a provider `auth.json` does not hold | as a key above, never importable; no `provider` with a `baseUrl` |
+| a file that is broken or cannot be read, or holds one entry Pi refuses | one `CANNOT_SAY` with its path: Pi then refuses the whole file |
+
+The contract has no free-text field, so a provider Porelo has no name for is not named. The order of the findings is the
+default Pi was given, then the providers Porelo declares in Pi's own order, then the rest; `enabledModels` and a session's
+restored model are not followed.
+
+Measured on the pinned Pi 1.4.0 on a VM, with made-up values, `pi auth check --provider <id> --no-refresh
+--json`:
+
+| In `auth.json` | Pi says |
+|---|---|
+| a literal key; `oauth`; `openrouter` as `oauth` with an empty `refresh`; `github-copilot` past `expires` | `ready` |
+| a key `!command` | `ready`, and the command is not run by this check |
+| a key `$UNSET`; no key; an empty key | `not_ready` |
+| a key `$NAME` that the entry's `env` answers; a literal with `$$` | `ready` |
+| a broken file; a list; one entry of an unknown type, or `oauth` without `refresh`, beside a good one | `invalid`, for every provider |
+| a byte order mark | `ready` |
+
+A key in `models.json` makes Pi `ready`, comments included; a keyless entry in `auth.json` wins over it, `not_ready`.
+Read in the package and not measured: `enterpriseUrl` on Copilot, in `dist/auth/oauth/github-copilot.js`, which needs a
+sign-in on such a host; and the order, in `dist/core/model-resolver.js`.
+
+Declined: a file changed between the findings' read and the import's, an edit by the person in that instant, whose command
+text would be stored and not run; a key with a raw newline, invalid to Pi and accepted by the wire's parser, which harms nobody.
 
 ## The release tooling is Porelo's, configured from the pom
 
