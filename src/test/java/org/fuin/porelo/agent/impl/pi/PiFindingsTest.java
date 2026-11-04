@@ -1,6 +1,7 @@
 package org.fuin.porelo.agent.impl.pi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -279,6 +280,8 @@ class PiFindingsTest {
         final Path file = directory.resolve("auth.json");
         Files.setPosixFilePermissions(file, Set.of());
         try {
+            // The forge's runner is root, which reads through any mode.
+            assumeFalse(Files.isReadable(file), "this account reads through a mode");
             assertThat(signIns())
                     .as("an auth.json that cannot be read")
                     .containsExactly(cannotSay("auth.json"));
