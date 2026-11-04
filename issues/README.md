@@ -36,6 +36,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi40"></a>[PI40](PI40-The-Acceptance-Legs-Run-On-The-Host-s-Forge.md) |  | [PI38](#pi38) | the acceptance legs on the host's pool again, once it lends a forge job a machine by kind |
 | <a id="pi37"></a>[PI37](PI37-Nothing-The-Agent-Writes-Reaches-The-Next-Pi.md) |  | — | nothing the agent writes in a task reaches a later Pi: its settings, models, MCP servers, extensions, `PATH` |
 | <a id="pi33"></a>[PI33](PI33-Tell-Waiting-From-Pi-s-Program-Status.md) |  | — | Porelo tells a waiting Pi from one at rest by what Pi 1 reports of itself |
+| <a id="pi45"></a>[PI45](PI45-Depend-On-The-Agent-Protocol-Porelo-Provides.md) |  | — | the agent contract named at install time |
 
 ## Finished
 
