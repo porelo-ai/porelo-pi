@@ -12,6 +12,7 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 
 ### Added
 
+- A task's skills are switched off, on any start, resumed or not.
 - `vault import` takes Pi's sign-in for the provider asked for, from `auth.json`, and never a key given as a command or a variable.
 - The adapter says what it finds of Pi on the host: which providers it is signed in to, by kind and with the path, from `auth.json` and `models.json`, never a value, and a key given as a command is reported and never run; the definition names `config_dir`.
 - The definition names how its sign-in is answered, `login.flow: device-code`, so a person granting GitHub Copilot on a host over SSH can be told to confirm the code on GitHub's page; the Porelo it builds against reads the key, and its agent listing names the flow.

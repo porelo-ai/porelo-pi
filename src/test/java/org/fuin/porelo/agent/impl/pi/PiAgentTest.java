@@ -94,7 +94,16 @@ class PiAgentTest {
     void ignoresWhatTheRepositoryWouldConfigure() {
 
         // The workspace is untrusted input; its .pi extensions would load after porelo-route.ts.
-        assertThat(agent.definition().sandboxedArguments()).containsExactly("--no-approve");
+        assertThat(agent.definition().sandboxedArguments()).contains("--no-approve");
+    }
+
+    @Test
+    void leavesATaskNoSkills() {
+
+        // Measured on 1.4.0: without this the agent lists the skills in its directory.
+        assertThat(agent.definition().sandboxedArguments())
+                .as("a task has no skills on any start, resumed or not")
+                .contains("--no-skills");
     }
 
     @Test
@@ -108,6 +117,7 @@ class PiAgentTest {
                 .containsExactly(
                         "pi",
                         "--no-approve",
+                        "--no-skills",
                         "--model",
                         "z-ai/glm-4.6",
                         "--print",
@@ -122,7 +132,8 @@ class PiAgentTest {
         assertThat(
                         agent.headlessCommand(
                                 new RunRequest("carry on", null, null, "01a07a41", false, false)))
-                .containsExactly("pi", "--no-approve", "--session", "01a07a41", "carry on");
+                .containsExactly(
+                        "pi", "--no-approve", "--no-skills", "--session", "01a07a41", "carry on");
     }
 
     @Test

@@ -21,8 +21,11 @@ config_dir: "~/.pi/agent"
 # --no-approve answers it by ignoring those files, and that is a choice, not a default: trusting
 # them would load the repository's own extensions after porelo-route.ts, where one could re-register
 # the provider Porelo routed. The cost is that a repository's own Pi extensions do not load.
+#
+# --no-skills: measured on 1.4.0, --no-approve leaves the skills in Pi's own directory listed, and with
+# this none is. A soft bound: the agent can still read such a file, and start another Pi from its shell.
 sandboxed:
-    arguments: ["--no-approve"]
+    arguments: ["--no-approve", "--no-skills"]
 
 # How the agent is told what Porelo puts in its task - the mailbox where there is one, /porelo/files and
 # what arrives there. Porelo writes this guide to a read-only file in every task Porelo makes and puts these
