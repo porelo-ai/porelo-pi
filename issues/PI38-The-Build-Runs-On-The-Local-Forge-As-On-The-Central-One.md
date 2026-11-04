@@ -17,19 +17,22 @@ Read in today's `.github/workflows/`, `settings.xml` and `pom.xml`. The shape is
 variables those of porelo-host's `doc/local-forge.md`, *The local registry and publication settings*.
 
 - **What ties the Build to GitHub today:**
-  - `settings.xml` reads snapshots from Sonatype only, through the `standard` profile, active unless
-    `-Dporelo.release`. From there come `porelo-bom`, `porelo-agent-api` and `porelo-wire` (`porelo.version`
-    0.5.1-SNAPSHOT), `porelo-acceptance-kit` (`porelo.kit.version`, profile `acceptance`), and `porelo-parent`,
+  - `settings.xml` reads snapshots from `MAVEN_SNAPSHOTS_URL` through the `forge` profile, and from Sonatype through the
+    `standard` profile where that variable is unset; a tag's `-P!standard,!forge` reads none. From there come `porelo-bom`, `porelo-agent-api` and `porelo-wire` (`porelo.version`
+    0.5.1-SNAPSHOT), `porelo-acceptance-kit` (`porelo.kit.version` 0.5.1-SNAPSHOT, profile `acceptance`), and `porelo-parent`,
     `porelo-release` and `porelo-machines`.
   - Publish and its index check, in the `build` and the `release` job of `build.yml`, take `vars.JF_URL` and
-    `secrets.JF_ACCESS_TOKEN` unconditionally; so does `artifactory-smoke.yml`.
-  - The `proof` job asks GitHub's API for a run that proved the tree (`proven-legs`, `github.token`).
-  - The acceptance legs (`build.yml`'s *Acceptance on …*, `update.yml`'s two legs) pass the cloud provider's token and key
-    secrets to `porelo-machines acceptance` and `sweep --mine`, and on `main` install the package last published to Artifactory,
-    not the one the run built.
+    `secrets.JF_ACCESS_TOKEN` and `artifactory-smoke.yml`, only where `vars.PORELO_PUBLISH` is `true`.
+  - The `proof` job asks GitHub's API for a run that proved the tree (`proven-legs`, `github.token`), only where
+    `vars.PORELO_PUBLISH` is `true`.
+  - The acceptance legs (`build.yml`'s *Acceptance on …*, `update.yml`'s two legs) pass `PORELO_MACHINES_API` and
+    `PORELO_MACHINES_SSH` to `porelo-machines acceptance --kind amd64` and `sweep --mine`. `build.yml`'s `acceptance` job runs
+    only where `github.server_url` is GitHub's; on `main` with `vars.PORELO_PUBLISH` `true` it installs the package last
+    published to Artifactory, on a tag or elsewhere the one the run built.
   - `delete-runs.yml` calls `gh api`. In `update.yml`, *Open the pull request* pushes with GitHub's extra header and
     runs `gh pr` and `gh api`, *Merge, or say why not* runs `gh pr merge`, and *What else changed in the shipped tree*
-    reads the published bill from Artifactory's fixed address.
+    reads the published bill from Artifactory's fixed address. Both workflows run only where `vars.PORELO_PUBLISH` is
+    `true`.
 - **Where Porelo's snapshots come from on the local forge:** the `forge` profile replaces Sonatype, so the forge's
   registry must hold `porelo`'s Maven snapshots before this Build resolves there, while `porelo` itself moves last.
   `porelo`'s Build on the host's forge deploys them there (`forge-release`, as porelo-parent and
@@ -42,7 +45,7 @@ variables those of porelo-host's `doc/local-forge.md`, *The local registry and p
   it; the registry starts empty, so the snapshots this Build resolves are deployed there first.
 - **Steps:**
   1. `settings.xml` gains the `forge` profile and the `porelo-forge` server as porelo-message-sluice has them
-     (activated by `MAVEN_SNAPSHOTS_URL`, the token from `PORELO_PUBLISHER_TOKEN`), and `standard` stays off where
+     (activated by `MAVEN_SNAPSHOTS_URL`, the token from `PORELO_PACKAGES_READ_TOKEN`), and `standard` stays off where
      `MAVEN_SNAPSHOTS_URL` is set. A profile's activation takes one property only, so `-Dporelo.release` no longer
      turns the snapshot repositories off: a tag's `MAVEN_ARGS` adds `-P!standard,!forge`. Every Maven call passes
      both values through the step's `env`, since a workflow's `env` cannot read a secret: the `pinned-jdk` action's,
@@ -63,8 +66,8 @@ variables those of porelo-host's `doc/local-forge.md`, *The local registry and p
      forge job a machine by kind; [PI40](README.md#pi40) switches it on there.
   4. `porelo-release check-providers` joins the Build's checks in the same commit; the provider's names leave
      `build.md` and the machine type in `pi.yaml`'s comment too.
-- **Red first:** today's `build.yml` on the local Forgejo, which stops at the snapshot resolution or at Publish; and
-  `check-providers` on today's tree, which names the workflows and `build.md` and the machine type in `pi.yaml`'s comment.
+- **Red first:** the `build.yml` from before these changes on the local Forgejo, which stops at the snapshot resolution or
+  at Publish; and `check-providers` on the tree from before them, which named the workflows and `build.md` and the machine type in `pi.yaml`'s comment.
 
 - **Built on the central forge's side:** steps 1, 2 and 4 and step 3's GitHub half; `check-providers` was seen red on
   the tree before and green after, and a tag's `-P!standard,!forge` was measured to resolve no snapshot parent from an
@@ -74,7 +77,7 @@ variables those of porelo-host's `doc/local-forge.md`, *The local registry and p
 
 ## Acceptance
 
-- Seen to fail first: today's `build.yml` on the local Forgejo.
+- Seen to fail first: the `build.yml` from before these changes on the local Forgejo.
 - The same commit's Build green on the local Forgejo (the `acceptance` job skipped, nothing published) and on GitHub (legs
   rented, published as today).
 - The kinds' check finds no provider's name in this repository's workflows.
