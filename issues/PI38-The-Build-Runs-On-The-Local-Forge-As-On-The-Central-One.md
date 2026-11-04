@@ -1,6 +1,6 @@
 # PI38 — The Build Runs On The Local Forge As On The Central One
 
-**Status:** Backlog; the GitHub side is built, and the Forgejo half moves to Implementing when it starts.
+**Status:** Implementing; the GitHub side is built, the Forgejo half is being measured on a local Forgejo.
 **Size:** S - the workflows and `settings.xml` of this one repository, no contract another repository reads; about
 2 hours of work once porelo-claude-code has set the shape, plus the runs on the
 local Forgejo.
