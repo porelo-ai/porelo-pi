@@ -64,5 +64,5 @@ Feature: What a person sees with this agent, before there is any credential
         And its output does not contain "REMOVED"
         And its output does not contain "MADE WRITABLE"
         And its output does not contain "MOVED"
-        When a script runs "porelo project unfollow nologin --force"
+        When a script runs "porelo project remove nologin --force"
         Then it exits zero

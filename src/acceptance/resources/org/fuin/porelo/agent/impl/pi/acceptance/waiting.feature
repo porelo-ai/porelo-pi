@@ -23,5 +23,5 @@ Feature: Porelo says what it can tell about the agent waiting for a person, and 
         When a script runs "porelo task status porelo-asks-asks"
         Then it exits zero
         And its output has a line matching "screen +cannot say - .*"
-        When a script runs "porelo project unfollow asks --force"
+        When a script runs "porelo project remove asks --force"
         Then it exits zero

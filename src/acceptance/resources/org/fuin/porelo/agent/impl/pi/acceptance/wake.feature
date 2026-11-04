@@ -53,5 +53,5 @@ Feature: Pi is never woken, because nothing on its screen tells an open question
         Then the terminal does not show "A message for you waits"
         And the terminal does not show "A file arrived in /porelo/files"
         When a script runs "rm -f /tmp/porelo-wake-spec.txt; porelo task remove porelo-wake-wake --force"
-        And a script runs "porelo project unfollow wake --force"
+        And a script runs "porelo project remove wake --force"
         Then it exits zero
