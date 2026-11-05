@@ -7,8 +7,8 @@
 # own; that Node is pom.xml's pin.node.version, checked against pin.node.sha256, and PinAgreementTest keeps the
 # two the same.
 image:
-    base_image: "docker.io/library/ubuntu:24.04@sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac"
-    snippet: |
+    from: "docker.io/library/ubuntu:24.04@sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac"
+    run: |
         RUN apt-get update \
             && apt-get install -y --no-install-recommends build-essential zlib1g-dev ca-certificates curl git unzip rpm \
             && rm -rf /var/lib/apt/lists/*
