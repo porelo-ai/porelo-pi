@@ -151,7 +151,7 @@ jobs:
                   version="$(sed -n 's:.*<pin.node.version>\(.*\)</pin.node.version>.*:\1:p' pom.xml | head -n 1)"
                   digest="$(sed -n 's:.*<pin.node.sha256>\(.*\)</pin.node.sha256>.*:\1:p' pom.xml | head -n 1)"
                   [ -n "$version" ] && [ -n "$digest" ] || { echo "::error::pom.xml names no pinned Node"; exit 1; }
-                  curl -fsSL -o "$RUNNER_TEMP/node.tar.gz" "https://nodejs.org/dist/v$version/node-v$version-linux-x64.tar.gz"
+                  curl -fsSL --retry 5 --retry-all-errors -o "$RUNNER_TEMP/node.tar.gz" "https://nodejs.org/dist/v$version/node-v$version-linux-x64.tar.gz"
                   echo "$digest  $RUNNER_TEMP/node.tar.gz" | sha256sum -c -
                   mkdir -p "$RUNNER_TEMP/node"
                   tar -xzf "$RUNNER_TEMP/node.tar.gz" -C "$RUNNER_TEMP/node" --strip-components=1
@@ -248,12 +248,12 @@ jobs:
                   if [ "$CHANNEL" = releases ]; then
                       DEB="$(basename target/*.deb)"
                       RPM="$(basename target/*.rpm)"
-                      curl -sfL -o target/published-index "${JF_URL}/artifactory/porelo-dist-deb/dists/releases/main/binary-amd64/Packages" \
+                      curl -sfL --retry 5 --retry-all-errors -o target/published-index "${JF_URL}/artifactory/porelo-dist-deb/dists/releases/main/binary-amd64/Packages" \
                           || { echo "::error::the Debian index could not be read, so whether $DEB is published is unknown"; exit 1; }
                       if grep -qF "Filename: pool/main/p/porelo-agent-pi/$DEB" target/published-index; then
                           echo "::error::this release is published already: $DEB"; exit 1
                       fi
-                      CODE="$(curl -sL -o /dev/null -w '%{http_code}' "${JF_URL}/artifactory/api/storage/porelo-dist-rpm/releases/$RPM")" \
+                      CODE="$(curl -sL --retry 5 --retry-all-errors -o /dev/null -w '%{http_code}' "${JF_URL}/artifactory/api/storage/porelo-dist-rpm/releases/$RPM")" \
                           || { echo "::error::Artifactory could not be asked whether $RPM is published"; exit 1; }
                       case "$CODE" in
                           404) ;;
@@ -286,7 +286,7 @@ jobs:
                   # -L: Artifactory answers a file with a redirect to its cloud storage, and without it the
                   # body is empty - every package then reads as "not indexed" although it is.
                   while [ "$tries" -lt 20 ]; do
-                      if curl -sfL "${JF_URL}/artifactory/porelo-dist-deb/dists/${CHANNEL}/main/binary-amd64/Packages" \
+                      if curl -sfL --retry 5 --retry-all-errors "${JF_URL}/artifactory/porelo-dist-deb/dists/${CHANNEL}/main/binary-amd64/Packages" \
                           | awk -v version="$VERSION" '
                               /^$/ { pi = 0 }
                               /^Package: / { pi = ($2 == "porelo-agent-pi") }
@@ -505,12 +505,12 @@ jobs:
                   if [ "$CHANNEL" = releases ]; then
                       DEB="$(basename target/*.deb)"
                       RPM="$(basename target/*.rpm)"
-                      curl -sfL -o target/published-index "${JF_URL}/artifactory/porelo-dist-deb/dists/releases/main/binary-amd64/Packages" \
+                      curl -sfL --retry 5 --retry-all-errors -o target/published-index "${JF_URL}/artifactory/porelo-dist-deb/dists/releases/main/binary-amd64/Packages" \
                           || { echo "::error::the Debian index could not be read, so whether $DEB is published is unknown"; exit 1; }
                       if grep -qF "Filename: pool/main/p/porelo-agent-pi/$DEB" target/published-index; then
                           echo "::error::this release is published already: $DEB"; exit 1
                       fi
-                      CODE="$(curl -sL -o /dev/null -w '%{http_code}' "${JF_URL}/artifactory/api/storage/porelo-dist-rpm/releases/$RPM")" \
+                      CODE="$(curl -sL --retry 5 --retry-all-errors -o /dev/null -w '%{http_code}' "${JF_URL}/artifactory/api/storage/porelo-dist-rpm/releases/$RPM")" \
                           || { echo "::error::Artifactory could not be asked whether $RPM is published"; exit 1; }
                       case "$CODE" in
                           404) ;;
@@ -542,7 +542,7 @@ jobs:
                   # -L: Artifactory answers a file with a redirect to its cloud storage, and without it the
                   # body is empty - every package then reads as "not indexed" although it is.
                   while [ "$tries" -lt 20 ]; do
-                      if curl -sfL "${JF_URL}/artifactory/porelo-dist-deb/dists/${CHANNEL}/main/binary-amd64/Packages" \
+                      if curl -sfL --retry 5 --retry-all-errors "${JF_URL}/artifactory/porelo-dist-deb/dists/${CHANNEL}/main/binary-amd64/Packages" \
                           | awk -v version="$VERSION" '
                               /^$/ { pi = 0 }
                               /^Package: / { pi = ($2 == "porelo-agent-pi") }
