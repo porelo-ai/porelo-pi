@@ -20,10 +20,9 @@ image*) and `doc/running.md` (the agent's layer), and porelo-project's `project.
   CLI comes from its package's own layer, not from `porelo.yml`. The acceptance legs do not run in a task (no container
   inside it, no rented machine); they run in the forge's Build ([PI38](README.md#pi38)).
 - **What the task reaches while it runs:** Maven Central, Sonatype or the forge's registry, `fuinorg.jfrog.io` for
-  the skills, `github.com` for `check-citations`, and the forge's address as a host service. Pi's tree
-  (`buildtools/build-pi-tree.sh`, `PI_TREE_DIRECT` in a task) adds `registry.npmjs.org` for `npm ci`, `nodejs.org` for
-  the runtime, and `github.com`'s releases of fd and rg with the storage hosts they redirect to
-  (`objects.githubusercontent.com`, `release-assets.githubusercontent.com`). That egress is the project's, in
+  the skills, `github.com` for `check-citations`, and the forge's address as a host service. The task runs `verify`
+  only: Pi's tree (`buildtools/build-pi-tree.sh`) would add `registry.npmjs.org`, `nodejs.org` and GitHub's release
+  downloads, which the project's egress does not name, so the forge's Build builds the packages. That egress is the project's, in
   porelo-project's `project.yml`; the image, the agent's CLI with it, is built on the host outside the task's firewall.
   The task's build reads Sonatype's snapshots: the forge's registry refuses a task today (the organization is private), and nothing sets
   `MAVEN_SNAPSHOTS_URL` in a task yet, so the `forge` profile stays off there until both are in.
@@ -42,9 +41,9 @@ image*) and `doc/running.md` (the agent's layer), and porelo-project's `project.
      none failed or skipped, in 39 s; the native packages, `.deb` and `.rpm`, with Pi's tree built directly
      (`PI_TREE_DIRECT`, fetching Node, the npm packages, fd and rg), built and checked in 101 s.
   1. *Before, from this machine:* a dry run of the task start on the host names each image key's source as
-     `porelo.yml`; the image builds; inside it, `./mvnw -s settings.xml verify` and the native packages pass.
-  2. *porelo-project (the coordinator):* `repositories.pi.agent` and the nickname `Pi`
-     in `project.yml`, and the upstream switched to the host's forge, as the project's procedure for an agent's move lays out.
+     `porelo.yml`; the image builds; inside it, `./mvnw -s settings.xml verify` passes.
+  2. *porelo-project (the coordinator):* `repositories.pi.agent` in `project.yml`, no nickname, since the key
+     `pi` gives the room's name, and the upstream switched to the host's forge, as the project's procedure for an agent's move lays out.
   3. *The start:* the operator starts the task attended; inside it the agent takes this issue to Review, its push
      through the gate to `porelo/<task>`, the forge's Build read through the `forgejo` reader.
   4. *After the check:* the session on this machine gives up `porelo-pi`;
@@ -58,7 +57,7 @@ image*) and `doc/running.md` (the agent's layer), and porelo-project's `project.
 - The task follows `porelo-pi` through the gate; its pushes reach the local Forgejo, and it reads its builds through the
   `forgejo` reader.
 - Its build runs on the local forge as on the central one, [PI38](README.md#pi38).
-- The room shows it as `Agent Pi`, from the nickname `Pi` in porelo-project's `project.yml`.
+- The room shows it as `Agent Pi`, from the capitalized key `pi` in porelo-project's `project.yml`.
 - The build in the task passes on Sonatype's snapshots; it takes them from the local forge's registry only once that registry lets a task read it and the task sets `MAVEN_SNAPSHOTS_URL`, which is not this move's.
 - Claude Code works in the task with the operator's subscription from the vault.
 - The move's check is red for `porelo-pi` before the move and green after it; the agent's session on this machine and its
@@ -68,8 +67,7 @@ image*) and `doc/running.md` (the agent's layer), and porelo-project's `project.
 
 - That the context tells the task's agent the skills are read as files: the adapter's settings deny Claude Code's
   `Skill` tool in every task, so a skill fetched into the skills folder is never loaded as one.
-- That porelo-project's `project.yml` lets the task reach the hosts named under *Plan*, Pi's tree's download hosts
-  among them.
+- That porelo-project's `project.yml` lets the task reach the hosts named under *Plan*.
 - Where the task's agent finds what the local setup gives it here (its name, the room in place of the channel, the
   operator's language and time zone): that setup is not committed, so it is not in the task.
 - That the outside reader can fetch `porelo/<task>` from the host's forge, not only from GitHub.
