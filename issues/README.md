@@ -29,6 +29,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
+| <a id="pi50"></a>[PI50](PI50-The-Clean-Up-Says-When-Nothing-Was-Rented.md) |  | — | a leg that failed before resolving the machine tooling rented nothing, and its clean-up says so instead of failing on a missing class |
 | <a id="pi49"></a>[PI49](PI49-The-Tree-Build-Retries-A-Failed-Download.md) |  | — | the tree build fetches Node, fd and ripgrep again on a 5xx or a broken connection, a few times, before it fails |
 | <a id="pi48"></a>[PI48](PI48-The-Acceptance-Legs-Run-Side-By-Side.md) |  | — | a Build's acceptance legs run at the same time, two machines held at once instead of one, the Build done about one leg sooner |
 | <a id="pi44"></a>[PI44](PI44-A-Copilot-Task-Uses-The-Models-The-Account-Has.md) |  | — | a task on GitHub Copilot runs on a model the account has: no flagless failure on a default it lacks, and `--model` takes every model the account has |
