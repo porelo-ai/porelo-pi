@@ -44,7 +44,7 @@ jobs:
     update:
         name: Follow upstream
         runs-on: ubuntu-24.04
-        timeout-minutes: 90
+        timeout-minutes: 105
         # It updates the central forge only - its pull request, its merge and the bill it compares with are
         # GitHub's and Artifactory's - so it runs only where PORELO_PUBLISH is true.
         if: vars.PORELO_PUBLISH == 'true'
@@ -76,9 +76,9 @@ jobs:
                   VERSION="$(./mvnw -B -q -s settings.xml help:evaluate -Dexpression=shfmt.version -DforceStdout)"
                   [ "$VERSION" = 3.12.0 ] || { echo "::error::the pom pins shfmt '$VERSION'; this step installs 3.12.0"; exit 1; }
                   mkdir -p "$RUNNER_TEMP/bin"
-                  curl -fsSL --retry 5 --retry-all-errors -o "$RUNNER_TEMP/bin/shfmt" \
-                      "https://github.com/mvdan/sh/releases/download/v$VERSION/shfmt_v${VERSION}_linux_amd64"
-                  echo "d9fbb2a9c33d13f47e7618cf362a914d029d02a6df124064fff04fd688a745ea  $RUNNER_TEMP/bin/shfmt" | sha256sum -c -
+                  . .github/actions/pinned-jdk/pinned.sh
+                  pinned_fetch "https://github.com/mvdan/sh/releases/download/v$VERSION/shfmt_v${VERSION}_linux_amd64" \
+                      d9fbb2a9c33d13f47e7618cf362a914d029d02a6df124064fff04fd688a745ea "$RUNNER_TEMP/bin/shfmt"
                   chmod +x "$RUNNER_TEMP/bin/shfmt"
                   echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
 

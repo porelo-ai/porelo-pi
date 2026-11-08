@@ -262,8 +262,8 @@ class PinAgreementTest {
     @Test
     void refusesABuilderImageNamedByTagAlone(@TempDir final Path dir) throws Exception {
 
-        // A tag is a name its owner may repoint, and npm ci, the Node download and its checksum all
-        // run inside that image: whoever repoints it controls the checks that protect the package.
+        // A tag is a name its owner may repoint, and npm ci and the downloads' checksums all run
+        // inside that image: whoever repoints it controls the checks that protect the package.
         final Processes.Result tagged =
                 buildTree(dir.resolve("tagged"), "docker.io/library/node:22-slim");
 
@@ -315,8 +315,14 @@ class PinAgreementTest {
         Files.copy(
                 sbom.resolve("package-lock.json"),
                 module.resolve(sbom).resolve("package-lock.json"));
+        final Path pinned = Path.of(".github/actions/pinned-jdk/pinned.sh");
+        Files.createDirectories(module.resolve(pinned).getParent());
+        Files.copy(pinned, module.resolve(pinned));
         final Path stubs = module.resolve("stubs");
         WorkflowSteps.stub(stubs, "podman", "exit 0");
+        // The downloads come after the first podman call; a 404 fails them at once, without the
+        // network.
+        WorkflowSteps.stub(stubs, "curl", "echo 404");
         if (node != null) {
             WorkflowSteps.stub(stubs, "node", node);
         }

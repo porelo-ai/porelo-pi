@@ -39,7 +39,7 @@ jobs:
         name: Build and unit tests
         # Pinned, not 'ubuntu-latest'.
         runs-on: ubuntu-24.04
-        timeout-minutes: 20
+        timeout-minutes: 35
         steps:
             # Every commit, so a pushed range is read from this checkout.
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -73,9 +73,9 @@ jobs:
                   VERSION="$(./mvnw -B -q -s settings.xml help:evaluate -Dexpression=shfmt.version -DforceStdout)"
                   [ "$VERSION" = 3.12.0 ] || { echo "::error::the pom pins shfmt '$VERSION'; this step installs 3.12.0"; exit 1; }
                   mkdir -p "$RUNNER_TEMP/bin"
-                  curl -fsSL --retry 5 --retry-all-errors -o "$RUNNER_TEMP/bin/shfmt" \
-                      "https://github.com/mvdan/sh/releases/download/v$VERSION/shfmt_v${VERSION}_linux_amd64"
-                  echo "d9fbb2a9c33d13f47e7618cf362a914d029d02a6df124064fff04fd688a745ea  $RUNNER_TEMP/bin/shfmt" | sha256sum -c -
+                  . .github/actions/pinned-jdk/pinned.sh
+                  pinned_fetch "https://github.com/mvdan/sh/releases/download/v$VERSION/shfmt_v${VERSION}_linux_amd64" \
+                      d9fbb2a9c33d13f47e7618cf362a914d029d02a6df124064fff04fd688a745ea "$RUNNER_TEMP/bin/shfmt"
                   chmod +x "$RUNNER_TEMP/bin/shfmt"
                   echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
 
@@ -152,8 +152,9 @@ jobs:
                   version="$(sed -n 's:.*<pin.node.version>\(.*\)</pin.node.version>.*:\1:p' pom.xml | head -n 1)"
                   digest="$(sed -n 's:.*<pin.node.sha256>\(.*\)</pin.node.sha256>.*:\1:p' pom.xml | head -n 1)"
                   [ -n "$version" ] && [ -n "$digest" ] || { echo "::error::pom.xml names no pinned Node"; exit 1; }
-                  curl -fsSL --retry 5 --retry-all-errors -o "$RUNNER_TEMP/node.tar.gz" "https://nodejs.org/dist/v$version/node-v$version-linux-x64.tar.gz"
-                  echo "$digest  $RUNNER_TEMP/node.tar.gz" | sha256sum -c -
+                  . .github/actions/pinned-jdk/pinned.sh
+                  pinned_fetch "https://nodejs.org/dist/v$version/node-v$version-linux-x64.tar.gz" "$digest" \
+                      "$RUNNER_TEMP/node.tar.gz"
                   mkdir -p "$RUNNER_TEMP/node"
                   tar -xzf "$RUNNER_TEMP/node.tar.gz" -C "$RUNNER_TEMP/node" --strip-components=1
                   echo "$RUNNER_TEMP/node/bin" >> "$GITHUB_PATH"
@@ -309,7 +310,7 @@ jobs:
     proof:
         name: Legs already proven
         runs-on: ubuntu-24.04
-        timeout-minutes: 10
+        timeout-minutes: 25
         if: vars.PORELO_PUBLISH == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         # Reads this repository's runs, jobs and artifact names; nothing more.
         permissions:
@@ -348,7 +349,7 @@ jobs:
     acceptance:
         name: Acceptance - ${{ matrix.os }}
         runs-on: ubuntu-24.04
-        timeout-minutes: 40
+        timeout-minutes: 55
         needs: [build, proof]
         # The proof is skipped on a tag and a dispatch, and a failed one proves nothing: the legs run then.
         # Only on GitHub while the repository moves: the host's pool lends no forge job a machine by kind yet.
@@ -395,9 +396,9 @@ jobs:
                   VERSION="$(./mvnw -B -q -s settings.xml help:evaluate -Dexpression=shfmt.version -DforceStdout)"
                   [ "$VERSION" = 3.12.0 ] || { echo "::error::the pom pins shfmt '$VERSION'; this step installs 3.12.0"; exit 1; }
                   mkdir -p "$RUNNER_TEMP/bin"
-                  curl -fsSL --retry 5 --retry-all-errors -o "$RUNNER_TEMP/bin/shfmt" \
-                      "https://github.com/mvdan/sh/releases/download/v$VERSION/shfmt_v${VERSION}_linux_amd64"
-                  echo "d9fbb2a9c33d13f47e7618cf362a914d029d02a6df124064fff04fd688a745ea  $RUNNER_TEMP/bin/shfmt" | sha256sum -c -
+                  . .github/actions/pinned-jdk/pinned.sh
+                  pinned_fetch "https://github.com/mvdan/sh/releases/download/v$VERSION/shfmt_v${VERSION}_linux_amd64" \
+                      d9fbb2a9c33d13f47e7618cf362a914d029d02a6df124064fff04fd688a745ea "$RUNNER_TEMP/bin/shfmt"
                   chmod +x "$RUNNER_TEMP/bin/shfmt"
                   echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
 

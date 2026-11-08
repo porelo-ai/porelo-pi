@@ -6,7 +6,8 @@
 #
 # Everything runs in a pinned container rather than on the build machine, so no Node toolchain
 # has to be installed to build Porelo, and the toolchain itself is a stated version rather than
-# whatever the machine happens to have.
+# whatever the machine happens to have. Only the three downloads are fetched on the build machine,
+# with curl, and checked against their pins there and again in the container.
 #
 # Skipped, with a message, when there is no container runtime: the rest of Porelo still builds.
 #
@@ -144,20 +145,30 @@ in_builder -- "
 # Out again before anything is packaged: it was needed for one command and belongs to the build.
 rm -rf "$TARGET/sbom-tool"
 
-# The published runtime, checked against the digest nodejs.org publishes beside it. Fetched with
-# node's own fetch rather than curl: the container runs as the build user, so it cannot install
-# packages, and the builder image already has the one tool needed.
-in_builder "NODE_VERSION=$NODE_VERSION" "NODE_SHA256=$NODE_SHA256" -- "
+# The three downloads, fetched here by the one rule every pinned download follows (pinned.sh, copied unchanged from
+# porelo-buildtools beside the pinned-jdk action): a 5xx or a broken connection is tried again, a wrong digest fails at
+# once, and a file already in target/pi-downloads that matches its pin is kept. GitHub's release downloads answered
+# 503 and 504 for most of an hour on 2026-11-08. The builder only unpacks them, from $OUT/.downloads, which is out of
+# the tree again before anything is packaged.
+# shellcheck source=SCRIPTDIR/../.github/actions/pinned-jdk/pinned.sh
+. "$MODULE/.github/actions/pinned-jdk/pinned.sh"
+DOWNLOADS="$MODULE/target/pi-downloads"
+pinned_fetch "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" "$NODE_SHA256" \
+    "$DOWNLOADS/node.tar.gz"
+MUSL=x86_64-unknown-linux-musl.tar.gz
+pinned_fetch "https://github.com/sharkdp/fd/releases/download/v$FD_VERSION/fd-v$FD_VERSION-$MUSL" "$FD_SHA256" \
+    "$DOWNLOADS/fd.tar.gz"
+pinned_fetch "https://github.com/BurntSushi/ripgrep/releases/download/$RG_VERSION/ripgrep-$RG_VERSION-$MUSL" \
+    "$RG_SHA256" "$DOWNLOADS/rg.tar.gz"
+mkdir -p "$TARGET/.downloads"
+cp "$DOWNLOADS/node.tar.gz" "$DOWNLOADS/fd.tar.gz" "$DOWNLOADS/rg.tar.gz" "$TARGET/.downloads/"
+
+# The published runtime, checked against the digest nodejs.org publishes beside it, here again
+# where it is unpacked.
+in_builder "NODE_SHA256=$NODE_SHA256" -- "
     set -eu
-    node -e \"
-        const { writeFileSync } = require('fs');
-        const version = process.env.NODE_VERSION;
-        fetch('https://nodejs.org/dist/v' + version + '/node-v' + version + '-linux-x64.tar.gz')
-            .then(r => { if (!r.ok) { throw new Error('HTTP ' + r.status); } return r.arrayBuffer(); })
-            .then(b => writeFileSync(process.env.WORK + '/node.tar.gz', Buffer.from(b)));
-    \"
-    echo \"\$NODE_SHA256  \$WORK/node.tar.gz\" | sha256sum -c -
-    tar -xzf \"\$WORK/node.tar.gz\" -C \"\$OUT/node\" --strip-components=1
+    echo \"\$NODE_SHA256  \$OUT/.downloads/node.tar.gz\" | sha256sum -c -
+    tar -xzf \"\$OUT/.downloads/node.tar.gz\" -C \"\$OUT/node\" --strip-components=1
     # Only the runtime is used: Pi is started as 'node <cli.js>'. npm, npx and the headers are
     # build-time tools that would otherwise ride along in every installation.
     rm -rf \"\$OUT/node/include\" \"\$OUT/node/share\" \"\$OUT/node/lib/node_modules\"
@@ -165,25 +176,12 @@ in_builder "NODE_VERSION=$NODE_VERSION" "NODE_SHA256=$NODE_SHA256" -- "
 "
 
 # fd and rg, checked against the pinned digests, the binary and its licenses kept and nothing else.
-# Fetched with node's fetch like the runtime above; it follows GitHub's redirect to its storage.
-in_builder "FD_VERSION=$FD_VERSION" "FD_SHA256=$FD_SHA256" "RG_VERSION=$RG_VERSION" "RG_SHA256=$RG_SHA256" -- "
+in_builder "FD_SHA256=$FD_SHA256" "RG_SHA256=$RG_SHA256" -- "
     set -eu
-    node -e \"
-        const { writeFileSync } = require('fs');
-        const e = process.env;
-        const get = (url, file) => fetch(url)
-            .then(r => { if (!r.ok) { throw new Error(url + ': HTTP ' + r.status); } return r.arrayBuffer(); })
-            .then(b => writeFileSync(file, Buffer.from(b)));
-        Promise.all([
-            get('https://github.com/sharkdp/fd/releases/download/v' + e.FD_VERSION + '/fd-v' + e.FD_VERSION
-                + '-x86_64-unknown-linux-musl.tar.gz', e.WORK + '/fd.tar.gz'),
-            get('https://github.com/BurntSushi/ripgrep/releases/download/' + e.RG_VERSION + '/ripgrep-'
-                + e.RG_VERSION + '-x86_64-unknown-linux-musl.tar.gz', e.WORK + '/rg.tar.gz'),
-        ]).catch(err => { console.error(err.message); process.exit(1); });
-    \"
-    echo \"\$FD_SHA256  \$WORK/fd.tar.gz\" | sha256sum -c -
-    echo \"\$RG_SHA256  \$WORK/rg.tar.gz\" | sha256sum -c -
+    echo \"\$FD_SHA256  \$OUT/.downloads/fd.tar.gz\" | sha256sum -c -
+    echo \"\$RG_SHA256  \$OUT/.downloads/rg.tar.gz\" | sha256sum -c -
     cd \"\$WORK\"
+    cp \"\$OUT/.downloads/fd.tar.gz\" \"\$OUT/.downloads/rg.tar.gz\" .
     mkdir -p \"\$OUT/tools/bin\" \"\$OUT/tools/licenses/fd\" \"\$OUT/tools/licenses/ripgrep\" fd rg
     tar -xzf fd.tar.gz -C fd --strip-components=1
     tar -xzf rg.tar.gz -C rg --strip-components=1
@@ -191,6 +189,7 @@ in_builder "FD_VERSION=$FD_VERSION" "FD_SHA256=$FD_SHA256" "RG_VERSION=$RG_VERSI
     cp fd/LICENSE-APACHE fd/LICENSE-MIT \"\$OUT/tools/licenses/fd/\"
     cp rg/LICENSE-MIT rg/UNLICENSE rg/COPYING \"\$OUT/tools/licenses/ripgrep/\"
 "
+rm -rf "$TARGET/.downloads"
 
 # Prebuilt binaries for platforms a Linux container will never run. Dead weight in a package
 # that is already large, and confusing to anyone auditing what is shipped.
