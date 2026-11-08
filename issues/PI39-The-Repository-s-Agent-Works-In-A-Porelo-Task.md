@@ -1,6 +1,6 @@
 # PI39 — The Repository's Agent Works In A Porelo Task
 
-**Status:** Implementing; blocked by [PI38](README.md#pi38), in Review.
+**Status:** Review; blocked by [PI38](README.md#pi38), in Review.
 **Size:** S - no code here beyond `porelo.yml`, the move itself done by the procedure; about 2 hours of the agent's
 work, plus the operator's attended start of the task.
 
@@ -65,16 +65,9 @@ image*) and `doc/running.md` (the agent's layer), and porelo-project's `project.
 
 ## To be checked
 
-- That the context tells the task's agent the skills are read as files: the adapter's settings deny Claude Code's
-  `Skill` tool in every task, so a skill fetched into the skills folder is never loaded as one.
 - That porelo-project's `project.yml` lets the task reach the hosts named under *Plan*.
-- Where the task's agent finds what the local setup gives it here (its name, the room in place of the channel, the
-  operator's language and time zone): that setup is not committed, so it is not in the task.
 - That the outside reader can fetch `porelo/<task>` from the host's forge, not only from GitHub.
 - The way back, rehearsed once: the task's open work fetched from the host's forge into the checkout here.
-- That the host's inventory names `porelo-pi` in `forge_repositories`: the forge role skips the migration, `main`'s
-  protection and the gate's identity where it names none (porelo-host `roles/forge/tasks/main.yml`), and a task
-  start then finds no copy of the repository on the host's forge.
 - What porelo-message-sluice's dry run showed, each to hold here before the start:
   - That the task's Claude writes `Assisted-by: Claude Code, <model>` and no `Co-Authored-By` line, set in the image or
     the task's settings, since the shared rules ask for `Assisted-by`, and check-commits lets a `Co-authored-by`
@@ -85,3 +78,19 @@ image*) and `doc/running.md` (the agent's layer), and porelo-project's `project.
     running task keeps the credential it started with.
   - That the outside reader may join the room from its harness; otherwise it posts its findings in the channel and the
     operator relays them.
+
+## Findings from the trial
+
+- **What ran:** the seven skills fetched from the skills repository and checked against their sha256 each; the
+  tests tagged `documents` (5 tests) and `verify` (197 tests, none failed or skipped) passed in the task, each its own
+  step with exit code 0, the packages left to the forge's Build.
+- **Missing, egress:** `raw.githubusercontent.com` is not reachable from the task, so `check-citations` cannot run
+  there and is left to the forge's *Shared rules check*; *Plan* names `github.com` for it, which is the wrong host.
+- **Missing, forge:** the *Shared rules check* on the local forge failed in its first Maven step, since the parent
+  `porelo-parent` 0.2.1-SNAPSHOT is absent from the forge's registry; the Build there needs it published first.
+- **Missing, context:** the task has no remote `origin`, only the gate's, so `check-commits` reads `porelo/main`
+  where the brief names `origin/main`; no `forgejo` reader was in the task, so Build results come by relay.
+- **Held:** the settings deny `Skill`, `Agent` and `Workflow`, so skills are read as files and the brief says so; the
+  agent's name, the room in place of the channel and the operator's language and time zone came with the brief, not from
+  a file in the task; the task's start found a copy of the repository on the host's forge; the commit hook ends the
+  message with the `Assisted-by` trailer and strips a `Co-authored-by` line naming Anthropic.
