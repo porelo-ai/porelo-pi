@@ -27,6 +27,7 @@ on:
 # the snapshot repository Maven reads, a variable present on GitHub and the local Forgejo.
 env:
     MAVEN_SNAPSHOTS_URL: ${{ vars.MAVEN_SNAPSHOTS_URL }}
+    MAVEN_UPSTREAM_SNAPSHOTS_URL: ${{ vars.MAVEN_UPSTREAM_SNAPSHOTS_URL }}
     MAVEN_ARGS: -U
 
 # Read-only for the workflow; the job below takes the two it needs to write, and no more.
