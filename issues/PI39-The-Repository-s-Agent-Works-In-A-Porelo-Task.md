@@ -1,6 +1,6 @@
 # PI39 — The Repository's Agent Works In A Porelo Task
 
-**Status:** Implementing; blocked by [PI38](README.md#pi38), in Review.
+**Status:** Review; blocked by [PI38](README.md#pi38), in Review.
 **Size:** S - no code here beyond `porelo.yml`, the move itself done by the procedure; about 2 hours of the agent's
 work, plus the operator's attended start of the task.
 
@@ -65,27 +65,25 @@ image*) and `doc/running.md` (the agent's layer), and porelo-project's `project.
 
 ## Findings from the trial
 
-- **What ran:** the seven skills fetched from the skills repository and checked against their sha256 each; the
-  tests tagged `documents` (5 tests) and `verify` (197 tests, none failed or skipped) passed in the task, each its own
-  step with exit code 0, the packages left to the forge's Build.
-- **Missing, egress:** `raw.githubusercontent.com` is not reachable from the task, so `check-citations` cannot run
-  there and is left to the forge's *Shared rules check*.
-- **Missing, forge:** the *Shared rules check* on the local forge failed in its first Maven step, since the parent
-  `porelo-parent` 0.2.1-SNAPSHOT is absent from the forge's registry; both go green once the forge reads the Porelo
-  snapshots its registry does not hold from an upstream snapshot repository.
-- **Missing, context:** the task has no remote `origin`, only the gate's, so `check-commits` reads `porelo/main`
-  where the brief names `origin/main`; no `forgejo` reader was in the task, so Build results come by relay.
-- **Held:** the settings deny `Skill`, `Agent` and `Workflow`, so skills are read as files and the brief says so; the
-  agent's name, the room in place of the channel and the operator's language and time zone came with the brief, not from
-  a file in the task; the task's start found a copy of the repository on the host's forge; the commit hook ends the
-  message with the `Assisted-by` trailer and strips a `Co-authored-by` line naming Anthropic.
+- **What ran:** the seven skills fetched from the skills repository, each checked against its sha256 before it was
+  unpacked; the tests tagged `documents` (5 tests) and `verify` (201 tests, none failed or skipped) passed in the task,
+  each its own step with exit code 0, the packages left to the forge's Build.
+- **Missing, egress:** `raw.githubusercontent.com` does not resolve from the task, so `check-citations` ran without
+  reading other repositories' indexes (it says so, and exits 0) and that part is left to the forge's *Shared rules check*.
+- **Missing, context:** the task has no remote `origin`, only the gate's, so `check-commits` reads `porelo/main` where the
+  brief names `origin/main`; no `forgejo` reader was in the task, so Build results come by relay; the mailbox card names
+  no room, so the room is answered as `people`.
+- **Held:** the settings deny `Skill`, `Agent` and `Workflow`, so skills are read as files; the agent's name, the room in
+  place of the channel and the operator's language and time zone came with the brief, not from a file in the task; the
+  task's start found a copy of the repository on the host's forge and a harness skills folder that did not exist yet.
 
 ## To be checked
 
 - That the forge's Build and *Shared rules check* pass on this issue's commits, once the forge reads the Porelo
   snapshots its registry does not hold.
 - That the task reads its builds through the `forgejo` reader; in the trial none was in the task.
-- That the project's egress lets the task reach `raw.githubusercontent.com`, which `check-citations` reads.
+- That the project's egress is widened to `raw.githubusercontent.com` or `check-citations` is moved to where it
+  resolves: in the trial the task could not read the other repositories' indexes.
 - That the outside reader can fetch `porelo/<task>` from the host's forge, not only from GitHub.
 - The way back, rehearsed once: the task's open work fetched from the host's forge into the checkout here.
 - That a revoked sign-in is renewed with `porelo vault login claude --force` and a stop and start of the task: a
