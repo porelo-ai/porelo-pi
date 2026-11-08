@@ -67,6 +67,8 @@ jobs:
             # none. The version the parent pom pins, checked against the digest of its release, pinned here.
             - name: The pinned shfmt
               env:
+                  # The job's token, for a download from https://github.com alone; none on a host's forge.
+                  PORELO_PINNED_GITHUB_TOKEN: ${{ github.server_url == 'https://github.com' && github.token || '' }}
                   PORELO_PACKAGES_READ_TOKEN: ${{ secrets.PORELO_PACKAGES_READ_TOKEN }}
               run: |
                   set -eu
@@ -159,6 +161,25 @@ jobs:
                   tar -xzf "$RUNNER_TEMP/node.tar.gz" -C "$RUNNER_TEMP/node" --strip-components=1
                   echo "$RUNNER_TEMP/node/bin" >> "$GITHUB_PATH"
                   echo PI_TREE_DIRECT=1 >> "$GITHUB_ENV"
+
+            # fd and ripgrep come from github.com, so they are fetched here with the job's token, into the place
+            # build-pi-tree.sh keeps a file that matches its pin: the token goes to this step alone, never into Maven's.
+            - name: The pinned search tools
+              env:
+                  # The job's token, for a download from https://github.com alone; none on a host's forge.
+                  PORELO_PINNED_GITHUB_TOKEN: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+              run: |
+                  set -euo pipefail
+                  pin() { sed -n "s:.*<pin.$1>\(.*\)</pin.$1>.*:\1:p" pom.xml | head -n 1; }
+                  fd="$(pin fd.version)" fd_sha="$(pin fd.sha256)" rg="$(pin rg.version)" rg_sha="$(pin rg.sha256)"
+                  [ -n "$fd" ] && [ -n "$fd_sha" ] && [ -n "$rg" ] && [ -n "$rg_sha" ] \
+                      || { echo "::error::pom.xml names no pinned fd or ripgrep"; exit 1; }
+                  . .github/actions/pinned-jdk/pinned.sh
+                  musl=x86_64-unknown-linux-musl.tar.gz
+                  pinned_fetch "https://github.com/sharkdp/fd/releases/download/v$fd/fd-v$fd-$musl" "$fd_sha" \
+                      target/pi-downloads/fd.tar.gz
+                  pinned_fetch "https://github.com/BurntSushi/ripgrep/releases/download/$rg/ripgrep-$rg-$musl" "$rg_sha" \
+                      target/pi-downloads/rg.tar.gz
 
             # The packages are what an operator installs, so a build that has not produced them has not proved.
             # Not -DskipTests: that also skips NativeLinkageCheck and PackageVersionCheck, the tests that
@@ -390,6 +411,8 @@ jobs:
             # none. The version the parent pom pins, checked against the digest of its release, pinned here.
             - name: The pinned shfmt
               env:
+                  # The job's token, for a download from https://github.com alone; none on a host's forge.
+                  PORELO_PINNED_GITHUB_TOKEN: ${{ github.server_url == 'https://github.com' && github.token || '' }}
                   PORELO_PACKAGES_READ_TOKEN: ${{ secrets.PORELO_PACKAGES_READ_TOKEN }}
               run: |
                   set -eu
