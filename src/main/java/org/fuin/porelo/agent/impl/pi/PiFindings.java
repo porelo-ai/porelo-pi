@@ -47,6 +47,39 @@ final class PiFindings implements Finder {
     /** The ones of them whose Pi sign-in Porelo can use: the others' entries are API keys. */
     private static final Set<String> SIGN_IN_PROVIDERS = Set.of(ANTHROPIC, COPILOT, OPENROUTER);
 
+    /** Reads a file's text; what fails to read is a file Porelo cannot say anything about. */
+    @FunctionalInterface
+    interface FileReader {
+
+        /**
+         * Returns a file's text.
+         *
+         * @param path The file.
+         * @return Its content, as UTF-8.
+         * @throws IOException If it cannot be read.
+         */
+        String read(Path path) throws IOException;
+    }
+
+    /** Reads a file from the file system. */
+    static final FileReader FILE_SYSTEM = path -> Files.readString(path, StandardCharsets.UTF_8);
+
+    private final FileReader reader;
+
+    /** Reads the files from the file system. */
+    PiFindings() {
+        this(FILE_SYSTEM);
+    }
+
+    /**
+     * Reads the files with the reader given, so a file no account can read is made for any account.
+     *
+     * @param reader How a file's text is read.
+     */
+    PiFindings(final FileReader reader) {
+        this.reader = reader;
+    }
+
     @Override
     public List<Finding> find(final Path configDirectory) {
 
@@ -57,9 +90,10 @@ final class PiFindings implements Finder {
                     new Finding(What.CONFIGURATION, directory.toString(), null, null, null, null));
         }
 
-        final JsonFile auth = JsonFile.read(directory.resolve(AUTH_FILE));
-        final JsonFile models = JsonFile.read(directory.resolve(MODELS_FILE));
-        final String preferred = preferredProvider(JsonFile.read(directory.resolve(SETTINGS_FILE)));
+        final JsonFile auth = JsonFile.read(reader, directory.resolve(AUTH_FILE));
+        final JsonFile models = JsonFile.read(reader, directory.resolve(MODELS_FILE));
+        final String preferred =
+                preferredProvider(JsonFile.read(reader, directory.resolve(SETTINGS_FILE)));
         final Map<?, ?> configured = configuredProviders(models);
 
         final boolean authUsable =
@@ -247,9 +281,13 @@ final class PiFindings implements Finder {
         }
 
         static JsonFile read(final Path path) {
+            return read(FILE_SYSTEM, path);
+        }
+
+        static JsonFile read(final FileReader reader, final Path path) {
             final String content;
             try {
-                content = Files.readString(path, StandardCharsets.UTF_8);
+                content = reader.read(path);
             } catch (NoSuchFileException ex) {
                 return new JsonFile(path, State.ABSENT, Map.of());
             } catch (IOException ex) {

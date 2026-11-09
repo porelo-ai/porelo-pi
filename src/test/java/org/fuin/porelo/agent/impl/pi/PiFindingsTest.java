@@ -1,14 +1,13 @@
 package org.fuin.porelo.agent.impl.pi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.PosixFilePermission;
 import java.util.List;
-import java.util.Set;
 import org.fuin.porelo.agent.api.Finding;
 import org.fuin.porelo.agent.api.Finding.Kind;
 import org.fuin.porelo.agent.api.Finding.SignedIn;
@@ -299,19 +298,33 @@ class PiFindingsTest {
     void aFileThatCannotBeReadCannotSay() throws IOException {
 
         // Prevents a sign-in that may be there being passed over.
+        // The refusal comes from the reader, so root, which runs the forge's Build and reads
+        // through any mode, meets it too.
         auth("{\"openrouter\":" + API_KEY + "}");
         final Path file = directory.resolve("auth.json");
-        Files.setPosixFilePermissions(file, Set.of());
-        try {
-            // The forge's runner is root, which reads through any mode.
-            assumeFalse(Files.isReadable(file), "this account reads through a mode");
-            assertThat(signIns())
-                    .as("an auth.json that cannot be read")
-                    .containsExactly(cannotSay("auth.json"));
-        } finally {
-            Files.setPosixFilePermissions(
-                    file, Set.of(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE));
-        }
+        final PiFindings findings =
+                new PiFindings(
+                        path -> {
+                            if (path.equals(file)) {
+                                throw new AccessDeniedException(path.toString());
+                            }
+                            return Files.readString(path, StandardCharsets.UTF_8);
+                        });
+
+        assertThat(findings.find(directory).stream().filter(f -> f.what() == What.SIGN_IN))
+                .as("an auth.json this account may not read")
+                .containsExactly(cannotSay("auth.json"));
+    }
+
+    @Test
+    void anAuthJsonThatIsADirectoryCannotSay() throws IOException {
+
+        // Prevents a sign-in that may be there being passed over when the name is no file.
+        Files.createDirectories(directory.resolve("auth.json"));
+
+        assertThat(signIns())
+                .as("an auth.json that is a directory")
+                .containsExactly(cannotSay("auth.json"));
     }
 
     @Test
