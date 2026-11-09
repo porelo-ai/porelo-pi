@@ -1,6 +1,6 @@
 # PI43 — Mutation Testing With PIT
 
-**Status:** Backlog.
+**Status:** Implementing.
 **Size:** S - one profile in `pom.xml` and a report in this issue, no contract.
 
 **What must be true.** A person can run mutation testing over this repository by hand and read which changes to the
