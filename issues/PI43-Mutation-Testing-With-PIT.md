@@ -37,16 +37,21 @@ code no test notices, sorted into real gaps and harmless ones.
 
 The run by hand over the seven classes of `org.fuin.porelo.agent.impl.pi`, with the 25 unit test classes: 171
 mutants, 165 killed, 3 survived, 3 without coverage; ended with exit 0 in under a minute. It ran in a task
-container, not on a VM; the tests that start real processes ran there, and `verify` there skipped none of its
-201 tests.
+container, not on a VM; the tests that start real processes ran there.
 
-**Real gaps** - a change that can do harm and no test sees:
+`verify` runs 202 tests, the one below included. In the task container, as an account other than root, none is
+skipped. On the forge's runner one is: `PiFindingsTest.aFileThatCannotBeReadCannotSay` takes away every
+permission of `auth.json` and assumes the file then cannot be read; the runner is root, which reads through any
+mode, so the assumption fails and the test is skipped. It is the one assumption among the unit tests; the
+package checks run after `verify` have their own.
 
-- `PiFindings.isValid`, line 157, the `env` of an `api_key` entry taken as a map: negated, survived. Made to read
-  every `env` map as invalid by hand, `PiFindingsTest` and `PiCredentialExtractorTest` still pass. No test holds
+**Real gaps** - a change that can do harm and no test saw; each is now killed:
+
+- `PiFindings.isValid`, line 157, the `env` of an `api_key` entry taken as a map: negated, survived. No test held
   an entry whose `env` is a map of strings beside a good entry, so a file Pi accepts could read as one it refuses:
-  every provider would read as "cannot say" and the import would stop. It fails closed, nothing leaks; recorded
-  here, not grave.
+  every provider would read as "cannot say" and the import would stop. `PiFindingsTest` now holds such a file and
+  expects both entries read; it fails with every `env` map read as invalid, and a run by hand over `PiFindings`
+  kills all 68 of its mutants, this one by that test.
 
 **Harmless ones:**
 

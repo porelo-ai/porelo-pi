@@ -233,6 +233,29 @@ class PiFindingsTest {
     }
 
     @Test
+    void anEntryWithAnEnvironmentOfTextLeavesTheFileUsable() throws IOException {
+
+        // Prevents a file Pi accepts reading as one it refuses, which stops the import of a
+        // sign-in beside it.
+        auth(
+                "{\"openrouter\":"
+                        + API_KEY
+                        + ",\"groq\":{\"type\":\"api_key\",\"key\":\"x\",\"env\":{\"A\":\"b\"}}}");
+
+        assertThat(signIns())
+                .as("a good entry beside one with an environment of text")
+                .containsExactlyInAnyOrder(
+                        signedIn(true, "openrouter", Kind.API_KEY),
+                        new Finding(
+                                What.SIGN_IN,
+                                path("auth.json"),
+                                SignedIn.SIGNED_IN,
+                                false,
+                                null,
+                                Kind.API_KEY));
+    }
+
+    @Test
     void aProviderPoreloDoesNotDeclareIsSignedInWithoutAProvider() throws IOException {
 
         // Prevents a name in a person's file reaching Porelo, and being offered for import.
