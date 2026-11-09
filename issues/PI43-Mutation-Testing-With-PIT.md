@@ -1,6 +1,6 @@
 # PI43 — Mutation Testing With PIT
 
-**Status:** Implementing.
+**Status:** Review.
 **Size:** S - one profile in `pom.xml` and a report in this issue, no contract.
 
 **What must be true.** A person can run mutation testing over this repository by hand and read which changes to the
@@ -32,3 +32,30 @@ code no test notices, sorted into real gaps and harmless ones.
 - `## Survivors` names every survivor the report lists, each sorted.
 
 **The model.** The `pit` profile in the messaging repository's `pom.xml`.
+
+## Survivors
+
+The run by hand over the seven classes of `org.fuin.porelo.agent.impl.pi`, with the 25 unit test classes: 171
+mutants, 165 killed, 3 survived, 3 without coverage; ended with exit 0 in under a minute. It ran in a task
+container, not on a VM; the tests that start real processes ran there, and `verify` there skipped none of its
+201 tests.
+
+**Real gaps** - a change that can do harm and no test sees:
+
+- `PiFindings.isValid`, line 157, the `env` of an `api_key` entry taken as a map: negated, survived. Made to read
+  every `env` map as invalid by hand, `PiFindingsTest` and `PiCredentialExtractorTest` still pass. No test holds
+  an entry whose `env` is a map of strings beside a good entry, so a file Pi accepts could read as one it refuses:
+  every provider would read as "cannot say" and the import would stop. It fails closed, nothing leaks; recorded
+  here, not grave.
+
+**Harmless ones:**
+
+- `PiCredentialExtractor.extract`, line 61, the filter on the finding's file replaced by `true`: survived, and
+  cannot be killed today. Only `auth.json` makes a finding importable (a key in `models.json` is found with
+  `stored` false), so the filter on importable already drops every other file; this one is a second guard.
+- `PiJsonFormatter.cut`, line 238, `> MAX` as `>= MAX`: survived. A line of exactly 300 code points would show
+  the cut mark after all of it; only the output reads differently.
+- `PiJsonFormatter.shape`, line 79, `message`, lines 105 and 116, each return replaced by `""`: no coverage. A
+  line that parses to JSON but not an object, a `message_end` without a message object, and an assistant message
+  without a content list would show an empty line instead of the line marked unreadable; what is shown still
+  passes the control-character filter, so only the output reads differently.
