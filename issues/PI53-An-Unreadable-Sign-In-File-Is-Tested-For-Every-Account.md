@@ -1,6 +1,6 @@
 # PI53 — An Unreadable Sign-In File Is Tested For Every Account
 
-**Status:** Backlog.
+**Status:** Implementing.
 **Size:** S - one test and, if the reproduction needs it, one seam in `PiFindings`; no contract.
 
 **What must be true.** The test that an `auth.json` which cannot be read makes Porelo say "cannot say", rather than
