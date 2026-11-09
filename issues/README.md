@@ -15,11 +15,11 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi41"></a>[PI41](PI41-Snapshots-Resolved-With-A-Read-Only-Token.md) | S | — | on a forge other than the central one, snapshots resolved with the runner's read-only token, the publisher's token in no step, since nothing here deploys to the registry, and a Build without `MAVEN_SNAPSHOTS_URL` refused at its start |
 | <a id="pi39"></a>[PI39](PI39-The-Repository-s-Agent-Works-In-A-Porelo-Task.md) | S | [PI38](#pi38) | the repository's agent moves into its own Porelo task, after a dry run on this machine |
 
-## Accepted
+## Backlog
 
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
-| <a id="pi43"></a>[PI43](PI43-Mutation-Testing-With-PIT.md) |  | — | mutation testing by hand: a `pit` profile outside CI with no threshold, and a report sorting survivors into real gaps and harmless ones |
+| <a id="pi43"></a>[PI43](PI43-Mutation-Testing-With-PIT.md) | S | — | mutation testing by hand: a `pit` profile outside CI with no threshold, and a report sorting survivors into real gaps and harmless ones |
 
 ## Idea
 
