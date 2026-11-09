@@ -16,6 +16,12 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi41"></a>[PI41](PI41-Snapshots-Resolved-With-A-Read-Only-Token.md) | S | — | on a forge other than the central one, snapshots resolved with the runner's read-only token, the publisher's token in no step, since nothing here deploys to the registry, and a Build without `MAVEN_SNAPSHOTS_URL` refused at its start |
 | <a id="pi39"></a>[PI39](PI39-The-Repository-s-Agent-Works-In-A-Porelo-Task.md) | S | [PI38](#pi38) | the repository's agent moves into its own Porelo task, after a dry run on this machine |
 
+## Backlog
+
+| # | Size | Blocked by | What it covers |
+|---|---|---|---|
+| <a id="pi53"></a>[PI53](PI53-An-Unreadable-Sign-In-File-Is-Tested-For-Every-Account.md) | S | — | the test that an unreadable `auth.json` cannot say runs and passes as root and as a user other than root, never skipped; the failure as uid 1001 reproduced first |
+
 ## Accepted
 
 | # | Size | Blocked by | What it covers |
