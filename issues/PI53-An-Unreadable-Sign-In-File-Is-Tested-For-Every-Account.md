@@ -1,7 +1,20 @@
 # PI53 — An Unreadable Sign-In File Is Tested For Every Account
 
-**Status:** Review.
-**Size:** S - one test and one seam in `PiFindings`; no contract.
+```json
+{
+  "$schema": "issue-1.json",
+  "id": "PI53",
+  "title": "An Unreadable Sign-In File Is Tested For Every Account",
+  "state": "Review",
+  "size": "S",
+  "priority": "Medium",
+  "rank": 1,
+  "blockedBy": [],
+  "covers": "the test that an unreadable `auth.json` cannot say runs and passes as root and as a user other than root, never skipped; the failure as uid 1001 reproduced first"
+}
+```
+
+**Why this size.** one test and one seam in `PiFindings`; no contract.
 
 **What must be true.** The test that an `auth.json` which cannot be read makes Porelo say "cannot say", rather than
 pass over a sign-in that may be there, runs and passes for every account: root in the forge's Build and a user other

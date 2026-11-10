@@ -1,7 +1,20 @@
 # PI52 — The Tests Follow The Pyramid
 
-**Status:** Accepted.
-**Size:** M - two scenario files, the status extension's tests moved into the unit phase with a JavaScript engine
+```json
+{
+  "$schema": "issue-1.json",
+  "id": "PI52",
+  "title": "The Tests Follow The Pyramid",
+  "state": "Accepted",
+  "size": "M",
+  "priority": "Medium",
+  "rank": 1,
+  "blockedBy": [],
+  "covers": "the suites by level with measured times; the status extension's prompt stack proven in the unit phase, the sign-in store outside the home guarded there, five end-to-end scenarios that test only Porelo leave the legs, and the timeout test waits 100 ms"
+}
+```
+
+**Why this size.** two scenario files, the status extension's tests moved into the unit phase with a JavaScript engine
 of their own, and one test class; no contract.
 
 **What must be true.** Every flow this adapter owns is proven by unit tests that run in seconds, the status

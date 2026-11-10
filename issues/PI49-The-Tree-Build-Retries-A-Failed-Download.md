@@ -1,7 +1,20 @@
 # PI49 — The Tree Build Retries A Failed Download
 
-**Status:** Review.
-**Size:** S - three fetches moved onto porelo-buildtools' `pinned.sh`, with the workflows' own copies of the action.
+```json
+{
+  "$schema": "issue-1.json",
+  "id": "PI49",
+  "title": "The Tree Build Retries A Failed Download",
+  "state": "Review",
+  "size": "S",
+  "priority": "Medium",
+  "rank": 3,
+  "blockedBy": [],
+  "covers": "the tree build fetches Node, fd and ripgrep again on a 5xx or a broken connection, a few times, before it fails"
+}
+```
+
+**Why this size.** three fetches moved onto porelo-buildtools' `pinned.sh`, with the workflows' own copies of the action.
 
 **What must be true.** Pi's tree build (`buildtools/build-pi-tree.sh`) fetches the pinned Node runtime, fd and ripgrep
 again when a server answers with a 5xx or the connection breaks, a few times with a growing wait, before it fails and

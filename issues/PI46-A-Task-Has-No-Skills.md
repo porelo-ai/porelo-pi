@@ -1,7 +1,20 @@
 # PI46 — A Task Has No Skills
 
-**Status:** Review.
-**Size:** XS - one argument in the definition and its tests, no contract.
+```json
+{
+  "$schema": "issue-1.json",
+  "id": "PI46",
+  "title": "A Task Has No Skills",
+  "state": "Review",
+  "size": "XS",
+  "priority": "Medium",
+  "rank": 5,
+  "blockedBy": [],
+  "covers": "a task has no skills, on any start"
+}
+```
+
+**Why this size.** one argument in the definition and its tests, no contract.
 
 **What must be true.** Pi in a Porelo task lists no skill on any start, resumed or not.
 

@@ -1,6 +1,18 @@
 # PI37 — Nothing The Agent Writes Reaches The Next Pi
 
-**Status:** Idea.
+```json
+{
+  "$schema": "issue-1.json",
+  "id": "PI37",
+  "title": "Nothing The Agent Writes Reaches The Next Pi",
+  "state": "Idea",
+  "size": "-",
+  "priority": "Medium",
+  "rank": 6,
+  "blockedBy": [],
+  "covers": "nothing the agent writes in a task reaches a later Pi: its settings, models, MCP servers, extensions, `PATH`"
+}
+```
 
 **What must be true.** Nothing the agent writes in a task reaches a later Pi in it: not Pi's settings, models,
 MCP servers or extensions, and not a `pi` or a variable that comes before the root-owned wrapper. So code the

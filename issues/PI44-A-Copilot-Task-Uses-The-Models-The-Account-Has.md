@@ -1,6 +1,18 @@
 # PI44 — A Copilot Task Uses The Models The Account Has
 
-**Status:** Idea.
+```json
+{
+  "$schema": "issue-1.json",
+  "id": "PI44",
+  "title": "A Copilot Task Uses The Models The Account Has",
+  "state": "Idea",
+  "size": "-",
+  "priority": "Medium",
+  "rank": 4,
+  "blockedBy": [],
+  "covers": "a task on GitHub Copilot runs on a model the account has: no flagless failure on a default it lacks, and `--model` takes every model the account has"
+}
+```
 
 **What must be true.** A task on GitHub Copilot runs on a model the person's account has: started without
 `--model` it asks for none the account lacks, or stops saying which model is missing and what to do, and

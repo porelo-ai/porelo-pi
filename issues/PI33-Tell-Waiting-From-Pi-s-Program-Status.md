@@ -1,6 +1,18 @@
 # PI33 — Tell Waiting From Pi's Program Status
 
-**Status:** Idea.
+```json
+{
+  "$schema": "issue-1.json",
+  "id": "PI33",
+  "title": "Tell Waiting From Pi's Program Status",
+  "state": "Idea",
+  "size": "-",
+  "priority": "Medium",
+  "rank": 7,
+  "blockedBy": [],
+  "covers": "Porelo tells a waiting Pi from one at rest by what Pi 1 reports of itself"
+}
+```
 
 **What must be true.** Porelo can say whether Pi waits for a person from what Pi reports of itself, and not
 only "cannot say", and wakes it only where that report says it is at rest.

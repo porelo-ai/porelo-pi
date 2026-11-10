@@ -1,7 +1,20 @@
 # PI39 — The Repository's Agent Works In A Porelo Task
 
-**Status:** Review; blocked by [PI38](README.md#pi38), in Review.
-**Size:** S - no code here beyond `porelo.yml`, the move itself done by the procedure; about 2 hours of the agent's
+```json
+{
+  "$schema": "issue-1.json",
+  "id": "PI39",
+  "title": "The Repository's Agent Works In A Porelo Task",
+  "state": "Review",
+  "size": "S",
+  "priority": "Medium",
+  "rank": 8,
+  "blockedBy": ["PI38"],
+  "covers": "the repository's agent moves into its own Porelo task, after a dry run on this machine"
+}
+```
+
+**Why this size.** no code here beyond `porelo.yml`, the move itself done by the procedure; about 2 hours of the agent's
 work, plus the operator's attended start of the task.
 
 **What must be true.** `porelo-pi`'s agent works in a Porelo task of the project `porelo` on the move's host, reached

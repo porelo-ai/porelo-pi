@@ -1,40 +1,40 @@
 # Issues
 
-What is open in this repository, grouped by state in the order Review, Rework, Implementing, Backlog,
-Analyzed, Accepted, Idea, Estimated, Finished and Rejected; a group with nothing in it is left out.
+What is open in this repository, grouped by state in the order of [workflow.yml](workflow.yml); a group
+with nothing in it is left out. The index is generated from the issues' heads and never edited by hand.
 Within a group, the order is the priority. The number is identity, not sequence.
-
-## Review
-
-| # | Size | Blocked by | What it covers |
-|---|---|---|---|
-| <a id="pi53"></a>[PI53](PI53-An-Unreadable-Sign-In-File-Is-Tested-For-Every-Account.md) | S | — | the test that an unreadable `auth.json` cannot say runs and passes as root and as a user other than root, never skipped; the failure as uid 1001 reproduced first |
-| <a id="pi43"></a>[PI43](PI43-Mutation-Testing-With-PIT.md) | S | — | mutation testing by hand: a `pit` profile outside CI with no threshold, and a report sorting survivors into real gaps and harmless ones |
-| <a id="pi49"></a>[PI49](PI49-The-Tree-Build-Retries-A-Failed-Download.md) | S | — | the tree build fetches Node, fd and ripgrep again on a 5xx or a broken connection, a few times, before it fails |
-| <a id="pi47"></a>[PI47](PI47-Snapshots-Not-Published-On-The-Forge-Come-From-Upstream.md) | S | — | on a forge whose registry holds only its organization's packages, the other Porelo snapshots come from the anonymous repository `MAVEN_UPSTREAM_SNAPSHOTS_URL` names, the forge's token sent to the forge alone, a tag still built from releases only |
-| <a id="pi46"></a>[PI46](PI46-A-Task-Has-No-Skills.md) | XS | — | a task has no skills, on any start |
-| <a id="pi38"></a>[PI38](PI38-The-Build-Runs-On-The-Local-Forge-As-On-The-Central-One.md) | S | — | the workflows run 1:1 on the local Forgejo and the central forge: snapshots from `MAVEN_SNAPSHOTS_URL`, publishing switched by `PORELO_PUBLISH`, legs asked by kind, green on a local Forgejo |
-| <a id="pi41"></a>[PI41](PI41-Snapshots-Resolved-With-A-Read-Only-Token.md) | S | — | on a forge other than the central one, snapshots resolved with the runner's read-only token, the publisher's token in no step, since nothing here deploys to the registry, and a Build without `MAVEN_SNAPSHOTS_URL` refused at its start |
-| <a id="pi39"></a>[PI39](PI39-The-Repository-s-Agent-Works-In-A-Porelo-Task.md) | S | [PI38](#pi38) | the repository's agent moves into its own Porelo task, after a dry run on this machine |
-
-## Accepted
-
-| # | Size | Blocked by | What it covers |
-|---|---|---|---|
-| <a id="pi52"></a>[PI52](PI52-The-Tests-Follow-The-Pyramid.md) | M | — | the suites by level with measured times; the status extension's prompt stack proven in the unit phase, the sign-in store outside the home guarded there, five end-to-end scenarios that test only Porelo leave the legs, and the timeout test waits 100 ms |
 
 ## Idea
 
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
-| <a id="pi51"></a>[PI51](PI51-The-Bill-Generator-Is-Relocked-Past-Its-Advisories.md) |  | — | the bill generator's lock resolves no release with a published advisory; it never ships, so low in priority |
-| <a id="pi50"></a>[PI50](PI50-The-Clean-Up-Says-When-Nothing-Was-Rented.md) |  | — | a leg that failed before resolving the machine tooling rented nothing, and its clean-up says so instead of failing on a missing class |
-| <a id="pi48"></a>[PI48](PI48-The-Acceptance-Legs-Run-Side-By-Side.md) |  | — | a Build's acceptance legs run at the same time, two machines held at once instead of one, the Build done about one leg sooner |
-| <a id="pi44"></a>[PI44](PI44-A-Copilot-Task-Uses-The-Models-The-Account-Has.md) |  | — | a task on GitHub Copilot runs on a model the account has: no flagless failure on a default it lacks, and `--model` takes every model the account has |
-| <a id="pi40"></a>[PI40](PI40-The-Acceptance-Legs-Run-On-The-Host-s-Forge.md) |  | [PI38](#pi38) | the acceptance legs on the host's pool again, once it lends a forge job a machine by kind |
-| <a id="pi37"></a>[PI37](PI37-Nothing-The-Agent-Writes-Reaches-The-Next-Pi.md) |  | — | nothing the agent writes in a task reaches a later Pi: its settings, models, MCP servers, extensions, `PATH` |
-| <a id="pi33"></a>[PI33](PI33-Tell-Waiting-From-Pi-s-Program-Status.md) |  | — | Porelo tells a waiting Pi from one at rest by what Pi 1 reports of itself |
-| <a id="pi45"></a>[PI45](PI45-Depend-On-The-Agent-Protocol-Porelo-Provides.md) |  | — | the agent contract named at install time |
+| <a id="pi51"></a>[PI51](PI51-The-Bill-Generator-Is-Relocked-Past-Its-Advisories.md) | - | - | the bill generator's lock resolves no release with a published advisory; it never ships, so low in priority |
+| <a id="pi50"></a>[PI50](PI50-The-Clean-Up-Says-When-Nothing-Was-Rented.md) | - | - | a leg that failed before resolving the machine tooling rented nothing, and its clean-up says so instead of failing on a missing class |
+| <a id="pi48"></a>[PI48](PI48-The-Acceptance-Legs-Run-Side-By-Side.md) | - | - | a Build's acceptance legs run at the same time, two machines held at once instead of one, the Build done about one leg sooner |
+| <a id="pi44"></a>[PI44](PI44-A-Copilot-Task-Uses-The-Models-The-Account-Has.md) | - | - | a task on GitHub Copilot runs on a model the account has: no flagless failure on a default it lacks, and `--model` takes every model the account has |
+| <a id="pi40"></a>[PI40](PI40-The-Acceptance-Legs-Run-On-The-Host-s-Forge.md) | - | [PI38](README.md#pi38) | the acceptance legs on the host's pool again, once it lends a forge job a machine by kind |
+| <a id="pi37"></a>[PI37](PI37-Nothing-The-Agent-Writes-Reaches-The-Next-Pi.md) | - | - | nothing the agent writes in a task reaches a later Pi: its settings, models, MCP servers, extensions, `PATH` |
+| <a id="pi33"></a>[PI33](PI33-Tell-Waiting-From-Pi-s-Program-Status.md) | - | - | Porelo tells a waiting Pi from one at rest by what Pi 1 reports of itself |
+| <a id="pi45"></a>[PI45](PI45-Depend-On-The-Agent-Protocol-Porelo-Provides.md) | - | - | the agent contract named at install time |
+
+## Accepted
+
+| # | Size | Blocked by | What it covers |
+|---|---|---|---|
+| <a id="pi52"></a>[PI52](PI52-The-Tests-Follow-The-Pyramid.md) | M | - | the suites by level with measured times; the status extension's prompt stack proven in the unit phase, the sign-in store outside the home guarded there, five end-to-end scenarios that test only Porelo leave the legs, and the timeout test waits 100 ms |
+
+## Review
+
+| # | Size | Blocked by | What it covers |
+|---|---|---|---|
+| <a id="pi53"></a>[PI53](PI53-An-Unreadable-Sign-In-File-Is-Tested-For-Every-Account.md) | S | - | the test that an unreadable `auth.json` cannot say runs and passes as root and as a user other than root, never skipped; the failure as uid 1001 reproduced first |
+| <a id="pi43"></a>[PI43](PI43-Mutation-Testing-With-PIT.md) | S | - | mutation testing by hand: a `pit` profile outside CI with no threshold, and a report sorting survivors into real gaps and harmless ones |
+| <a id="pi49"></a>[PI49](PI49-The-Tree-Build-Retries-A-Failed-Download.md) | S | - | the tree build fetches Node, fd and ripgrep again on a 5xx or a broken connection, a few times, before it fails |
+| <a id="pi47"></a>[PI47](PI47-Snapshots-Not-Published-On-The-Forge-Come-From-Upstream.md) | S | - | on a forge whose registry holds only its organization's packages, the other Porelo snapshots come from the anonymous repository `MAVEN_UPSTREAM_SNAPSHOTS_URL` names, the forge's token sent to the forge alone, a tag still built from releases only |
+| <a id="pi46"></a>[PI46](PI46-A-Task-Has-No-Skills.md) | XS | - | a task has no skills, on any start |
+| <a id="pi38"></a>[PI38](PI38-The-Build-Runs-On-The-Local-Forge-As-On-The-Central-One.md) | S | - | the workflows run 1:1 on the local Forgejo and the central forge: snapshots from `MAVEN_SNAPSHOTS_URL`, publishing switched by `PORELO_PUBLISH`, legs asked by kind, green on a local Forgejo |
+| <a id="pi41"></a>[PI41](PI41-Snapshots-Resolved-With-A-Read-Only-Token.md) | S | - | on a forge other than the central one, snapshots resolved with the runner's read-only token, the publisher's token in no step, since nothing here deploys to the registry, and a Build without `MAVEN_SNAPSHOTS_URL` refused at its start |
+| <a id="pi39"></a>[PI39](PI39-The-Repository-s-Agent-Works-In-A-Porelo-Task.md) | S | [PI38](README.md#pi38) | the repository's agent moves into its own Porelo task, after a dry run on this machine |
 
 ## Finished
 
