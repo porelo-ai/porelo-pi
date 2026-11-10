@@ -23,12 +23,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 |---|---|---|---|
 | <a id="pi52"></a>[PI52](PI52-The-Tests-Follow-The-Pyramid.md) | M | - | the suites by level with measured times; the status extension's prompt stack proven in the unit phase, the sign-in store outside the home guarded there, five end-to-end scenarios that test only Porelo leave the legs, and the timeout test waits 100 ms |
 
-## Implementing
-
-| # | Size | Blocked by | What it covers |
-|---|---|---|---|
-| <a id="pi54"></a>[PI54](PI54-Third-Party-Notices-Ship-With-The-Package.md) | S | - | the license texts of what the executable compiles in from outside Porelo - SnakeYAML, JSpecify, the GraalVM runtime - in one THIRD-PARTY-NOTICES file, in the deb's doc directory and as `%license` in the rpm |
-
 ## Review
 
 | # | Size | Blocked by | What it covers |
@@ -41,6 +35,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi38"></a>[PI38](PI38-The-Build-Runs-On-The-Local-Forge-As-On-The-Central-One.md) | S | - | the workflows run 1:1 on the local Forgejo and the central forge: snapshots from `MAVEN_SNAPSHOTS_URL`, publishing switched by `PORELO_PUBLISH`, legs asked by kind, green on a local Forgejo |
 | <a id="pi41"></a>[PI41](PI41-Snapshots-Resolved-With-A-Read-Only-Token.md) | S | - | on a forge other than the central one, snapshots resolved with the runner's read-only token, the publisher's token in no step, since nothing here deploys to the registry, and a Build without `MAVEN_SNAPSHOTS_URL` refused at its start |
 | <a id="pi39"></a>[PI39](PI39-The-Repository-s-Agent-Works-In-A-Porelo-Task.md) | S | [PI38](README.md#pi38) | the repository's agent moves into its own Porelo task, after a dry run on this machine |
+| <a id="pi54"></a>[PI54](PI54-Third-Party-Notices-Ship-With-The-Package.md) | S | - | the license texts of what the executable compiles in from outside Porelo - SnakeYAML, JSpecify, the GraalVM runtime - in one THIRD-PARTY-NOTICES file, in the deb's doc directory and as `%license` in the rpm |
 
 ## Finished
 

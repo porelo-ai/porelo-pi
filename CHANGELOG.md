@@ -17,6 +17,7 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 - The adapter says what it finds of Pi on the host: which providers it is signed in to, by kind and with the path, from `auth.json` and `models.json`, never a value, and a key given as a command is reported and never run; the definition names `config_dir`.
 - The definition names how its sign-in is answered, `login.flow: device-code`, so a person granting GitHub Copilot on a host over SSH can be told to confirm the code on GitHub's page; the Porelo it builds against reads the key, and its agent listing names the flow.
 - `porelo vault authorize github-copilot` grants GitHub Copilot through the OAuth app Pi itself signs in with, and the build stops when the pinned Pi signs in with another.
+- The package carries the full license texts of what its executable compiles in from outside Porelo - SnakeYAML, JSpecify and the GraalVM runtime - in `THIRD-PARTY-NOTICES`, in its doc directory and as an RPM license file, and its Debian copyright names them.
 
 ### Security
 
