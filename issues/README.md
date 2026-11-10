@@ -16,6 +16,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi37"></a>[PI37](PI37-Nothing-The-Agent-Writes-Reaches-The-Next-Pi.md) | - | - | nothing the agent writes in a task reaches a later Pi: its settings, models, MCP servers, extensions, `PATH` |
 | <a id="pi33"></a>[PI33](PI33-Tell-Waiting-From-Pi-s-Program-Status.md) | - | - | Porelo tells a waiting Pi from one at rest by what Pi 1 reports of itself |
 | <a id="pi45"></a>[PI45](PI45-Depend-On-The-Agent-Protocol-Porelo-Provides.md) | - | - | the agent contract named at install time |
+| <a id="pi54"></a>[PI54](PI54-Third-Party-Notices-Ship-With-The-Package.md) | - | - | the license and notice texts of what the executable compiles in - SnakeYAML, JSpecify, the agent API, the wire classes, the GraalVM runtime - in one THIRD-PARTY-NOTICES file, in the deb's doc directory and as `%license` in the rpm |
 
 ## Accepted
 
