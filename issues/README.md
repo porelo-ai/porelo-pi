@@ -23,16 +23,11 @@ Within a group, the order is the priority. The number is identity, not sequence.
 |---|---|---|---|
 | <a id="pi52"></a>[PI52](PI52-The-Tests-Follow-The-Pyramid.md) | M | - | the suites by level with measured times; the status extension's prompt stack proven in the unit phase, the sign-in store outside the home guarded there, five end-to-end scenarios that test only Porelo leave the legs, and the timeout test waits 100 ms |
 
-## Implementing
-
-| # | Size | Blocked by | What it covers |
-|---|---|---|---|
-| <a id="pi56"></a>[PI56](PI56-The-Acceptance-Takes-A-Task-s-Container-Name-From-Porelo.md) | XS | - | the acceptance scenarios name a task by its own name in Porelo's commands and take its container's name from `porelo task status --json`, never built as `porelo-<project>-<task>` |
-
 ## Review
 
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
+| <a id="pi56"></a>[PI56](PI56-The-Acceptance-Takes-A-Task-s-Container-Name-From-Porelo.md) | XS | - | the acceptance scenarios name a task by its own name in Porelo's commands and take its container's name from `porelo task status --json`, never built as `porelo-<project>-<task>` |
 | <a id="pi53"></a>[PI53](PI53-An-Unreadable-Sign-In-File-Is-Tested-For-Every-Account.md) | S | - | the test that an unreadable `auth.json` cannot say runs and passes as root and as a user other than root, never skipped; the failure as uid 1001 reproduced first |
 | <a id="pi55"></a>[PI55](PI55-The-Build-Takes-Its-Downloads-From-A-Cache.md) | S | - | shfmt, Node, fd, ripgrep, the Node builder image and the npm packages of Pi's tree come from the Actions cache, keyed by digest or lockfile, so an outage of their hosts no longer fails a Build that already ran once; an entry nobody reads for 7 days is removed by GitHub |
 | <a id="pi43"></a>[PI43](PI43-Mutation-Testing-With-PIT.md) | S | - | mutation testing by hand: a `pit` profile outside CI with no threshold, and a report sorting survivors into real gaps and harmless ones |

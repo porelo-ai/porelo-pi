@@ -28,30 +28,30 @@ Feature: Pi is never woken, because nothing on its screen tells an open question
         # The model's answer, not the typed line, which has the word in it too.
         Then within 120 seconds this script exits zero:
             """
-            podman exec porelo-wake-wake tmux capture-pane -p -t porelo | grep -v 'single word PONG' | grep -qw PONG
+            podman exec "$(porelo task status wake --json | grep -o '"name": *"[^"]*"' | head -n 1 | cut -d'"' -f4)" tmux capture-pane -p -t porelo | grep -v 'single word PONG' | grep -qw PONG
             """
         # An answer is on the screen a moment before its turn ends. At rest is what pi.yaml's at_rest reads, so what
         # comes below comes to Pi at rest, the case in which an agent that declares waiting would be woken.
         Then within 60 seconds this script exits zero:
             """
-            screen=$(podman exec porelo-wake-wake tmux capture-pane -p -t porelo)
+            screen=$(podman exec "$(porelo task status wake --json | grep -o '"name": *"[^"]*"' | head -n 1 | cut -d'"' -f4)" tmux capture-pane -p -t porelo)
             printf '%s\n' "$screen" | grep -qF '(auto)' || exit 1
             ! printf '%s\n' "$screen" | grep -qF 'Working ─'
             """
-        When a script runs "echo 'What is 1234 plus 4321? Reply with the digits only.' | porelo talk tell porelo-wake-wake"
+        When a script runs "echo 'What is 1234 plus 4321? Reply with the digits only.' | porelo talk tell wake"
         Then it exits zero
-        When a script runs "echo 'a specification' > /tmp/porelo-wake-spec.txt && porelo task give porelo-wake-wake /tmp/porelo-wake-spec.txt"
+        When a script runs "echo 'a specification' > /tmp/porelo-wake-spec.txt && porelo task give wake /tmp/porelo-wake-spec.txt"
         Then it exits zero
         # Both reached the task, so a wake would be due from here on.
         Then within 60 seconds this script exits zero:
             """
-            podman exec porelo-wake-wake sh -c 'find /run/porelo/mail/inbox/new /run/porelo/mail/inbox/cur -type f | grep -q . && test -s /porelo/files/porelo-wake-spec.txt'
+            podman exec "$(porelo task status wake --json | grep -o '"name": *"[^"]*"' | head -n 1 | cut -d'"' -f4)" sh -c 'find /run/porelo/mail/inbox/new /run/porelo/mail/inbox/cur -type f | grep -q . && test -s /porelo/files/porelo-wake-spec.txt'
             """
         # The command that delivered each would have typed its line at once, and the daemon's message watcher passes
         # every 5 seconds while idle: three of its passes go by before the screen is read.
         When a script runs "sleep 15"
         Then the terminal does not show "A message for you waits"
         And the terminal does not show "A file arrived in /porelo/files"
-        When a script runs "rm -f /tmp/porelo-wake-spec.txt; porelo task remove porelo-wake-wake --force"
+        When a script runs "rm -f /tmp/porelo-wake-spec.txt; porelo task remove wake --force"
         And a script runs "porelo project remove wake --force"
         Then it exits zero

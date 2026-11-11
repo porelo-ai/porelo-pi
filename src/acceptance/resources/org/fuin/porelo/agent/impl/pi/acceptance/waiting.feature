@@ -20,7 +20,7 @@ Feature: Porelo says what it can tell about the agent waiting for a person, and 
         And a terminal on the machine
         When I run "porelo task start asks --project asks --repository asks --agent pi --clearance deny"
         Then the "pi" agent in task "asks" of "asks" reaches work without being asked anything
-        When a script runs "porelo task status porelo-asks-asks"
+        When a script runs "porelo task status asks"
         Then it exits zero
         And its output has a line matching "screen +cannot say - .*"
         When a script runs "porelo project remove asks --force"
