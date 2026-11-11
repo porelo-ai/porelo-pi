@@ -5,13 +5,12 @@
   "$schema": "issue-1.json",
   "id": "PI55",
   "title": "The Build Takes Its Downloads From A Cache",
-  "state": "Analyzed",
+  "state": "Implementing",
   "size": "S",
   "priority": "Medium",
   "rank": 1,
   "blockedBy": [],
-  "covers": "shfmt, Node, fd, ripgrep, the Node builder image and the npm packages of Pi's tree come from the Actions cache, keyed by digest or lockfile, so an outage of their hosts no longer fails a Build that already ran once; only the newest entry of each is kept",
-  "openQuestions": 0
+  "covers": "shfmt, Node, fd, ripgrep, the Node builder image and the npm packages of Pi's tree come from the Actions cache, keyed by digest or lockfile, so an outage of their hosts no longer fails a Build that already ran once; only the newest entry of each is kept"
 }
 ```
 
