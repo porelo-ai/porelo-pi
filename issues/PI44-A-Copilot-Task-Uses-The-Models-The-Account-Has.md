@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI44",
   "title": "A Copilot Task Uses The Models The Account Has",
-  "state": "Idea",
+  "state": "Accepted",
   "size": "-",
   "priority": "Medium",
   "rank": 4,

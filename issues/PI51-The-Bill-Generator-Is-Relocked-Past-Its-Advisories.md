@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI51",
   "title": "The Bill Generator Is Relocked Past Its Advisories",
-  "state": "Idea",
+  "state": "Accepted",
   "size": "-",
   "priority": "Medium",
   "rank": 1,

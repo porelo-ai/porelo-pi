@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI50",
   "title": "The Clean-Up Says When Nothing Was Rented",
-  "state": "Idea",
+  "state": "Accepted",
   "size": "-",
   "priority": "Medium",
   "rank": 2,
