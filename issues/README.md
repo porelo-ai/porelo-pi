@@ -23,6 +23,12 @@ Within a group, the order is the priority. The number is identity, not sequence.
 |---|---|---|---|
 | <a id="pi52"></a>[PI52](PI52-The-Tests-Follow-The-Pyramid.md) | M | - | the suites by level with measured times; the status extension's prompt stack proven in the unit phase, the sign-in store outside the home guarded there, five end-to-end scenarios that test only Porelo leave the legs, and the timeout test waits 100 ms |
 
+## Analyzed
+
+| # | Size | Blocked by | What it covers | Open questions |
+|---|---|---|---|---|
+| <a id="pi55"></a>[PI55](PI55-The-Build-Takes-Its-Downloads-From-A-Cache.md) | S | - | shfmt, Node, fd, ripgrep, the Node builder image and the npm packages of Pi's tree come from the Actions cache, keyed by digest or lockfile, so an outage of their hosts no longer fails a Build that already ran once; only the newest entry of each is kept | 0 |
+
 ## Review
 
 | # | Size | Blocked by | What it covers |
