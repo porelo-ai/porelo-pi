@@ -23,6 +23,12 @@ Within a group, the order is the priority. The number is identity, not sequence.
 |---|---|---|---|
 | <a id="pi52"></a>[PI52](PI52-The-Tests-Follow-The-Pyramid.md) | M | - | the suites by level with measured times; the status extension's prompt stack proven in the unit phase, the sign-in store outside the home guarded there, five end-to-end scenarios that test only Porelo leave the legs, and the timeout test waits 100 ms |
 
+## Implementing
+
+| # | Size | Blocked by | What it covers |
+|---|---|---|---|
+| <a id="pi56"></a>[PI56](PI56-The-Acceptance-Takes-A-Task-s-Container-Name-From-Porelo.md) | XS | - | the acceptance scenarios name a task by its own name in Porelo's commands and take its container's name from `porelo task status --json`, never built as `porelo-<project>-<task>` |
+
 ## Review
 
 | # | Size | Blocked by | What it covers |
