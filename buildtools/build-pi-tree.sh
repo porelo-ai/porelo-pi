@@ -60,6 +60,28 @@ JAVA_CMD="${JAVA_CMD:-$(command -v java || true)}"
 # A digest, not a tag alone: npm ci and every checksum run inside this image, and a tag can be repointed.
 [[ "$BUILDER" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*(:[A-Za-z0-9._-]+)?@sha256:[0-9a-f]{64}$ ]] ||
     refuse "PI_BUILDER_IMAGE must be pinned by an @sha256: digest - '$BUILDER' is not"
+# A saved and loaded image no longer carries the pinned index digest, so the workflow that checked it
+# names it by its image id, which is the hash of its content and cannot be repointed.
+RUN_BUILDER=("$BUILDER")
+if [ -n "${PI_BUILDER_IMAGE_ID:-}" ]; then
+    [[ "$PI_BUILDER_IMAGE_ID" =~ ^sha256:[0-9a-f]{64}$ ]] ||
+        refuse "PI_BUILDER_IMAGE_ID must be sha256: and a 64-character lowercase image id - '$PI_BUILDER_IMAGE_ID' is not"
+    RUN_BUILDER=(--pull=never "$PI_BUILDER_IMAGE_ID")
+fi
+# npm's cache, kept between builds where one is named: it becomes a mount, so it must be one plain absolute
+# path, and outside the tree that is shipped.
+NPM_CACHE_RUN=()
+NPM_CACHE_DIRECT=()
+if [ -n "${PI_NPM_CACHE:-}" ]; then
+    [[ "$PI_NPM_CACHE" =~ ^/[A-Za-z0-9._/-]+$ && "$PI_NPM_CACHE" != *..* ]] ||
+        refuse "PI_NPM_CACHE must be an absolute path of letters, digits, '.', '_', '-' and '/' - '$PI_NPM_CACHE' is not"
+    case "$PI_NPM_CACHE/" in
+    "$TARGET"/*) refuse "PI_NPM_CACHE must lie outside the tree, $TARGET" ;;
+    esac
+    mkdir -p "$PI_NPM_CACHE"
+    NPM_CACHE_RUN=(-v "$PI_NPM_CACHE:/npm-cache:z" --env npm_config_cache=/npm-cache)
+    NPM_CACHE_DIRECT=("npm_config_cache=$PI_NPM_CACHE")
+fi
 
 if [ "${PI_TREE_DIRECT:-}" != 1 ] && ! command -v podman >/dev/null 2>&1; then
     echo "build-pi-tree: no podman, so the Pi tree is not built; porelo-agent-pi will be incomplete"
@@ -86,7 +108,7 @@ in_builder() {
         rm -rf "$TARGET/.home" "$TARGET/.work"
         mkdir -p "$TARGET/.home" "$TARGET/.work"
         (env -i PATH="$PATH" HOME="$TARGET/.home" OUT="$TARGET" WORK="$TARGET/.work" \
-            "${values[@]}" sh -c "$1")
+            "${NPM_CACHE_DIRECT[@]}" "${values[@]}" sh -c "$1")
         rm -rf "$TARGET/.home" "$TARGET/.work"
     else
         local envs=()
@@ -96,7 +118,7 @@ in_builder() {
         # HOME too: the build user is the runner's uid, which the image does not know, so podman would
         # give it / and npm could not write its cache. /tmp is outside the tree, as the direct way's is.
         podman run --rm --userns=keep-id --env HOME=/tmp --env OUT=/out --env WORK=/tmp "${envs[@]}" \
-            -v "$TARGET:/out:z" "$BUILDER" sh -c "$1"
+            "${NPM_CACHE_RUN[@]}" -v "$TARGET:/out:z" "${RUN_BUILDER[@]}" sh -c "$1"
     fi
 }
 

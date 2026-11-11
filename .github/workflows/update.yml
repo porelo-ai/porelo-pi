@@ -66,23 +66,11 @@ jobs:
                   PORELO_PACKAGES_READ_TOKEN: ${{ secrets.PORELO_PACKAGES_READ_TOKEN }}
               uses: ./.github/actions/pinned-jdk
 
-            # Spotless checks every *.sh against shfmt in validate but does not download it, and a runner has
-            # none. The version the parent pom pins, checked against the digest of its release, pinned here.
+            # Spotless checks every *.sh against shfmt in validate but does not download it, and a runner has none.
             - name: The pinned shfmt
               env:
-                  # The job's token, for a download from https://github.com alone; none on a host's forge.
-                  PORELO_PINNED_GITHUB_TOKEN: ${{ github.server_url == 'https://github.com' && github.token || '' }}
                   PORELO_PACKAGES_READ_TOKEN: ${{ secrets.PORELO_PACKAGES_READ_TOKEN }}
-              run: |
-                  set -eu
-                  VERSION="$(./mvnw -B -q -s settings.xml help:evaluate -Dexpression=shfmt.version -DforceStdout)"
-                  [ "$VERSION" = 3.12.0 ] || { echo "::error::the pom pins shfmt '$VERSION'; this step installs 3.12.0"; exit 1; }
-                  mkdir -p "$RUNNER_TEMP/bin"
-                  . .github/actions/pinned-jdk/pinned.sh
-                  pinned_fetch "https://github.com/mvdan/sh/releases/download/v$VERSION/shfmt_v${VERSION}_linux_amd64" \
-                      d9fbb2a9c33d13f47e7618cf362a914d029d02a6df124064fff04fd688a745ea "$RUNNER_TEMP/bin/shfmt"
-                  chmod +x "$RUNNER_TEMP/bin/shfmt"
-                  echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+              uses: ./.github/actions/pinned-shfmt
 
             - name: Resolve the release and machine tooling
               env:
@@ -116,25 +104,12 @@ jobs:
               run: |
                   ./mvnw -B -s settings.xml verify || echo "STOP=the unit suite failed" >> "$GITHUB_ENV"
 
-            # fd and ripgrep come from github.com, so they are fetched here with the job's token, into the place
-            # build-pi-tree.sh keeps a file that matches its pin: the token goes to this step alone, never into Maven's.
-            - name: The pinned search tools
+            # Node, fd, ripgrep, the builder image and npm's packages, from the Actions cache where a run kept them; a pin
+            # that moved here is fetched and kept under its new digest.
+            - name: The tree's downloads
+              id: tree-downloads
               if: steps.follow.outputs.moved == 'yes' && !env.STOP
-              env:
-                  # The job's token, for a download from https://github.com alone; none on a host's forge.
-                  PORELO_PINNED_GITHUB_TOKEN: ${{ github.server_url == 'https://github.com' && github.token || '' }}
-              run: |
-                  set -euo pipefail
-                  pin() { sed -n "s:.*<pin.$1>\(.*\)</pin.$1>.*:\1:p" pom.xml | head -n 1; }
-                  fd="$(pin fd.version)" fd_sha="$(pin fd.sha256)" rg="$(pin rg.version)" rg_sha="$(pin rg.sha256)"
-                  [ -n "$fd" ] && [ -n "$fd_sha" ] && [ -n "$rg" ] && [ -n "$rg_sha" ] \
-                      || { echo "::error::pom.xml names no pinned fd or ripgrep"; exit 1; }
-                  . .github/actions/pinned-jdk/pinned.sh
-                  musl=x86_64-unknown-linux-musl.tar.gz
-                  pinned_fetch "https://github.com/sharkdp/fd/releases/download/v$fd/fd-v$fd-$musl" "$fd_sha" \
-                      target/pi-downloads/fd.tar.gz
-                  pinned_fetch "https://github.com/BurntSushi/ripgrep/releases/download/$rg/ripgrep-$rg-$musl" "$rg_sha" \
-                      target/pi-downloads/rg.tar.gz
+              uses: ./.github/actions/pi-tree-downloads
 
             # Not -DskipTests: it would skip the checks that need the binary and the built tree, which are
             # what a new version most needs asked.
@@ -146,6 +121,12 @@ jobs:
                   ./mvnw -B -s settings.xml -Pnative,dist verify \
                       -Dagent.snapshot.run=${{ github.run_number }} \
                       || echo "STOP=the packages did not build" >> "$GITHUB_ENV"
+
+            - if: steps.follow.outputs.moved == 'yes' && !env.STOP && steps.tree-downloads.outputs.npm-hit != 'true'
+              uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: ~/.cache/porelo-pinned/pi-npm
+                  key: ${{ steps.tree-downloads.outputs.npm-key }}
 
             # What moved carries its version in its purl, so without --expect-moved this stops every time.
             # Nothing else is excused, which is the point.

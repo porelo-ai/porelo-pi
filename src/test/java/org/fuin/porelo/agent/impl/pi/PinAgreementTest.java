@@ -285,6 +285,85 @@ class PinAgreementTest {
                 .isNotEmpty();
     }
 
+    @Test
+    void aKeptNpmCacheIsMountedOutsideTheTree(@TempDir final Path dir) throws Exception {
+
+        // npm's cache kept between Builds must reach npm, and never land in the shipped tree.
+        final Path cache = dir.resolve("npm-cache");
+        final Processes.Result kept =
+                buildTree(
+                        dir.resolve("kept"),
+                        "docker.io/library/node:22-slim@sha256:" + "a".repeat(64),
+                        Map.of("PI_NPM_CACHE", cache.toString()),
+                        null);
+
+        final List<String> runs = WorkflowSteps.calls(dir.resolve("kept/stubs"), "podman");
+        assertThat(runs).as("podman calls with a kept npm cache:%n%s", kept.output()).isNotEmpty();
+        assertThat(runs.get(0))
+                .as("the first builder step mounts the kept cache as npm's")
+                .contains("-v " + cache + ":/npm-cache:z", "--env npm_config_cache=/npm-cache")
+                .doesNotContain(cache + ":/out");
+    }
+
+    @Test
+    void refusesAnNpmCacheThatCouldChangeTheMount(@TempDir final Path dir) throws Exception {
+
+        // The value becomes part of a podman mount: a colon or a relative path could mount
+        // something else over the tree, so it is refused before any container starts.
+        for (final String value : List.of("relative/cache", dir + "/c:/out", dir + "/c d")) {
+            final Path module = dir.resolve("m" + Math.abs(value.hashCode()));
+            final Processes.Result refused =
+                    buildTree(
+                            module,
+                            "docker.io/library/node:22-slim@sha256:" + "a".repeat(64),
+                            Map.of("PI_NPM_CACHE", value),
+                            null);
+            assertThat(refused.exit())
+                    .as("exit with PI_NPM_CACHE='%s':%n%s", value, refused.output())
+                    .isEqualTo(2);
+            assertThat(WorkflowSteps.calls(module.resolve("stubs"), "podman"))
+                    .as("podman calls with PI_NPM_CACHE='%s'", value)
+                    .isEmpty();
+        }
+    }
+
+    @Test
+    void aBuilderLoadedFromTheCacheRunsByItsIdWithoutAPull(@TempDir final Path dir)
+            throws Exception {
+
+        // A saved image loses the pinned index digest, so it runs by the id the workflow checked;
+        // a pull there would reach the registry the cache is meant to spare.
+        final String id = "sha256:" + "b".repeat(64);
+        final Processes.Result loaded =
+                buildTree(
+                        dir.resolve("loaded"),
+                        "docker.io/library/node:22-slim@sha256:" + "a".repeat(64),
+                        Map.of("PI_BUILDER_IMAGE_ID", id),
+                        null);
+
+        final List<String> runs = WorkflowSteps.calls(dir.resolve("loaded/stubs"), "podman");
+        assertThat(runs)
+                .as("podman calls with a loaded builder:%n%s", loaded.output())
+                .isNotEmpty();
+        assertThat(runs.get(0))
+                .as("the first builder step runs the loaded image, never pulling")
+                .contains("--pull=never", id)
+                .doesNotContain("docker.io/library/node");
+
+        final Processes.Result named =
+                buildTree(
+                        dir.resolve("named"),
+                        "docker.io/library/node:22-slim@sha256:" + "a".repeat(64),
+                        Map.of("PI_BUILDER_IMAGE_ID", "docker.io/library/node:22-slim"),
+                        null);
+        assertThat(named.exit())
+                .as("exit with a builder id that is a name:%n%s", named.output())
+                .isEqualTo(2);
+        assertThat(WorkflowSteps.calls(dir.resolve("named/stubs"), "podman"))
+                .as("podman calls with a builder id that is a name")
+                .isEmpty();
+    }
+
     /**
      * Runs a copy of the build script in a module of its own with the pom's pins, the given builder
      * image, and a podman stub that does nothing.

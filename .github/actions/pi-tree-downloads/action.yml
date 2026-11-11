@@ -1,0 +1,130 @@
+# What buildtools/build-pi-tree.sh takes from outside - Node, fd, ripgrep, the builder image and npm's packages - from the
+# Actions cache, keyed by the pom's pins and the lockfiles, so a Build on unchanged pins reaches none of their hosts.
+# Every file is still checked against its pin before use, and the loaded image against the id recorded when it was
+# pulled by its digest. GitHub removes an entry nobody read for 7 days, so an old pin's entries go by themselves.
+# npm's cache is filled only by the native build: the caller saves it after that step with this action's npm outputs.
+name: Pi tree downloads
+description: Restores or fetches the pinned downloads of Pi's tree, and sets PI_BUILDER_IMAGE_ID and PI_NPM_CACHE.
+outputs:
+    npm-key:
+        description: The key npm's cache is kept under.
+        value: ${{ steps.pins.outputs.npm-key }}
+    npm-hit:
+        description: Whether npm's cache came from the Actions cache.
+        value: ${{ steps.npm.outputs.cache-hit }}
+runs:
+    using: composite
+    steps:
+        - name: The tree's pins
+          id: pins
+          shell: bash
+          run: |
+              set -euo pipefail
+              pin() { sed -n "s:.*<pin.$1>\(.*\)</pin.$1>.*:\1:p" pom.xml | head -n 1; }
+              node="$(pin node.version)" node_sha="$(pin node.sha256)" image="$(pin node.image.digest)"
+              fd="$(pin fd.version)" fd_sha="$(pin fd.sha256)" rg="$(pin rg.version)" rg_sha="$(pin rg.sha256)"
+              # Each value goes into a key, a URL and a podman reference, so each must be what it claims.
+              for v in "$node" "$fd" "$rg"; do
+                  [[ $v =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::pom.xml pins a version '$v'"; exit 1; }
+              done
+              for d in "$node_sha" "$fd_sha" "$rg_sha"; do
+                  [[ $d =~ ^[0-9a-f]{64}$ ]] || { echo "::error::pom.xml pins a digest '$d'"; exit 1; }
+              done
+              [[ $image =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "::error::pom.xml pins a builder image '$image'"; exit 1; }
+              {
+                  echo "node=$node"
+                  echo "node-sha=$node_sha"
+                  echo "fd=$fd"
+                  echo "fd-sha=$fd_sha"
+                  echo "rg=$rg"
+                  echo "rg-sha=$rg_sha"
+                  echo "image=docker.io/library/node:$node-slim@$image"
+                  echo "image-digest=${image#sha256:}"
+                  echo "npm-key=pi-npm-${{ hashFiles('src/main/npm/package-lock.json', 'buildtools/sbom/package-lock.json') }}"
+              } >> "$GITHUB_OUTPUT"
+              echo "PI_NPM_CACHE=$HOME/.cache/porelo-pinned/pi-npm" >> "$GITHUB_ENV"
+
+        - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+          id: files
+          with:
+              path: target/pi-downloads
+              key: pi-downloads-${{ steps.pins.outputs.node-sha }}-${{ steps.pins.outputs.fd-sha }}-${{ steps.pins.outputs.rg-sha }}
+
+        # Into the place build-pi-tree.sh keeps a file that matches its pin. fd and ripgrep come from github.com, so they
+        # go with the job's token, in this step alone, never into Maven's.
+        - name: Node, fd and ripgrep
+          shell: bash
+          env:
+              PORELO_PINNED_GITHUB_TOKEN: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+              NODE: ${{ steps.pins.outputs.node }}
+              NODE_SHA: ${{ steps.pins.outputs.node-sha }}
+              FD: ${{ steps.pins.outputs.fd }}
+              FD_SHA: ${{ steps.pins.outputs.fd-sha }}
+              RG: ${{ steps.pins.outputs.rg }}
+              RG_SHA: ${{ steps.pins.outputs.rg-sha }}
+          run: |
+              set -euo pipefail
+              . "$GITHUB_ACTION_PATH/../pinned-jdk/pinned.sh"
+              musl=x86_64-unknown-linux-musl.tar.gz
+              pinned_fetch "https://nodejs.org/dist/v$NODE/node-v$NODE-linux-x64.tar.gz" "$NODE_SHA" \
+                  target/pi-downloads/node.tar.gz
+              pinned_fetch "https://github.com/sharkdp/fd/releases/download/v$FD/fd-v$FD-$musl" "$FD_SHA" \
+                  target/pi-downloads/fd.tar.gz
+              pinned_fetch "https://github.com/BurntSushi/ripgrep/releases/download/$RG/ripgrep-$RG-$musl" "$RG_SHA" \
+                  target/pi-downloads/rg.tar.gz
+
+        - if: steps.files.outputs.cache-hit != 'true'
+          uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+          with:
+              path: target/pi-downloads
+              key: pi-downloads-${{ steps.pins.outputs.node-sha }}-${{ steps.pins.outputs.fd-sha }}-${{ steps.pins.outputs.rg-sha }}
+
+        - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+          id: image
+          with:
+              path: ~/.cache/porelo-pinned/pi-builder
+              key: pi-builder-${{ steps.pins.outputs.image-digest }}
+
+        # A saved image keeps its content but not the pinned index digest, so it is pulled by that digest once, its id
+        # recorded beside the archive, and a loaded one is used only when it has that id. Without podman the tree is
+        # built directly and no image is needed.
+        - name: The builder image
+          id: builder
+          shell: bash
+          env:
+              IMAGE: ${{ steps.pins.outputs.image }}
+          run: |
+              set -euo pipefail
+              command -v podman > /dev/null || exit 0
+              dir="$HOME/.cache/porelo-pinned/pi-builder"
+              if [ -f "$dir/image.tar" ] && [ -f "$dir/id" ]; then
+                  id="$(cat "$dir/id")"
+                  [[ $id =~ ^[0-9a-f]{64}$ ]] || { echo "::error::the cached builder's id file holds no image id"; exit 1; }
+                  podman load -q -i "$dir/image.tar" > /dev/null
+                  got="$(podman image inspect --format '{{.Id}}' "sha256:$id")" \
+                      || { echo "::error::the cached builder archive holds no image sha256:$id"; exit 1; }
+                  [ "$got" = "$id" ] || { echo "::error::the cached builder is $got, recorded as $id"; exit 1; }
+                  echo "$IMAGE taken from the cache as sha256:$id" >&2
+              else
+                  podman pull -q "$IMAGE" > /dev/null
+                  id="$(podman image inspect --format '{{.Id}}' "$IMAGE")"
+                  [[ $id =~ ^[0-9a-f]{64}$ ]] || { echo "::error::podman named no image id for $IMAGE: '$id'"; exit 1; }
+                  rm -rf "$dir"
+                  mkdir -p "$dir"
+                  podman save -q --format oci-archive -o "$dir/image.tar" "sha256:$id"
+                  echo "$id" > "$dir/id"
+                  echo "saved=true" >> "$GITHUB_OUTPUT"
+              fi
+              echo "PI_BUILDER_IMAGE_ID=sha256:$id" >> "$GITHUB_ENV"
+
+        - if: steps.image.outputs.cache-hit != 'true' && steps.builder.outputs.saved == 'true'
+          uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+          with:
+              path: ~/.cache/porelo-pinned/pi-builder
+              key: pi-builder-${{ steps.pins.outputs.image-digest }}
+
+        - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+          id: npm
+          with:
+              path: ~/.cache/porelo-pinned/pi-npm
+              key: ${{ steps.pins.outputs.npm-key }}
