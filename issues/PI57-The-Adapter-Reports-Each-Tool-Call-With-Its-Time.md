@@ -31,10 +31,10 @@ its own time gets, the masking of a command line and where the entry is kept are
 - Source: Pi's JSON mode, measured with the pinned Pi (CC57 in porelo-claude-code). `tool_execution_start` (`toolCallId`, `toolName`,
   `args`) is START; `tool_execution_end` (`toolCallId`, `isError`, `durationMs`) is END. `PiJsonFormatter` reads the
   same events today.
-- Neither line has a clock time, so `at` stays empty and Porelo stamps the line when it arrives. `durationMs` has no
-  field in `ToolEvent` and is not passed.
+- Neither line has a clock time, so `at` stays empty and Porelo stamps the line when it arrives. The END passes
+  `durationMs` as Pi gives it; porelod dates the start from it when the line has no time.
 - `PiAgent` overrides `Agent#toolEvents(String line)`; `PiToolEvents` maps one output line to its
-  `ToolEvent(line, id, phase, tool, kind, command, background, jobId, at, name, parent)`. It keeps no state between
+  `ToolEvent(line, id, phase, tool, kind, command, background, jobId, at, name, parent, durationMs)`. It keeps no state between
   lines: Porelo joins a start to its end by `id`, a background job's by `jobId`, and a call to its sub-agent by
   `parent`.
 - Kinds: `bash` -> shell (`command` = `args.command`), `edit`/`write` -> edit, `read` -> read, `grep`/`find`/`ls` -> search, any other (an extension's) -> other.
@@ -66,7 +66,8 @@ its own time gets, the masking of a command line and where the entry is kept are
 - A shell call keeps its whole command line, not only its program. Porelo masks it before it is stored; the adapter
   passes the line as the stream gives it.
 - A task gives each issue a sub-agent of its own, named by the issue's id; an issue's time is its sub-agent's span.
+- Pi has no sub-agents, so a Pi task's time is shared evenly among its issues.
 
 ## To be checked
 
-- The agent API with `name` and `parent` on `ToolEvent`, installed locally to build against.
+- The agent API with `name`, `parent` and `durationMs` on `ToolEvent`, installed locally to build against.
