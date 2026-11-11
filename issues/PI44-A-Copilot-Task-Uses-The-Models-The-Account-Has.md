@@ -5,13 +5,13 @@
   "$schema": "issue-1.json",
   "id": "PI44",
   "title": "A Copilot Task Uses The Models The Account Has",
-  "state": "Analyzed",
+  "state": "Estimated",
   "size": "M",
   "priority": "Medium",
   "rank": 4,
   "blockedBy": [],
   "covers": "a task on GitHub Copilot runs on a model the account has: no flagless failure on a default it lacks, and `--model` takes every model the account has",
-  "openQuestions": 1
+  "openQuestions": 0
 }
 ```
 
@@ -79,9 +79,9 @@ store adds what the tree's catalogue lacks. A task holds neither, so its Pi know
   answer (`supported_endpoints` gives the API: `/v1/messages` to `anthropic-messages`, `/responses` to
   `openai-responses`, else `openai-completions`; limits from `capabilities.limits`). Other providers' file stays
   as it is.
-- Without `--model`, the order of the registered list decides what Pi's `findInitialModel` takes once its own
-  default is missing; the answer to the open question sets that order, or makes the extension stop the start
-  with a line naming the account's models and `--model`.
+- Without `--model`, when the account lacks Pi's default, the extension stops the start with one line naming the
+  account's models and asking for `--model`; it never lets Pi's `findInitialModel` pick another. The red-first
+  check gets a third case: a stand-in `/models` without Pi's default and no `--model` ends the start with that line.
 - When `/models` fails or answers nothing usable, the extension registers as today (catalogue, Pi's default)
   and writes one line to stderr saying the account's models could not be read; the start is not refused.
 - `PiContainerSetup` is unchanged: the file stays `secret`, holding the token as before.
@@ -120,11 +120,11 @@ store adds what the tree's catalogue lacks. A task holds neither, so its Pi know
 - A new Pi pin may move `registerProvider`, `getBuiltinModels` or the alias for `providers/all`; the tree check
   catches that at build.
 
-## Open questions
 
-- A Copilot task started without `--model`, on an account that lacks Pi's default: should it run on a model the
-  account has, chosen by a fixed order the adapter keeps (which one first, given Copilot charges models
-  differently), or stop at start, naming the account's models and asking for `--model`?
+## Decisions
+
+- The operator, 2026-11-11: a Copilot task without `--model`, on an account that lacks Pi's default, stops at the
+  start. It names the account's models and asks for `--model`; it never picks a model by itself.
 
 ## To be checked
 

@@ -5,13 +5,13 @@
   "$schema": "issue-1.json",
   "id": "PI33",
   "title": "Tell Waiting From Pi's Program Status",
-  "state": "Analyzed",
+  "state": "Estimated",
   "size": "M",
   "priority": "Medium",
   "rank": 7,
   "blockedBy": [],
   "covers": "Porelo tells a waiting Pi from one at rest by what Pi 1 reports of itself",
-  "openQuestions": 1
+  "openQuestions": 0
 }
 ```
 
@@ -115,13 +115,12 @@ rule that Porelo already reads.
 - A later Pi may add its own tool for asking a person, or change how `input` draws. `WaitingDeclarationTest` and the
   fixtures are pinned to the measured release, and the update job's acceptance run would catch a change.
 
-## Open questions
 
-- Pi reports a question as `blocked` only when it is asked through a dialog. A question written as plain text
-  reports `done`, like any finished turn, and tmux does not forward the report. Should Porelo give Pi its own "ask
-  the person" tool, and declare that tool's dialog as `waiting`? Then Porelo says "waiting" for those questions and
-  wakes Pi at rest, accepting that a question the model still writes as plain text is read as "not waiting" and may
-  get a wake line typed into it. Or should Pi stay at "cannot say", never woken, and this issue be rejected?
+## Decisions
+
+- The operator, 2026-11-11: Porelo gives Pi its own "ask the person" tool, and that tool's dialog is declared as
+  waiting. Pi becomes wakeable; the decision "waiting is declared as unknown" is reversed for Pi. A question the
+  model still writes as plain text is read as not waiting.
 
 ## To be checked
 

@@ -17,13 +17,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 |---|---|---|---|
 | <a id="pi52"></a>[PI52](PI52-The-Tests-Follow-The-Pyramid.md) | M | - | the suites by level with measured times; the status extension's prompt stack proven in the unit phase, the sign-in store outside the home guarded there, five end-to-end scenarios that test only Porelo leave the legs, and the timeout test waits 100 ms |
 
-## Analyzed
-
-| # | Size | Blocked by | What it covers | Open questions |
-|---|---|---|---|---|
-| <a id="pi44"></a>[PI44](PI44-A-Copilot-Task-Uses-The-Models-The-Account-Has.md) | M | - | a task on GitHub Copilot runs on a model the account has: no flagless failure on a default it lacks, and `--model` takes every model the account has | 1 |
-| <a id="pi33"></a>[PI33](PI33-Tell-Waiting-From-Pi-s-Program-Status.md) | M | - | Porelo tells a waiting Pi from one at rest by what Pi 1 reports of itself | 1 |
-
 ## Estimated
 
 | # | Size | Blocked by | What it covers | Open questions |
@@ -31,7 +24,9 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi57"></a>[PI57](PI57-The-Adapter-Reports-Each-Tool-Call-With-Its-Time.md) | S | - | the adapter reads each tool call from its agent's output and hands Porelo its tool, kind, start, end, a shell call's command line, whether it ran in the background, and a sub-agent's name and the calls made under it, in Porelo's common entry | 0 |
 | <a id="pi51"></a>[PI51](PI51-The-Bill-Generator-Is-Relocked-Past-Its-Advisories.md) | S | - | the bill generator's lock resolves no release with a published advisory; it never ships, so low in priority | 0 |
 | <a id="pi50"></a>[PI50](PI50-The-Clean-Up-Says-When-Nothing-Was-Rented.md) | XS | - | a leg that failed before resolving the machine tooling rented nothing, and its clean-up says so instead of failing on a missing class | 0 |
+| <a id="pi44"></a>[PI44](PI44-A-Copilot-Task-Uses-The-Models-The-Account-Has.md) | M | - | a task on GitHub Copilot runs on a model the account has: no flagless failure on a default it lacks, and `--model` takes every model the account has | 0 |
 | <a id="pi40"></a>[PI40](PI40-The-Acceptance-Legs-Run-On-The-Host-s-Forge.md) | S | [PI38](README.md#pi38) | the acceptance legs on the host's pool again, once it lends a forge job a machine by kind | 0 |
+| <a id="pi33"></a>[PI33](PI33-Tell-Waiting-From-Pi-s-Program-Status.md) | M | - | Porelo tells a waiting Pi from one at rest by what Pi 1 reports of itself | 0 |
 | <a id="pi45"></a>[PI45](PI45-Depend-On-The-Agent-Protocol-Porelo-Provides.md) | S | - | the agent contract named at install time | 0 |
 
 ## Review
