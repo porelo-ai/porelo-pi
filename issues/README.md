@@ -28,7 +28,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi33"></a>[PI33](PI33-Tell-Waiting-From-Pi-s-Program-Status.md) | M | - | Porelo tells a waiting Pi from one at rest by what Pi 1 reports of itself | 0 |
 | <a id="pi45"></a>[PI45](PI45-Depend-On-The-Agent-Protocol-Porelo-Provides.md) | S | - | the agent contract named at install time | 0 |
 
-## Backlog
+## Implementing
 
 | # | Size | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
