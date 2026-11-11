@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI57",
   "title": "The Adapter Reports Each Tool Call With Its Time",
-  "state": "Implementing",
+  "state": "Review",
   "size": "S",
   "priority": "High",
   "rank": 1,
@@ -67,7 +67,3 @@ its own time gets, the masking of a command line and where the entry is kept are
   passes the line as the stream gives it.
 - A task gives each issue a sub-agent of its own, named by the issue's id; an issue's time is its sub-agent's span.
 - Pi has no sub-agents, so a Pi task's time is shared evenly among its issues.
-
-## To be checked
-
-- The agent API with `name`, `parent` and `durationMs` on `ToolEvent`, installed locally to build against.

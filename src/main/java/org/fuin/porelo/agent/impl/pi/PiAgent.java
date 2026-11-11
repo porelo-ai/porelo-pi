@@ -1,10 +1,12 @@
 package org.fuin.porelo.agent.impl.pi;
 
+import java.util.List;
 import org.fuin.porelo.agent.api.AgentEnd;
 import org.fuin.porelo.agent.api.ContainerSetup;
 import org.fuin.porelo.agent.api.CredentialExtractor;
 import org.fuin.porelo.agent.api.Finder;
 import org.fuin.porelo.agent.api.LogFormatter;
+import org.fuin.porelo.agent.api.ToolEvent;
 import org.fuin.porelo.agent.api.YamlAgent;
 import org.jspecify.annotations.Nullable;
 
@@ -52,6 +54,17 @@ public final class PiAgent extends YamlAgent {
     @Override
     public @Nullable AgentEnd ended(String line) {
         return PiJsonFormatter.ended(line);
+    }
+
+    /**
+     * Reads the tool calls Pi starts or ends in one output line.
+     *
+     * @param line One raw line of output.
+     * @return The line's tool events.
+     */
+    @Override
+    public List<ToolEvent> toolEvents(String line) {
+        return PiToolEvents.read(line);
     }
 
     /**

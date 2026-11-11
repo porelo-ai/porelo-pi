@@ -12,6 +12,7 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 
 ### Added
 
+- The adapter reports Pi's tool-call starts and ends with their IDs, kinds, shell command lines and durations.
 - A task's skills are switched off, on any start, resumed or not.
 - `vault import` takes Pi's sign-in for the provider asked for, from `auth.json`, and never a key given as a command or a variable.
 - The adapter says what it finds of Pi on the host: which providers it is signed in to, by kind and with the path, from `auth.json` and `models.json`, never a value, and a key given as a command is reported and never run; the definition names `config_dir`.
