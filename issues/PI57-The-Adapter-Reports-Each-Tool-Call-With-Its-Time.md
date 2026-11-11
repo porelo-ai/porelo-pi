@@ -5,58 +5,68 @@
   "$schema": "issue-1.json",
   "id": "PI57",
   "title": "The Adapter Reports Each Tool Call With Its Time",
-  "state": "Analyzed",
+  "state": "Estimated",
   "size": "S",
   "priority": "High",
   "rank": 1,
   "blockedBy": [],
-  "covers": "the adapter reads each tool call from its agent's output and hands Porelo its tool, kind, start, end, a shell call's command line and whether it ran in the background, in Porelo's common entry",
+  "covers": "the adapter reads each tool call from its agent's output and hands Porelo its tool, kind, start, end, a shell call's command line, whether it ran in the background, and a sub-agent's name and the calls made under it, in Porelo's common entry",
   "openQuestions": 0
 }
 ```
 
-**Why this size.** one reader over the two events the formatter already reads, a name table and its tests; no background jobs to join. It builds against `ToolEvents`, which Porelo's agent API adds in its contract version 5;
-nothing of that format is decided here.
+**Why this size.** one reader over the two events the formatter already reads, a name table and its tests; no background jobs and no sub-agents. It builds against `ToolEvents` of Porelo's agent API, contract version 5.
 
-**What must be true.** For every tool call the agent makes in a task, Porelo records one entry in its common
-tool-call format: the task, the tool as the agent names it, its kind (shell, edit, read, search, web, sub-agent, mcp
-or other), when it started and when it ended, for a shell call its command line, and whether it ran in the
-background; a background job's start and end are joined by its id. The adapter only maps its agent's own output into
-that entry; the format, the time a line without its own time gets, and where the entry is kept are Porelo's.
+**Estimate.** S: 27 min, the measured median of S over all repositories (n=167).
+
+**What must be true.** For every tool call the agent makes in an unattended task, Porelo records one entry in its
+common tool-call format: the task, the tool as the agent names it, its kind (shell, edit, read, search, web,
+sub-agent, mcp or other), when it started and when it ended, for a shell call its command line, whether it ran in the
+background, and for a sub-agent the name it was given and the calls made under it. Porelo joins those calls to the
+issue whose id names the sub-agent. The adapter only maps its agent's own output; the format, the time a line without
+its own time gets, the masking of a command line and where the entry is kept are Porelo's.
 
 ## Plan
 
-- Source: Pi's JSON mode (`--mode json`). `tool_execution_start` and `tool_execution_end`, joined by `toolCallId`, with `toolName` and `args`; `PiJsonFormatter` reads the same two events today.
-- `PiAgent` overrides `Agent#toolEvents(String line)`, which the agent API's contract version 5 adds and AgentServer
-  serves as `ToolEvents`; `PiToolEvents` maps one output line to its tool events (`id`, START or END, `tool`, `kind`,
-  `command`, `background`, `jobId`, `at` where the line has a time). It keeps no state between lines: Porelo joins a
-  start to its end by `id`, and a background job's by `jobId`.
-- Kinds: `bash` -> shell (command from `args.command`), `edit`/`write` -> edit, `read` -> read, `grep`/`find`/`ls` -> search, any other (an extension's) -> other.
-- A shell call's `command` is its whole command line as the stream gives it. The adapter does not mask it: Porelo
-  masks the line once, before anything is stored.
-- Background: Pi's built-in tools run in the foreground; a call is never background.
-- Red first: `PiToolEventsTest` feeds a recorded run's lines (a shell call, an edit, an unknown tool, a failed call,
-  and a line that is not JSON) and expects one start and one end per call, the kinds above and each shell call's whole command line; it
-  fails while `toolEvents` still answers the API's default, nothing.
+- Source: Pi's JSON mode, measured with the pinned Pi (CC57 in porelo-claude-code). `tool_execution_start` (`toolCallId`, `toolName`,
+  `args`) is START; `tool_execution_end` (`toolCallId`, `isError`, `durationMs`) is END. `PiJsonFormatter` reads the
+  same events today.
+- Neither line has a clock time, so `at` stays empty and Porelo stamps the line when it arrives. `durationMs` has no
+  field in `ToolEvent` and is not passed.
+- `PiAgent` overrides `Agent#toolEvents(String line)`; `PiToolEvents` maps one output line to its
+  `ToolEvent(line, id, phase, tool, kind, command, background, jobId, at, name, parent)`. It keeps no state between
+  lines: Porelo joins a start to its end by `id`, a background job's by `jobId`, and a call to its sub-agent by
+  `parent`.
+- Kinds: `bash` -> shell (`command` = `args.command`), `edit`/`write` -> edit, `read` -> read, `grep`/`find`/`ls` -> search, any other (an extension's) -> other.
+- A shell call's `command` is its whole command line as the stream gives it, unmasked; Porelo masks it before it is
+  stored.
+- Sub-agents: Pi has none built in; `name` and `parent` stay empty.
+- Background: Pi's tools run in the foreground; a command started with `&` inside a shell call is not seen.
+  Calls of one turn run side by side, so a start is joined to its end by `id` only.
+- Red first: `PiToolEventsTest` feeds recorded lines (two calls in one turn ending in the other order, a shell call, an edit, an unknown tool, a failed call, and a line that is not JSON) and expects the events above; it fails while
+  `toolEvents` still answers the API's default, nothing.
 - Level: unit tests over recorded output only; the acceptance legs show the entries of a real run once Porelo writes
   them.
 
 ## Acceptance
 
 - A recorded unattended run yields one entry per tool call with tool, kind, start, end and, for a shell call, its
-  command line; a background job's start and end are one entry.
+  command line; a background job's start and end are joined by its id; a sub-agent carries its name.
 - No entry holds a file's content or a tool's output; a command line reaches Porelo unmasked and is stored masked.
 - A line the reader cannot read yields nothing and never stops the run.
+
+## What makes it uncertain
+
+- An extension may add a tool that starts sub-agents or jobs of its own; it is mapped as other.
 
 ## Decisions
 
 - Only unattended tasks are measured. Attended (tmux) sessions write no JSON stream; whether their tool calls are
   recorded is decided later.
-- A shell call keeps its whole command line, not only its program. Porelo masks it before it is stored (option values,
-  an `Authorization:` header, env assignments of secrets, a URL's user information, credential-shaped strings and the
-  task's vault values); the adapter passes the line as the stream gives it.
+- A shell call keeps its whole command line, not only its program. Porelo masks it before it is stored; the adapter
+  passes the line as the stream gives it.
+- A task gives each issue a sub-agent of its own, named by the issue's id; an issue's time is its sub-agent's span.
 
 ## To be checked
 
-- Porelo's agent API with contract version 5 and `Agent#toolEvents`, installed locally to build against.
-- Whether `tool_execution_start`/`_end` carry a time of their own in the pinned Pi, or only `message_end` does.
+- The agent API with `name` and `parent` on `ToolEvent`, installed locally to build against.
