@@ -50,7 +50,8 @@ class PiContainerSetupTest {
                 .extracting(ContainerFile::path)
                 .containsExactlyInAnyOrder(
                         "/var/lib/pi/agent/extensions/porelo-route.ts",
-                        "/var/lib/pi/agent/extensions/porelo-status.ts");
+                        "/var/lib/pi/agent/extensions/porelo-status.ts",
+                        "/var/lib/pi/agent/extensions/porelo-ask.ts");
     }
 
     @Test
@@ -81,7 +82,9 @@ class PiContainerSetupTest {
         // does not exist, which fails later and further away.
         assertThat(files(""))
                 .extracting(ContainerFile::path)
-                .containsExactly("/var/lib/pi/agent/extensions/porelo-status.ts");
+                .containsExactlyInAnyOrder(
+                        "/var/lib/pi/agent/extensions/porelo-status.ts",
+                        "/var/lib/pi/agent/extensions/porelo-ask.ts");
     }
 
     @Test
@@ -117,7 +120,9 @@ class PiContainerSetupTest {
                                                 "http://127.0.0.1:9419",
                                                 "openrouter")))
                 .extracting(ContainerFile::path)
-                .containsExactly("/var/lib/pi/agent/extensions/porelo-status.ts");
+                .containsExactlyInAnyOrder(
+                        "/var/lib/pi/agent/extensions/porelo-status.ts",
+                        "/var/lib/pi/agent/extensions/porelo-ask.ts");
     }
 
     @Test

@@ -124,10 +124,11 @@ rule that Porelo already reads.
 
 ## To be checked
 
-- Measure the open `input` dialog on the VM at a terminal, at the task's terminal width: the exact title line, how
-  many of the last lines it takes, and that the footer's "(auto)" stays or goes with it. These set the `waiting`
-  rule's region and `at_rest`.
-- Measure how often the pinned Pi, with the models the acceptance runs use, asks through the tool rather than in
-  text when its guide and the tool's guidelines tell it to.
-- Read that `ui.input` fires `ui_prompt_start`, so the status file says "waiting" too, and that it does so in the
-  shipped bundle, not only in the docs.
+- Measured on 2026-11-12 with the pinned Pi 1.5.0 run outside a task at an 80 by 24 terminal, the ask extension
+  loaded and its dialog opened by a command: the title `Pi asks you` stands alone on the ninth line from the bottom,
+  under it the answer line and `enter submit  escape/ctrl+c cancel`, then the working-directory line and the footer
+  with `(auto)`, which stays. The question itself is not drawn in the dialog (`input`'s second argument is a
+  placeholder Pi does not show); it stands in the tool call above. Answered or cancelled, the dialog is gone. In
+  the shipped bundle `ui.input` runs inside `withUIPrompt("input", …)`, which fires `ui_prompt_start`.
+- Still open, on the VM: `waiting.feature` and `wake.feature` as rewritten, which also show how often the
+  acceptance model asks through the tool rather than in text. Writing to the VM is not allowed from this session yet.

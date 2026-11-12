@@ -16,7 +16,7 @@ Ordered by what each decision covers; when one was taken, `git log` answers.
 | The agent in a task | [Pi does not check for a newer version in a task](#pi-does-not-check-for-a-newer-version-in-a-task) - the check could only fail, and never installs anything; telemetry off, pi.dev refused |
 | The agent in a task | [Pi shows nothing before work in a task](#pi-shows-nothing-before-work-in-a-task) - no dialog with a credential, without one, or headless; the status extension loads without a token |
 | The agent in a task | [Reaching work is checked by what the screen shows, not by the dialogs known](#reaching-work-is-checked-by-what-the-screen-shows-not-by-the-dialogs-known) - a declared marker, waited for attended; Pi draws it only after a question |
-| The agent in a task | [Waiting for a person is declared as unknown, because it is](#waiting-for-a-person-is-declared-as-unknown-because-it-is) - Pi's screen does not tell a question from idle, so Porelo says "cannot say" |
+| The agent in a task | [Waiting for a person is Pi's ask dialog](#waiting-for-a-person-is-pis-ask-dialog) - a tool Porelo gives Pi asks through a dialog whose title is declared as waiting; a question in text reads as not waiting |
 | The agent in a task | [A task that comes back continues its conversation](#a-task-that-comes-back-continues-its-conversation) - the session id read from Pi's first record, unattended or attached |
 | The agent in a task | [Pi's directory is outside the home, its sign-in stores root's](#pis-directory-is-outside-the-home-its-sign-in-stores-roots) - a `/login` leaves no key in Pi's stores |
 | On the host | [What the adapter finds of Pi on the host](#what-the-adapter-finds-of-pi-on-the-host) - files only, never a value; which entry is importable, and what Pi says of each |
@@ -159,25 +159,26 @@ read while the question was on screen - hold the question and not the header: Pi
 only after the question is answered. The kit's own failing step was not run for this, because its
 fixture project carries no skill.
 
-## Waiting for a person is declared as unknown, because it is
+## Waiting for a person is Pi's ask dialog
 
 Porelo tells a person an agent is waiting for them from a declaration in the agent's own YAML: literal
-lines on the attached screen that only a question draws. Pi has none. Measured on 0.85.0 at a terminal:
-asked to put a question and wait, it writes the question as plain text, and the rest of the
-screen is its idle screen byte for byte; the window title stays `π - <directory>` in every state.
+lines on the attached screen that only a question draws. Pi draws none of its own. It has no tool to ask
+a person, and a question the model writes as text ends its turn like any other answer: measured on 0.85.0,
+the rest of the screen is its idle screen byte for byte, and what Pi reports of itself (OSC 7501, read in
+1.5.0) says `done` for it too.
 
-**So `pi.yaml` declares nothing, and Porelo says "cannot say".** A rule written anyway would match
-nothing and make Porelo say "not waiting" - telling a person no question is there when one may be. The
-acceptance scenario `waiting.feature` proves the answer Porelo gives is "cannot say", on the VM against
-Porelo 196; `WaitingDeclarationTest` fails the day a declaration appears, so it cannot appear without
-the measurement and the scenario that drives Pi to a question.
+**So Porelo gives Pi the tool.** `PiAskExtension` installs `ask_person`, whose guidelines tell the model to
+ask the person only through it. Attached, it opens Pi's `input` dialog titled `Pi asks you`; unattended,
+where Pi has no dialogs, it answers at once that nobody is attending, so a run never hangs on a question.
+Measured on 1.5.0 at an 80 by 24 terminal, the title stands alone on the ninth line from the bottom, the
+footer with `(auto)` stays under the dialog, and the dialog is gone once answered or cancelled. `pi.yaml`
+declares the title as `waiting`, in the last 12 lines, and as something `at_rest` lacks, so no wake line is
+typed into the answer. `WaitingDeclarationTest` reads the measured screens; `waiting.feature` and
+`wake.feature` drive the pinned Pi to the dialog.
 
-**Pi's own extension does see its dialogs** - `PiStatusExtension` writes a state file around every
-prompt - but Porelo reads the screen, not files an agent package places, and a model's plain-text
-question is not a dialog either.
-
-**What would change the answer:** a Pi release that draws something only a question shows, or Porelo
-reading a signal an agent package provides.
+**A question still written as text reads as not waiting**, by the operator's decision of 2026-11-11. That
+is the risk taken: Porelo may type a wake line under a question nobody sees. Declaring `waiting` is also what
+makes Pi wakeable at all, since Porelo wakes only an agent that declares both `waiting` and `at_rest`.
 
 ## Three projects, two names
 

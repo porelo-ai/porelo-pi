@@ -9,10 +9,11 @@ import org.fuin.porelo.agent.api.SetupContext;
 /**
  * What Pi needs in a fresh container before it will run unattended.
  *
- * <p>Two files. One carries both halves of the wiring - where to send requests, and what to present
- * - and neither can be an environment variable here: Pi has no variable for an endpoint, and this
- * agent's broker starts after the container exists, so its environment is already fixed. The other
- * records what the agent is doing, for a host that cannot otherwise tell thinking from waiting.
+ * <p>Three files. One carries both halves of the wiring - where to send requests, and what to
+ * present - and neither can be an environment variable here: Pi has no variable for an endpoint,
+ * and this agent's broker starts after the container exists, so its environment is already fixed.
+ * One records what the agent is doing, for a host that cannot otherwise tell thinking from waiting.
+ * One gives the model a tool to ask the person through a dialog the host can see.
  */
 public class PiContainerSetup implements ContainerSetup {
 
@@ -25,6 +26,9 @@ public class PiContainerSetup implements ContainerSetup {
         // task that is thinking from one waiting on a question must not depend on how this task
         // happens to be served.
         files.add(ContainerFile.of(PiStatusExtension.FILE, PiStatusExtension.document()));
+        // Always too: the tool to ask the person, whose dialog is what Porelo reads as waiting.
+        // Unattended it answers at once, so it is safe where nobody watches.
+        files.add(ContainerFile.of(PiAskExtension.FILE, PiAskExtension.document()));
 
         if (!context.brokered() || !credentialed(context)) {
             // The routing file carries both halves, so with either missing it names an endpoint

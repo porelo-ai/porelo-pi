@@ -177,7 +177,7 @@ class PiAgentTest {
         final var atRest = agent.definition().atRest();
         assertThat(atRest).isNotNull();
         assertThat(atRest.shows()).containsExactly("(auto)");
-        assertThat(atRest.lacks()).containsExactly("Working ─");
+        assertThat(atRest.lacks()).containsExactly("Working ─", "Pi asks you");
         assertThat(
                         atRest.matches(
                                 "PONG\n────\n↑1.9k ↓19 $0.000 0.2%/1.0M (auto)      z-ai/glm-5.3-flash • high"))

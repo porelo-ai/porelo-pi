@@ -137,6 +137,31 @@ class BuiltTreeCheck {
     }
 
     @Test
+    void theAskToolPutsTheQuestionInItsDialogAndReturnsTheAnswer()
+            throws IOException, InterruptedException {
+
+        // The dialog's title is what pi.yaml reads as waiting, so it must be the fixed one.
+        assertThat(runAskExtension("true", "\"use main\""))
+                .contains("asked: " + PiAskExtension.TITLE + " | Which branch?")
+                .contains("answer: use main");
+    }
+
+    @Test
+    void theAskToolSaysSoWhenTheDialogIsCancelled() throws IOException, InterruptedException {
+
+        assertThat(runAskExtension("true", "undefined")).contains("answer: no answer");
+    }
+
+    @Test
+    void theAskToolAnswersAtOnceWhereNobodyIsAttending() throws IOException, InterruptedException {
+
+        // An unattended run has no dialog to open; waiting for one would hang the run.
+        assertThat(runAskExtension("false", "\"never asked\""))
+                .doesNotContain("asked:")
+                .contains("answer: no person is attending");
+    }
+
+    @Test
     void everyLicenseInTheTreeIsDeclaredByBothPackages() throws IOException {
 
         // A dependency that brings a new license changes what the packages may claim; the bill
@@ -252,5 +277,41 @@ class BuiltTreeCheck {
         }
         assertThat(node.exitValue()).as(Files.readString(dir.resolve("node.log"))).isZero();
         return Files.readString(state, StandardCharsets.UTF_8);
+    }
+
+    private String runAskExtension(final String hasUi, final String reply)
+            throws IOException, InterruptedException {
+        assertThat(Files.isExecutable(NODE))
+                .as("%s in the built tree - build-pi-tree.sh ran?", NODE)
+                .isTrue();
+        final Path extension = dir.resolve("ask.mjs");
+        Files.writeString(extension, PiAskExtension.document());
+        final Path harness = dir.resolve("ask-harness.mjs");
+        Files.writeString(
+                harness,
+                """
+                import extension from %s;
+                const tools = {};
+                extension({ registerTool: (tool) => { tools[tool.name] = tool; } });
+                const ctx = {
+                    hasUI: %s,
+                    ui: { input: async (title, text) => { console.log("asked: " + title + " | " + text); return %s; } },
+                };
+                const result = await tools.ask_person.execute("call-1", { question: "Which branch?" }, undefined, undefined, ctx);
+                console.log("answer: " + result.content[0].text);
+                """
+                        .formatted(Json.write(extension.toUri().toString()), hasUi, reply));
+        final Path log = dir.resolve("ask.log");
+        final Process node =
+                new ProcessBuilder(NODE.toAbsolutePath().toString(), harness.toString())
+                        .redirectErrorStream(true)
+                        .redirectOutput(log.toFile())
+                        .start();
+        if (!node.waitFor(30, TimeUnit.SECONDS)) {
+            node.destroyForcibly();
+            throw new AssertionError("node did not finish within 30 seconds");
+        }
+        assertThat(node.exitValue()).as(Files.readString(log)).isZero();
+        return Files.readString(log, StandardCharsets.UTF_8);
     }
 }
