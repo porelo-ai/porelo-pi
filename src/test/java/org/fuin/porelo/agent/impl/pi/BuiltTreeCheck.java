@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.fuin.porelo.agent.api.AgentGrant;
 import org.fuin.porelo.wire.Json;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -141,22 +142,22 @@ class BuiltTreeCheck {
             throws IOException, InterruptedException {
 
         // The dialog's title is what pi.yaml reads as waiting, so it must be the fixed one.
-        assertThat(runAskExtension("true", "\"use main\""))
-                .contains("asked: " + PiAskExtension.TITLE + " | Which branch?")
+        assertThat(runAskExtension(true, "use main"))
+                .contains("asked: " + PiAskExtension.TITLE + " | Which branch? | signal true")
                 .contains("answer: use main");
     }
 
     @Test
     void theAskToolSaysSoWhenTheDialogIsCancelled() throws IOException, InterruptedException {
 
-        assertThat(runAskExtension("true", "undefined")).contains("answer: no answer");
+        assertThat(runAskExtension(true, null)).contains("answer: no answer");
     }
 
     @Test
     void theAskToolAnswersAtOnceWhereNobodyIsAttending() throws IOException, InterruptedException {
 
         // An unattended run has no dialog to open; waiting for one would hang the run.
-        assertThat(runAskExtension("false", "\"never asked\""))
+        assertThat(runAskExtension(false, "never asked"))
                 .doesNotContain("asked:")
                 .contains("answer: no person is attending");
     }
@@ -279,7 +280,7 @@ class BuiltTreeCheck {
         return Files.readString(state, StandardCharsets.UTF_8);
     }
 
-    private String runAskExtension(final String hasUi, final String reply)
+    private String runAskExtension(final boolean hasUi, final @Nullable String reply)
             throws IOException, InterruptedException {
         assertThat(Files.isExecutable(NODE))
                 .as("%s in the built tree - build-pi-tree.sh ran?", NODE)
@@ -295,12 +296,16 @@ class BuiltTreeCheck {
                 extension({ registerTool: (tool) => { tools[tool.name] = tool; } });
                 const ctx = {
                     hasUI: %s,
-                    ui: { input: async (title, text) => { console.log("asked: " + title + " | " + text); return %s; } },
+                    ui: { input: async (title, text, opts) => { console.log("asked: " + title + " | " + text + " | signal " + (opts && opts.signal === signal)); return %s; } },
                 };
-                const result = await tools.ask_person.execute("call-1", { question: "Which branch?" }, undefined, undefined, ctx);
+                const signal = new AbortController().signal;
+                const result = await tools.ask_person.execute("call-1", { question: "Which branch?" }, signal, undefined, ctx);
                 console.log("answer: " + result.content[0].text);
                 """
-                        .formatted(Json.write(extension.toUri().toString()), hasUi, reply));
+                        .formatted(
+                                Json.write(extension.toUri().toString()),
+                                hasUi,
+                                reply == null ? "undefined" : Json.write(reply)));
         final Path log = dir.resolve("ask.log");
         final Process node =
                 new ProcessBuilder(NODE.toAbsolutePath().toString(), harness.toString())

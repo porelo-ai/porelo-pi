@@ -170,10 +170,13 @@ the rest of the screen is its idle screen byte for byte, and what Pi reports of 
 **So Porelo gives Pi the tool.** `PiAskExtension` installs `ask_person`, whose guidelines tell the model to
 ask the person only through it. Attached, it opens Pi's `input` dialog titled `Pi asks you`; unattended,
 where Pi has no dialogs, it answers at once that nobody is attending, so a run never hangs on a question.
-Measured on 1.5.0 at an 80 by 24 terminal, the title stands alone on the ninth line from the bottom, the
-footer with `(auto)` stays under the dialog, and the dialog is gone once answered or cancelled. `pi.yaml`
-declares the title as `waiting`, in the last 12 lines, and as something `at_rest` lacks, so no wake line is
-typed into the answer. `WaitingDeclarationTest` reads the measured screens; `waiting.feature` and
+Measured on 1.5.0, outside a task at 80 by 24 and in the acceptance suite's task, the title stands alone
+over the answer line and the dialog's keys, the footer with `(auto)` stays under the dialog, and the dialog
+is gone once answered or cancelled. `pi.yaml`
+declares the title as `waiting` in the last seven non-empty lines: in a task Pi draws rules around the dialog,
+the title is the sixth, and the seventh is the rule above it. So the title quoted in the conversation is not
+read as waiting unless it stands in the last three lines of an answer. `at_rest` lacks the dialog's keys line, `escape/ctrl+c cancel`, which every Pi dialog draws
+and a conversation hardly quotes, so no wake line is typed into an answer. `WaitingDeclarationTest` reads the measured screens; `waiting.feature` and
 `wake.feature` drive the pinned Pi to the dialog.
 
 **A question still written as text reads as not waiting**, by the operator's decision of 2026-11-11. That

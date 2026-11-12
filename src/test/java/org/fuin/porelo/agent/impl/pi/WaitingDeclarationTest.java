@@ -8,18 +8,40 @@ import org.junit.jupiter.api.Test;
 /**
  * The waiting declaration read against the screens it was written from.
  *
- * <p>Each screen is the bottom of what Pi 1.5.0 drew at an 80 by 24 terminal with the ask extension
- * this package installs: its dialog open, the prompt after it was answered, and the prompt with a
- * question as plain text above it. The working-directory line and the footer are those measured in
- * a task, since the capture ran outside one. Pi draws the dialog's title on a line of its own at
- * any width, so the narrowest terminal is the one that tests the region. Whether the pinned Pi
- * still draws these is the acceptance suite's question, not this one's.
+ * <p>The open dialog is a screen the acceptance suite's run captured in a task. The prompt after
+ * the answer and the question in plain text were measured with Pi 1.5.0 at 80 by 24 outside a task,
+ * with the working-directory line and footer of a task; the quoted title is laid out as the open
+ * dialog, with the empty editor in its place. Whether the pinned Pi still draws these is the
+ * acceptance suite's question, not this one's.
  */
 class WaitingDeclarationTest {
 
-    /** The ask tool's dialog, open: its title, the empty answer line and the dialog's keys. */
+    /** Pi's footer in the captured task; its cache counters are not issue numbers. */
+    private static final String TASK_FOOTER =
+            "↑2.7k ↓18 R704 CH20.8% $0.000 0.3%/1.0M (auto)                             z-ai/glm-5.3-flash • high\n"; // not-a-citation
+
+    /**
+     * The ask tool's dialog, open, in a task: the bottom of what Pi 1.5.0 drew at 100 by 39 in the
+     * acceptance suite's run of 2026-11-12, the model having called the tool. Inside a task Pi
+     * draws rules around the dialog, which puts its title on the sixth non-empty line from the
+     * bottom.
+     */
     static final String ASKING =
             """
+             Use your ask_person tool to ask me whether I prefer red or blue. Do nothing else.
+
+
+
+             ask_person question="Do you prefer red or blue?"
+
+
+
+
+
+
+
+
+            ────────────────────────────────────────────────────────────────────────────────────────────────────
 
              Pi asks you
 
@@ -27,11 +49,10 @@ class WaitingDeclarationTest {
 
              enter submit  escape/ctrl+c cancel
 
-
-
-            /workspace
-            0.2%/1.0M (auto)                                       z-ai/glm-5.3-flash • high
-            """;
+            ────────────────────────────────────────────────────────────────────────────────────────────────────
+            /workspace (main)
+            """
+                    + TASK_FOOTER;
 
     /** After the answer: the dialog is gone and Pi is back at its prompt. */
     static final String ANSWERED =
@@ -62,6 +83,30 @@ class WaitingDeclarationTest {
             0.2%/1.0M (auto)                                       z-ai/glm-5.3-flash • high
             """;
 
+    /**
+     * A resting screen whose conversation quotes the dialog's title, as it would in work on this
+     * package, laid out as {@link #ASKING} with the empty editor in place of the dialog: the title
+     * sits above the lines the declaration reads. A quote in the last three lines of an answer
+     * would still read as waiting until the next turn.
+     */
+    private static final String TITLE_QUOTED_ABOVE =
+            """
+
+             The extension opens a dialog titled "Pi asks you" and returns the
+             person's answer to the model; pi.yaml reads that title as waiting.
+             The unit tests read it against screens measured in a task.
+             I changed nothing else.
+
+
+
+
+            ────────────────────────────────────────────────────────────────────────────────────────────────────
+
+            ────────────────────────────────────────────────────────────────────────────────────────────────────
+            /workspace (main)
+            """
+                    + TASK_FOOTER;
+
     private Waiting waiting() {
         final Waiting waiting = new PiAgent().definition().waiting();
         assertThat(waiting).as("pi.yaml declares what waiting looks like").isNotNull();
@@ -89,6 +134,22 @@ class WaitingDeclarationTest {
 
         // The operator's decision of 2026-11-11: only the tool's dialog is waiting.
         assertThat(waiting().read(QUESTION_IN_TEXT).seen()).isEqualTo(Waiting.Seen.NOT_WAITING);
+    }
+
+    @Test
+    void readsTheTitleQuotedInTheConversationAsNotWaiting() {
+
+        assertThat(waiting().read(TITLE_QUOTED_ABOVE).seen()).isEqualTo(Waiting.Seen.NOT_WAITING);
+    }
+
+    @Test
+    void isAtRestWhereTheConversationQuotesTheTitle() {
+
+        // A wake reads the last 20 lines, so a lacks on the title would hold every wake back
+        // until the quote scrolled away.
+        final var atRest = new PiAgent().definition().atRest();
+        assertThat(atRest).isNotNull();
+        assertThat(atRest.matches(TITLE_QUOTED_ABOVE)).isTrue();
     }
 
     @Test

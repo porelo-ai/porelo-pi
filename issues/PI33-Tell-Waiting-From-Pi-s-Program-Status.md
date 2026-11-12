@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI33",
   "title": "Tell Waiting From Pi's Program Status",
-  "state": "Implementing",
+  "state": "Review",
   "size": "M",
   "priority": "Medium",
   "rank": 7,
@@ -130,5 +130,16 @@ rule that Porelo already reads.
   with `(auto)`, which stays. The question itself is not drawn in the dialog (`input`'s second argument is a
   placeholder Pi does not show); it stands in the tool call above. Answered or cancelled, the dialog is gone. In
   the shipped bundle `ui.input` runs inside `withUIPrompt("input", …)`, which fires `ui_prompt_start`.
-- Still open, on the VM: `waiting.feature` and `wake.feature` as rewritten, which also show how often the
-  acceptance model asks through the tool rather than in text. Writing to the VM is not allowed from this session yet.
+- On the VM `smith` (ubuntu 26.04, porelo main c43062468, the adapter installed in the account), 2026-11-12:
+  `waiting.feature` and `wake.feature` passed three times, first as written, then after the review's changes,
+  then with the final declaration. `z-ai/glm-5.3-flash` called `ask_person` in every one of the six turns rather
+  than asking in text. Nothing was typed into the open dialog in 15 s of the daemon's passes, and the message was
+  announced once Pi rested after the answer.
+- In a task Pi draws rules around the dialog (captured at 100 by 39): the title is the sixth non-empty line from
+  the bottom, not the fifth as outside a task. `in_last_lines` is 7, the rule above the title; `WaitingDeclarationTest`
+  reads that captured screen.
+- Changed from the plan after the review by a second model: `at_rest.lacks` names the dialog's keys line
+  `escape/ctrl+c cancel` instead of the title. A wake reads the last 20 lines, so the title quoted in the
+  conversation would have held every wake back; the keys line also covers Pi's other dialogs. The ask tool passes
+  the turn's abort signal to the dialog. Left as is: the review's wish that the wake scenario also check the
+  model's answer to the message, which tests the model, not the wake.

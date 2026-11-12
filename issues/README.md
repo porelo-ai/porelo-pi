@@ -28,12 +28,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 |---|---|---|---|---|
 | <a id="pi40"></a>[PI40](PI40-The-Acceptance-Legs-Run-On-The-Host-s-Forge.md) | S | [PI38](README.md#pi38) | the acceptance legs on the host's pool again, once it lends a forge job a machine by kind | 0 |
 
-## Implementing
-
-| # | Size | Blocked by | What it covers | Open questions |
-|---|---|---|---|---|
-| <a id="pi33"></a>[PI33](PI33-Tell-Waiting-From-Pi-s-Program-Status.md) | M | - | Porelo tells a waiting Pi from one at rest by what Pi 1 reports of itself | 0 |
-
 ## Review
 
 | # | Size | Blocked by | What it covers | Open questions |
@@ -48,6 +42,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi47"></a>[PI47](PI47-Snapshots-Not-Published-On-The-Forge-Come-From-Upstream.md) | S | - | on a forge whose registry holds only its organization's packages, the other Porelo snapshots come from the anonymous repository `MAVEN_UPSTREAM_SNAPSHOTS_URL` names, the forge's token sent to the forge alone, a tag still built from releases only | - |
 | <a id="pi46"></a>[PI46](PI46-A-Task-Has-No-Skills.md) | XS | - | a task has no skills, on any start | - |
 | <a id="pi38"></a>[PI38](PI38-The-Build-Runs-On-The-Local-Forge-As-On-The-Central-One.md) | S | - | the workflows run 1:1 on the local Forgejo and the central forge: snapshots from `MAVEN_SNAPSHOTS_URL`, publishing switched by `PORELO_PUBLISH`, legs asked by kind, green on a local Forgejo | - |
+| <a id="pi33"></a>[PI33](PI33-Tell-Waiting-From-Pi-s-Program-Status.md) | M | - | Porelo tells a waiting Pi from one at rest by what Pi 1 reports of itself | 0 |
 | <a id="pi41"></a>[PI41](PI41-Snapshots-Resolved-With-A-Read-Only-Token.md) | S | - | on a forge other than the central one, snapshots resolved with the runner's read-only token, the publisher's token in no step, since nothing here deploys to the registry, and a Build without `MAVEN_SNAPSHOTS_URL` refused at its start | - |
 | <a id="pi39"></a>[PI39](PI39-The-Repository-s-Agent-Works-In-A-Porelo-Task.md) | S | [PI38](README.md#pi38) | the repository's agent moves into its own Porelo task, after a dry run on this machine | - |
 | <a id="pi54"></a>[PI54](PI54-Third-Party-Notices-Ship-With-The-Package.md) | S | - | the license texts of what the executable compiles in from outside Porelo - SnakeYAML, JSpecify, the GraalVM runtime - in one THIRD-PARTY-NOTICES file, in the deb's doc directory and as `%license` in the rpm | - |

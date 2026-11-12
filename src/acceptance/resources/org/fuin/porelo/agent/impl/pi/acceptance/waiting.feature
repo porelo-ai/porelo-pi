@@ -34,9 +34,12 @@ Feature: Porelo shows Pi waiting for a person while its ask dialog is open
         Then porelo shows the "pi" agent in task "asks" of "asks" waiting for a person
         When I type "red"
         And I press Enter
-        Then within 60 seconds this script exits zero:
+        # Not only the dialog gone, which it is the moment Enter is pressed, but the turn finished and Pi at rest.
+        Then within 120 seconds this script exits zero:
             """
-            ! podman exec "$(porelo task status asks --json | grep -o '"name": *"[^"]*"' | head -n 1 | cut -d'"' -f4)" tmux capture-pane -p -t porelo | grep -qF 'Pi asks you'
+            screen=$(podman exec "$(porelo task status asks --json | grep -o '"name": *"[^"]*"' | head -n 1 | cut -d'"' -f4)" tmux capture-pane -p -t porelo)
+            printf '%s\n' "$screen" | grep -qF '(auto)' || exit 1
+            ! printf '%s\n' "$screen" | grep -qF -e 'Working ─' -e 'escape/ctrl+c cancel'
             """
         And porelo shows the "pi" agent in task "asks" of "asks" not waiting for a person
         When a script runs "porelo project remove asks --force"

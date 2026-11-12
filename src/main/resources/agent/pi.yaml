@@ -73,20 +73,23 @@ session:
     # no question box: a question it puts is plain text on a resting screen, so a wake there would read as an answer.
     at_rest:
         shows: ["(auto)"]
-        # The ask dialog keeps the footer under it, so "(auto)" alone would let a wake line be typed
-        # into the answer.
-        lacks: ["Working ─", "Pi asks you"]
+        # A dialog keeps the footer under it, so "(auto)" alone would let a wake line be typed into
+        # the answer. Its keys line is what every Pi dialog draws and nothing else does; the ask
+        # dialog's title would also match where a conversation merely quotes it.
+        lacks: ["Working ─", "escape/ctrl+c cancel"]
     # Pi has no tool to ask a person, and a question it writes as text ends its turn like any other:
     # nothing on its screen tells it from a turn that is done. So the ask extension this package installs
-    # gives the model one, which asks through a dialog titled "Pi asks you". Measured on 1.5.0 at an
-    # 80 by 24 terminal: the title stands alone on the ninth line from the bottom, under it the answer
-    # line and the dialog's keys, then the footer with "(auto)"; once answered or cancelled the dialog
-    # is gone. A question still written as text reads as not waiting, by the operator's decision of
+    # gives the model one, which asks through a dialog titled "Pi asks you". Measured on 1.5.0 in a
+    # task: the title stands alone between two rules, under it the answer line and the dialog's keys,
+    # then the rule, the working directory and the footer with "(auto)" - the sixth of the non-empty
+    # lines from the bottom, which are what in_last_lines counts. Seven reach the rule above the
+    # title and no further, so the title quoted in the conversation is not read as waiting. Once
+    # answered or cancelled the dialog is gone. A question still written as text reads as not waiting, by the operator's decision of
     # 2026-11-11.
     waiting:
         screen:
             - contains: "Pi asks you"
-              in_last_lines: 12
+              in_last_lines: 7
               for: "an answer to its question"
         # What a finished unattended run said last. Pi ends each message with a message_end record,
         # "the authoritative final message" in its docs/json.md, whose content is a list of parts -

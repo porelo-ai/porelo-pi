@@ -60,8 +60,10 @@ final class PiAskExtension {
                                 text = "no person is attending; decide yourself and say what you decided";
                             } else {
                                 // The question stands in the tool call above the dialog; the title
-                                // stays fixed, since it is what the host reads.
-                                const answer = await ctx.ui.input(TITLE, String(params.question));
+                                // stays fixed, since it is what the host reads. An aborted turn closes
+                                // the dialog with it.
+                                const question = params && params.question != null ? String(params.question) : "";
+                                const answer = await ctx.ui.input(TITLE, question, { signal });
                                 text = answer === undefined || answer === null || answer === ""
                                     ? "no answer"
                                     : String(answer);
