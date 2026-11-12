@@ -32,6 +32,7 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 
 ### Changed
 
+- Central's snapshots (`central.sonatype.snapshots`) are asked only for `org.fuin.porelo`, the group listed in `.mvn/rrf/`, through the switch in the now committed `.mvn/maven.config`, on a forge too, where they are read beside its registry and the newest wins; the forge's own repository stays unfiltered. The daily shared rules check refuses a filter that would let another name out.
 - fd pinned to 10.5.2 (was 10.5.0).
 - The package says that the `porelo-wire` classes in its executable are under Apache-2.0, in its
   Debian copyright and its RPM license, with the license's text beside the GPL's in the RPM.
