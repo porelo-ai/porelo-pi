@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI61",
   "title": "The SBOM Tool Takes Fixed URI And Glob Releases",
-  "state": "Backlog",
+  "state": "Implementing",
   "size": "XS",
   "priority": "Low",
   "rank": 1,
