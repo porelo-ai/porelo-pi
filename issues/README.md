@@ -22,6 +22,12 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi44"></a>[PI44](PI44-A-Copilot-Task-Uses-The-Models-The-Account-Has.md) | M | - | a task on GitHub Copilot runs on a model the account has: no flagless failure on a default it lacks, and `--model` takes every model the account has | 0 |
 | <a id="pi45"></a>[PI45](PI45-Depend-On-The-Agent-Protocol-Porelo-Provides.md) | S | - | the agent contract named at install time | 0 |
 
+## Backlog
+
+| # | Size | Blocked by | What it covers |
+|---|---|---|---|
+| <a id="pi62"></a>[PI62](PI62-A-Continued-Session-Is-Asked-For-Its-Word.md) | XS | - | session.feature's continued-conversation check asks the restarted Pi for the word it was told, instead of looking for the first turn's text on the visible screen |
+
 ## Implementing
 
 | # | Size | Blocked by | What it covers | Open questions |
