@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI52",
   "title": "The Tests Follow The Pyramid",
-  "state": "Accepted",
+  "state": "Analyzed",
   "size": "M",
   "priority": "Medium",
   "rank": 1,
@@ -90,6 +90,10 @@ bash and are proven by running them with stand-in tools, which is their lowest l
   when Pi's directory moves under the home.
 - The end-to-end legs hold 20 scenarios, none of which tests only Porelo.
 - `ProcessesTest` takes under 0.5 s.
+
+## Open questions
+
+- None. The JavaScript engine for the status extension's unit test is a test-only dependency, pinned like the others and chosen by measuring (under *To be checked*);  the five scenarios that test only Porelo leave the suite only where Porelo's own suite is confirmed to cover them (under *To be checked*); one it does not cover goes to Porelo's agent first, so no coverage is dropped.
 
 ## To be checked
 

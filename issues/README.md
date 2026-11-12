@@ -12,7 +12,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi48"></a>[PI48](PI48-The-Acceptance-Legs-Run-Side-By-Side.md) | - | - | a Build's acceptance legs run at the same time, two machines held at once instead of one, the Build done about one leg sooner |
 | <a id="pi37"></a>[PI37](PI37-Nothing-The-Agent-Writes-Reaches-The-Next-Pi.md) | - | - | nothing the agent writes in a task reaches a later Pi: its settings, models, MCP servers, extensions, `PATH` |
 
-## Accepted
+## Analyzed
 
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
