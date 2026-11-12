@@ -24,10 +24,15 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 ## Backlog
 
+| # | Size | Blocked by | What it covers |
+|---|---|---|---|
+| <a id="pi61"></a>[PI61](PI61-The-SBOM-Tool-Takes-Fixed-URI-And-Glob-Releases.md) | XS | - | buildtools/sbom's lock takes fast-uri 3.1.9, closing four advisories, and glob and minimatch either move to their fixed majors or stay as an accepted risk written down, so GitHub's Dependabot alerts on main are answered |
+
+## Implementing
+
 | # | Size | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
 | <a id="pi40"></a>[PI40](PI40-The-Acceptance-Legs-Run-On-The-Host-s-Forge.md) | S | [PI38](README.md#pi38) | the acceptance legs on the host's pool again, once it lends a forge job a machine by kind | 0 |
-| <a id="pi61"></a>[PI61](PI61-The-SBOM-Tool-Takes-Fixed-URI-And-Glob-Releases.md) | XS | - | buildtools/sbom's lock takes fast-uri 3.1.9, closing four advisories, and glob and minimatch either move to their fixed majors or stay as an accepted risk written down, so GitHub's Dependabot alerts on main are answered | - |
 
 ## Review
 
