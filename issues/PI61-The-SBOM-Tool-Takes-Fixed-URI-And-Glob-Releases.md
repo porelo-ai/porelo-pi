@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI61",
   "title": "The SBOM Tool Takes Fixed URI And Glob Releases",
-  "state": "Implementing",
+  "state": "Review",
   "size": "XS",
   "priority": "Low",
   "rank": 1,
@@ -41,6 +41,18 @@ day, no advisory there). Each alert is closed by a fixed release or answered by 
 
 - No Dependabot alert on `main` stays open without a fix or a written accepted risk.
 - The shipped bill of materials is unchanged.
+
+## What was measured
+
+- Against [PI51](README.md#pi51): its relock to `@cyclonedx/cyclonedx-npm` 7 drops `libxmljs2`, so these overrides go
+  with it; this is the fallback that issue names, applied early.
+
+- In the pinned builder image (Node 22.23.4, npm 10.9.9): `npm update fast-uri --package-lock-only` took 3.1.9;
+  `overrides` `glob` 14.0.2 and `minimatch` 11.0.1 then installed with `npm ci --ignore-scripts`, and the lock dropped
+  what only glob 10 had pulled in (jackspeak, cliui and the like) and gained two of glob 14's. Both reach the tree
+  only under `libxmljs2`'s `node-gyp`, which `--ignore-scripts` never runs.
+- `./mvnw -Pdist exec:exec@build-pi-tree` with the old lock and with the new one: both exit 0, and the two tree
+  bills hold the same 125 components with the same hashes and the same dependency graph.
 
 ## To be checked
 

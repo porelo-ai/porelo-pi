@@ -516,6 +516,15 @@ postinstall copies a binary its JS API finds without it. `PinAgreementTest` fail
 generator's version decides what the bill looks like, and that should change in a reviewed commit
 rather than on the day the registry serves something newer.
 
+**`glob` and `minimatch` are overridden to their fixed majors.** The generator's lock holds `glob`
+10 and `minimatch` 9 only as optional packages under `libxmljs2`'s `node-gyp`, which never runs:
+`--ignore-scripts` skips the native build that would call it. Both carry advisories fixed only in a
+new major (`glob` 14.0.2, `minimatch` 11.0.1), so `overrides` in `buildtools/sbom/package.json` take
+those; `cacache` asks for `^10.2.2` and gets 14, which needs Node 18, 20 or 22 and up, and the
+pinned Node is 22. Measured: the generator installs from the new lock and writes the same bill. Drop
+the overrides when the generator moves to `@cyclonedx/cyclonedx-npm` 7, which drops `libxmljs2` and
+with it both packages.
+
 ## NullAway comes from `porelo-parent`
 
 The compiler configuration that runs NullAway - Error Prone with only NullAway, `OnlyNullMarked`, the

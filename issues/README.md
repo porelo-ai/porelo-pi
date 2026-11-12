@@ -27,7 +27,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | # | Size | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
 | <a id="pi40"></a>[PI40](PI40-The-Acceptance-Legs-Run-On-The-Host-s-Forge.md) | S | [PI38](README.md#pi38) | the acceptance legs on the host's pool again, once it lends a forge job a machine by kind | 0 |
-| <a id="pi61"></a>[PI61](PI61-The-SBOM-Tool-Takes-Fixed-URI-And-Glob-Releases.md) | XS | - | buildtools/sbom's lock takes fast-uri 3.1.9, closing four advisories, and glob and minimatch either move to their fixed majors or stay as an accepted risk written down, so GitHub's Dependabot alerts on main are answered | - |
 
 ## Review
 
@@ -47,6 +46,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi41"></a>[PI41](PI41-Snapshots-Resolved-With-A-Read-Only-Token.md) | S | - | on a forge other than the central one, snapshots resolved with the runner's read-only token, the publisher's token in no step, since nothing here deploys to the registry, and a Build without `MAVEN_SNAPSHOTS_URL` refused at its start | - |
 | <a id="pi39"></a>[PI39](PI39-The-Repository-s-Agent-Works-In-A-Porelo-Task.md) | S | [PI38](README.md#pi38) | the repository's agent moves into its own Porelo task, after a dry run on this machine | - |
 | <a id="pi54"></a>[PI54](PI54-Third-Party-Notices-Ship-With-The-Package.md) | S | - | the license texts of what the executable compiles in from outside Porelo - SnakeYAML, JSpecify, the GraalVM runtime - in one THIRD-PARTY-NOTICES file, in the deb's doc directory and as `%license` in the rpm | - |
+| <a id="pi61"></a>[PI61](PI61-The-SBOM-Tool-Takes-Fixed-URI-And-Glob-Releases.md) | XS | - | buildtools/sbom's lock takes fast-uri 3.1.9, closing four advisories, and glob and minimatch either move to their fixed majors or stay as an accepted risk written down, so GitHub's Dependabot alerts on main are answered | - |
 | <a id="pi60"></a>[PI60](PI60-The-Issue-Heads-Are-Checked-Every-Day.md) | XS | - | a daily run checks this repository's issue heads and index with the released porelo-release, as buildtools' shared rules do | - |
 
 ## Finished
