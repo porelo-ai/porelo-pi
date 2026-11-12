@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI58",
   "title": "A Finished Run Answers Its Last Message",
-  "state": "Implementing",
+  "state": "Review",
   "size": "S",
   "priority": "Highest",
   "rank": 1,
@@ -32,17 +32,15 @@ message. A reader whose findings stand in that message is judged on them, not on
   { type: text }, text: text } }`.
 - Pi declares no screen rules on purpose: its screen cannot tell a question it put from rest. A `waiting` block that
   carries only `last_message` must therefore keep Porelo from typing a wake line into Pi and keep its waiting
-  reading at "cannot say". This holds only where Porelo treats a `waiting` without screen rules as declaring none,
-  which is checked before hand-over.
+  reading at "cannot say": Porelo types a wake line only into an agent whose `waiting` has screen rules, and reads
+  one without them as "cannot say".
 - Tests: a unit test reads the definition and answers the last message of a run of Pi's records (red first, without
   the declaration); it also asserts that the declaration names no screen rule.
 
 ## Acceptance
 
-- Over Pi's records of a run (a user message, an assistant message of thinking and text, an assistant message of
-  tool calls only), the answer is the text of the assistant's text parts, without its thinking.
+- Over Pi's records of a run that ended after a tool call (a user message, an assistant message of thinking and two
+  text parts, an assistant message of a tool call, the call's result), the answer is the assistant's text parts
+  joined by a newline, without its thinking and without the tool's output.
 - The definition declares no screen and no not-its-screen rule.
 
-## To be checked
-
-- That Porelo, as built against, wakes no agent whose `waiting` has no screen rules, and reads it as "cannot say".

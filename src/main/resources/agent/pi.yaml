@@ -74,16 +74,24 @@ session:
     at_rest:
         shows: ["(auto)"]
         lacks: ["Working ─"]
-    # No 'waiting' declaration, on purpose. Measured on 0.85.0 at a terminal: asked to put a question
+    # No screen rules, on purpose. Measured on 0.85.0 at a terminal: asked to put a question
     # and wait, it writes the question as plain text above its prompt; with the question open and at
     # rest after the answer, the last 20 lines differ only in the model's words and the footer's token
     # counters, a resting screen often ends with a question too, and its title never changes. Nothing on
     # it tells waiting from done, so Porelo says "cannot say" - which is true - rather than "not
     # waiting", which a rule matching nothing would claim. And since a line typed into a question
-    # nobody can see is open becomes its answer, Porelo types no wake line into an agent without
-    # 'waiting': Pi is never woken - not for a message, a handed-in file or a build verdict - and
-    # finds them when it looks, as its guide tells it. The status extension this package installs does
-    # see its dialogs, but Porelo does not read an agent's own files.
+    # nobody can see is open becomes its answer, Porelo types no wake line into an agent whose
+    # 'waiting' has no screen rule: Pi is never woken - not for a message, a handed-in file or a build
+    # verdict - and finds them when it looks, as its guide tells it. The status extension this package
+    # installs does see its dialogs, but Porelo does not read an agent's own files.
+    waiting:
+        # What a finished unattended run said last. Pi ends each message with a message_end record,
+        # "the authoritative final message" in its docs/json.md, whose content is a list of parts -
+        # thinking, text, tool calls - so the answer is the text parts of the last assistant message.
+        last_message:
+            record: { type: message_end, message.role: assistant }
+            text: message.content
+            part: { record: { type: text }, text: text }
 
 provider:
     # OpenRouter's half - upstream, bearer header, the /api/v1 the OpenAI dialect is served under -

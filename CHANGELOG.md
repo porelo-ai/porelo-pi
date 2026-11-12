@@ -12,6 +12,7 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 
 ### Added
 
+- A finished unattended run answers what Pi said last, the text of its last assistant message without its thinking, through the definition's `session.waiting.last_message`; Pi still declares no screen rule, so nothing is typed into its session.
 - The adapter reports Pi's tool-call starts and ends with their IDs, kinds, shell command lines and durations.
 - A task's skills are switched off, on any start, resumed or not.
 - `vault import` takes Pi's sign-in for the provider asked for, from `auth.json`, and never a key given as a command or a variable.
