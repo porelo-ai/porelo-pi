@@ -27,6 +27,11 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | # | Size | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
 | <a id="pi40"></a>[PI40](PI40-The-Acceptance-Legs-Run-On-The-Host-s-Forge.md) | S | [PI38](README.md#pi38) | the acceptance legs on the host's pool again, once it lends a forge job a machine by kind | 0 |
+
+## Implementing
+
+| # | Size | Blocked by | What it covers | Open questions |
+|---|---|---|---|---|
 | <a id="pi33"></a>[PI33](PI33-Tell-Waiting-From-Pi-s-Program-Status.md) | M | - | Porelo tells a waiting Pi from one at rest by what Pi 1 reports of itself | 0 |
 
 ## Review

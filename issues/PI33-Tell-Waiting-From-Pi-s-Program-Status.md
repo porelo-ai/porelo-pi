@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI33",
   "title": "Tell Waiting From Pi's Program Status",
-  "state": "Backlog",
+  "state": "Implementing",
   "size": "M",
   "priority": "Medium",
   "rank": 7,
