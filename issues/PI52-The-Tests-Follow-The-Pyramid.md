@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI52",
   "title": "The Tests Follow The Pyramid",
-  "state": "Analyzed",
+  "state": "Estimated",
   "size": "M",
   "priority": "Medium",
   "rank": 1,
