@@ -29,6 +29,7 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 
 ### Changed
 
+- fd pinned to 10.5.2 (was 10.5.0).
 - The package says that the `porelo-wire` classes in its executable are under Apache-2.0, in its
   Debian copyright and its RPM license, with the license's text beside the GPL's in the RPM.
 - Pi pinned to 1.5.0 (was 0.85.0).
