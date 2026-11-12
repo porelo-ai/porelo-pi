@@ -12,6 +12,7 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 
 ### Added
 
+- The daily shared rules check also holds every issue head to its schema and each index to its heads.
 - Pi gets a tool to ask the person, `ask_person`, whose dialog Porelo reads as waiting for a person; Pi is now woken for messages, handed-in files and build verdicts while it rests at its prompt, and a question it still writes as text reads as not waiting.
 - A finished unattended run answers what Pi said last, the text of its last assistant message without its thinking, through the definition's `session.waiting.last_message`; Pi still declares no screen rule, so nothing is typed into its session.
 - The adapter reports Pi's tool-call starts and ends with their IDs, kinds, shell command lines and durations.
