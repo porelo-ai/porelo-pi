@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI37",
   "title": "Nothing The Agent Writes Reaches The Next Pi",
-  "state": "Idea",
+  "state": "Accepted",
   "size": "-",
   "priority": "Low",
   "rank": 6,
