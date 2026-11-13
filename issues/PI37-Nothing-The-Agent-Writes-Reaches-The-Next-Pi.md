@@ -7,7 +7,7 @@
   "title": "Nothing The Agent Writes Reaches The Next Pi",
   "state": "Idea",
   "size": "-",
-  "priority": "Medium",
+  "priority": "Low",
   "rank": 6,
   "blockedBy": [],
   "covers": "nothing the agent writes in a task reaches a later Pi: its settings, models, MCP servers, extensions, `PATH`"
