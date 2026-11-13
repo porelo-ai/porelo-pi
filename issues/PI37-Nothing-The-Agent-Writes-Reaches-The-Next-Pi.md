@@ -10,8 +10,8 @@
   "priority": "Low",
   "rank": 6,
   "blockedBy": [],
-  "covers": "nothing the agent writes in a task reaches a later Pi: its settings, models, MCP servers, extensions, `PATH`",
-  "openQuestions": 1
+  "covers": "nothing the agent writes in a task reaches a later Pi: its settings, models, MCP servers, extensions",
+  "openQuestions": 0
 }
 ```
 
@@ -19,14 +19,15 @@
 directory and the start arguments), Porelo's three extensions moved from files placed in the task to files in the
 image, `PiContainerSetup` and `PiRoutingExtension` reshaped so only data is placed, their tests, `doc/decisions.md`
 and the changelog, and one start of Pi on the local VM with its directory read-only. It touches a trust boundary,
-so its plan is read by another model before it is built. It is L if the `PATH` part stays here (see *Open
-questions*): that part is Porelo's, not the adapter's.
+so its plan is read by another model before it is built. The `PATH` and the environment before the wrapper are
+Porelo's, for every agent, and not part of this size.
 
 **Estimate.** M: 53 min, the measured median of M over all repositories (n=113).
 
 **What must be true.** Nothing the agent writes in a task reaches a later Pi in it: not Pi's settings, models,
-MCP servers or extensions, and not a `pi` or a variable that comes before the root-owned wrapper. So code the
-agent prepared cannot run inside the Pi a person later signs in with.
+MCP servers or extensions. So code the agent prepared cannot run inside the Pi a person later signs in with.
+Which `pi` a person starts - the `PATH` and the environment before the root-owned wrapper - is Porelo's to close,
+for every agent's binary alike, and not this issue's.
 
 ## Why
 
@@ -37,9 +38,10 @@ Found by the skill reading of the move of Pi's directory out of the home, each r
   `extensions/*.ts`. Pi loads them at its next start as its user scope, which `--no-approve` does not refuse;
   only a workspace's `.pi/` is refused. An extension the agent wrote runs inside the next Pi and can copy a
   later `/login` out of it.
-- **`PATH` and the environment are the agent's.** The image puts `.local/bin` in the agent's home first on `PATH`, and
+- **`PATH` and the environment are the agent's, and Porelo's to close.** The image puts `.local/bin` in the agent's home first on `PATH`, and
   the agent owns it and its shell's start files. A `pi` of its own, or `PI_PACKAGE_DIR` pointing at a package
-  whose `piConfig` renames the directory variable, comes before the wrapper's `PI_CODING_AGENT_DIR`.
+  whose `piConfig` renames the directory variable, comes before the wrapper's `PI_CODING_AGENT_DIR`. No adapter can close that, and it holds for every agent's
+  binary, so Porelo owns it as a requirement of its own.
 - **Not this issue's:** a key a person types into `/login` is in the Pi process's memory before any store refuses
   it, and an extension cannot replace a built-in command. That is an accepted risk in `doc/decisions.md`.
 
@@ -101,16 +103,8 @@ Found by the skill reading of the move of Pi's directory out of the home, each r
   gives `/login` with them, at a listener of its own. Closing that needs the data placed as root and readable to
   the agent, a placement `ContainerFile` does not offer: a change to Porelo's agent API, which would make this L.
 
-## Open questions
-
-- **Does the `PATH` part stay in this issue?** The `pi` a person starts is found through the agent's own `PATH`,
-  and a shell in the task reads the agent's own start files. No adapter can close that, and the same holds for
-  every agent's binary. Recommended: it goes to Porelo as a requirement of its own, and this issue closes Pi's
-  directory alone (M). Kept here, it waits on Porelo and is L.
-
 ## To be checked
 
-- How Porelo starts the attended Pi: by `PATH` or by the definition's path, and through which shell.
 - Whether Pi starts, keeps its sessions and changes its model with its directory read-only and only `sessions/`
   writable, measured on the local VM.
 - Whether Porelo can place a file as root, readable to the agent, through the agent API today (its own files under

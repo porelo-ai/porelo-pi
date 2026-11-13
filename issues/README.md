@@ -15,7 +15,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 | # | Size | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
-| <a id="pi37"></a>[PI37](PI37-Nothing-The-Agent-Writes-Reaches-The-Next-Pi.md) | M | - | nothing the agent writes in a task reaches a later Pi: its settings, models, MCP servers, extensions, `PATH` | 1 |
+| <a id="pi37"></a>[PI37](PI37-Nothing-The-Agent-Writes-Reaches-The-Next-Pi.md) | M | - | nothing the agent writes in a task reaches a later Pi: its settings, models, MCP servers, extensions | 0 |
 
 ## Estimated
 
