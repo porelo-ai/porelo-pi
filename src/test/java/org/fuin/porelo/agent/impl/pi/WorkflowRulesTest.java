@@ -81,6 +81,79 @@ class WorkflowRulesTest {
     }
 
     @Test
+    void aLegInstallsWhatItsRunBuiltUnlessThatRunPublishedIt(@TempDir final Path dir)
+            throws Exception {
+
+        // Only a push to main publishes; any other run that took the published package would
+        // test what was published last against this commit's features, and its green would
+        // prove nothing about the commit.
+        final List<String> steps =
+                WorkflowSteps.scripts("build.yml", "Acceptance on ${{ matrix.os }}");
+        assertThat(steps).as("the acceptance step of build.yml").hasSize(1);
+        Files.writeString(dir.resolve("pom.xml"), "<agent.cli.version>1.0.0</agent.cli.version>\n");
+        Files.createDirectories(dir.resolve("target"));
+        Files.writeString(dir.resolve("target/cp.txt"), "cp");
+        final Path stubs = dir.resolve("stubs");
+        WorkflowSteps.stub(stubs, "java", "exit 0");
+
+        assertThat(
+                        legCall(
+                                steps.get(0),
+                                dir,
+                                stubs,
+                                "workflow_dispatch",
+                                "refs/heads/main",
+                                "true"))
+                .as("a dispatch on main, which publishes nothing")
+                .contains("--candidate candidate");
+        assertThat(legCall(steps.get(0), dir, stubs, "push", "refs/tags/v1.0.0", "true"))
+                .as("a tag, published only after its legs")
+                .contains("--candidate candidate");
+        assertThat(legCall(steps.get(0), dir, stubs, "push", "refs/heads/main", "false"))
+                .as("a push to main on a forge that publishes nothing")
+                .contains("--candidate candidate");
+        assertThat(legCall(steps.get(0), dir, stubs, "push", "refs/heads/main", "true"))
+                .as("a push to main that published its snapshot")
+                .contains("--package porelo-agent-pi")
+                .doesNotContain("--candidate");
+    }
+
+    /** Runs the acceptance leg for one trigger and returns how it called the machine tooling. */
+    private static String legCall(
+            final String leg,
+            final Path dir,
+            final Path stubs,
+            final String event,
+            final String ref,
+            final String publish)
+            throws Exception {
+        final Processes.Result run =
+                WorkflowSteps.run(
+                        leg,
+                        dir,
+                        stubs,
+                        Map.of(
+                                "PORELO_E2E_OPENROUTER_API_KEY",
+                                "a-key",
+                                "OS",
+                                "ubuntu",
+                                "GITHUB_EVENT_NAME",
+                                event,
+                                "GITHUB_REF",
+                                ref,
+                                "GITHUB_REF_TYPE",
+                                ref.startsWith("refs/tags/") ? "tag" : "branch",
+                                "PORELO_PUBLISH",
+                                publish));
+        assertThat(run.exit())
+                .as("exit of the leg on %s %s:%n%s", event, ref, run.output())
+                .isZero();
+        final List<String> calls = WorkflowSteps.calls(stubs, "java");
+        assertThat(calls).as("the machine tooling, called by the leg").isNotEmpty();
+        return calls.getLast();
+    }
+
+    @Test
     void anEmptyProviderKeyStopsTheBuildsAcceptanceLeg(@TempDir final Path dir) throws Exception {
 
         // Without it the credential scenarios skip, and a leg passes on less than it claims.
@@ -166,7 +239,13 @@ class WorkflowRulesTest {
         // GitHub's artifact actions refuse every other server, so the packages travel through the
         // cache, saved and restored under the condition the leg passes --candidate on.
         final String key = "key: candidate-${{ github.run_id }}-${{ github.run_attempt }}";
-        final String when = "if: github.ref_type == 'tag' || vars.PORELO_PUBLISH != 'true'";
+        final String when =
+                "if: \"!(vars.PORELO_PUBLISH == 'true' && github.event_name == 'push'"
+                        + " && github.ref == 'refs/heads/main')\"";
+        assertThat(lines)
+                .as("the packages are copied, saved and restored under one condition")
+                .filteredOn(line -> line.trim().replaceFirst("^- ", "").equals(when))
+                .hasSize(3);
         assertThat(lines)
                 .as("the build job saves the packages under the key the legs restore")
                 .filteredOn(line -> line.trim().equals(key))
@@ -179,12 +258,6 @@ class WorkflowRulesTest {
                         "restore-keys: candidate-${{ github.run_id }}-",
                         "fail-on-cache-miss: true")
                 .noneMatch(line -> line.contains("download-artifact"));
-        assertThat(step(lines, "Acceptance on ${{ matrix.os }}"))
-                .as("the leg passes --candidate where the packages were restored")
-                .anyMatch(
-                        line ->
-                                line.contains(
-                                        "if [ \"$GITHUB_REF_TYPE\" = tag ] || [ \"$PORELO_PUBLISH\" != true ]; then FROM=\"--package porelo-agent-pi --candidate candidate\""));
     }
 
     /** The lines of the named step, up to the next step or the next job. */
