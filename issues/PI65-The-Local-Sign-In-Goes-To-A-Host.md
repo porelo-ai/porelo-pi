@@ -51,8 +51,9 @@ the fields and the carrying by stdin or environment; Agent Frontend files the wi
 
 ## To be checked
 
-- **Porelo's half.** Porelo seals the value it takes through this adapter's extractor, as an import does; the
-  listing that shows these facts is still to come from Porelo, and the facts are mapped onto it then.
+- **The facts on the wire.** Porelo's listing of what can be carried names agent, provider and kind, asked of this
+  adapter's extractor per provider; it carries no account, expiry or last change, so the facts stay in the adapter
+  until a listing takes them, and the third acceptance point is Porelo's walk.
 
 ## What was built
 
@@ -66,7 +67,8 @@ the fields and the carrying by stdin or environment; Agent Frontend files the wi
   `models.json`, and a sign-in without a provider of Porelo's (or moved to another address) have no facts.
 - The value goes to Porelo only through `PiCredentialExtractor`, the one an import already uses.
 - Tests: `PiSignInFactsTest`, 11, each route, no account or expiry guessed, and no fixture value in any fact.
-- Mapping the facts onto Porelo's listing waits for the listing Porelo's half adds; so does the third acceptance point.
+- Mapped onto Porelo's listing of what can be carried, which asks the extractor per provider: each sign-in with facts
+  is one the extractor answers for its provider, named, by a test.
 - The reading by another model found the issue naming another repository's issue, and two tests that passed with
   the facts read from another provider's entry or with no `auth.json` at all; all fixed. Noted, not fixed: the facts
   read `auth.json` again after the findings, so a file changed in between is described as it is then.

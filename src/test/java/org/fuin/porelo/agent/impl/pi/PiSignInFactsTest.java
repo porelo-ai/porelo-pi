@@ -190,4 +190,32 @@ class PiSignInFactsTest {
         assertThat(facts).as("every route was read").hasSize(3);
         assertThat(facts.toString()).as("no value in any field").doesNotContain(SECRET);
     }
+
+    // Prevents offering a sign-in Porelo's listing of what can be carried would not hold: it asks
+    // the extractor per provider and keeps only an answer that names that provider.
+    @Test
+    void eachSignInWithFactsIsOneTheExtractorAnswersForItsProvider() throws IOException {
+        auth(
+                "{\"openrouter\":"
+                        + API_KEY
+                        + ",\"anthropic\":"
+                        + oauth(SECRET, EXPIRES)
+                        + ",\"github-copilot\":"
+                        + oauth(SECRET, EXPIRES)
+                        + "}");
+
+        final List<PiSignInFacts> facts = facts();
+
+        assertThat(facts).as("the fixture holds a sign-in to carry").isNotEmpty();
+        assertThat(facts)
+                .allSatisfy(
+                        fact ->
+                                assertThat(
+                                                new PiCredentialExtractor()
+                                                        .extract(
+                                                                directory,
+                                                                fact.finding().provider()))
+                                        .map(found -> found.provider())
+                                        .contains(fact.finding().provider()));
+    }
 }
