@@ -119,3 +119,5 @@ a JDK mounted as `JAVA_HOME_25_X64`; the registry held the snapshots this Build 
 - The registry through the host's proxy and gate, with `MAVEN_SNAPSHOTS_URL` as the host sets it, and the runner's jobs in
   their own containers rather than in the runner's.
 - `porelo`'s, `porelo-parent`'s and `porelo-buildtools`' snapshots deployed there by their own Builds, not copied.
+- A write to the registry with the read-only package token the steps hold is refused, and a Build with
+  `MAVEN_SNAPSHOTS_URL` unset stops at the `pinned-jdk` action's first step, naming the variable.
