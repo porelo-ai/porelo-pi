@@ -19,14 +19,16 @@ What the second command leaves in `target/`:
 ```
 porelo-agent-pi                              the adapter, run by Porelo on the host
 pi-tree.tar.gz                              Pi, a Node runtime, fd and ripgrep, ~74 MB
-porelo-agent-pi_0.4.0~SNAPSHOT_amd64.deb
-porelo-agent-pi-0.4.0~SNAPSHOT-1.x86_64.rpm
+porelo-agent-pi_0.5.7~snapshot.0_amd64.deb
+porelo-agent-pi-0.5.7~snapshot.0-1.x86_64.rpm
 ```
 
 **`-Pdist` needs podman**, because it builds `pi-tree.tar.gz` inside a pinned Node
 container rather than on the build machine - so no Node toolchain has to be installed
 here, and the toolchain is a stated version rather than whatever the machine has.
-Without podman the script says so and skips, and the package is then incomplete.
+Without podman the script says so and skips, and the package is then incomplete - unless
+`PI_TREE_DIRECT=1` is set, which builds the same tree directly with the pinned Node, as the
+CI runners do.
 
 That tree is why this build takes minutes where a single-binary agent takes seconds,
 and why the package is about 79 MB. It is shipped rather than fetched so a task image
@@ -108,9 +110,9 @@ doing both at once would make a failure ambiguous.
 
 **The point is the stopping.** The run refuses to publish when an acceptance suite failed, when
 the third-party component set or a license changed, or when the upstream **major** version moved.
-`--expect-moved pi-coding-agent` excuses only the package being updated - **its 165 dependencies
-are not excused, which is the point**: measured, 0.85.1 resolves two packages fewer than 0.85.0,
-and that is exactly the kind of change a person has to look at.
+`--expect-moved pi-coding-agent` excuses only the package being updated - **its dependencies
+are not excused, which is the point**: measured once, a Pi release resolved two packages fewer
+than the one before, and that is exactly the kind of change a person has to look at.
 
 `PinAgreementTest` runs with the unit tests on every build and needs no network: the definition,
 the pom, `package.json` and the lockfile must name one version, and the lockfile is the one that
@@ -124,18 +126,20 @@ of that profile without a tree fails it rather than skipping it.
 
 ## Publishing
 
-A push to `main` uploads the two packages to Artifactory, into the **same repositories
+Where `PORELO_PUBLISH` is `true`, a push to `main` uploads the two packages to Artifactory, into the **same repositories
 Porelo itself publishes to** - `porelo-dist-deb` and `porelo-dist-rpm`. They belong
 together: this package declares `Depends: porelo`, so split across repositories an
 operator would have to configure both for the dependency to resolve.
 
 A pull request builds and packages but publishes nothing.
 
-Two repository settings are needed, the same ones Porelo uses: the variable `JF_URL`
-(the platform url, **without** `/artifactory`) and the secret `JF_ACCESS_TOKEN`. The
+Three repository settings are needed, the same ones Porelo uses: the variable
+`PORELO_PUBLISH`, `true` to publish and `false` to build without publishing (anything else
+fails the build), the variable `JF_URL` (the platform url, **without** `/artifactory`) and
+the secret `JF_ACCESS_TOKEN`. The
 token needs Read, Deploy/Cache, **Annotate** and **Delete** on both repositories -
-Annotate because the Debian index is driven by properties, Delete because the snapshot
-file name is stable and every build overwrites it.
+Annotate because the Debian index is driven by properties, Delete because the bill's
+file name, `porelo-agent-pi.cdx.json`, is stable and every build overwrites it.
 
 `.github/workflows/artifactory-smoke.yml` checks all of that in about twenty seconds,
 without building anything. Run it after rotating the token, or before wondering why a
@@ -150,7 +154,8 @@ never a prepared snapshot - so it exercises the package repository itself: the
 signature, the index, and `Depends: porelo` resolving from the same place.
 
 `org.fuin.porelo.machines.Main acceptance` provisions the machine, installs from Artifactory
-the way [the README](README.md#install) says, creates an unprivileged user (a task runs
+the way [the README](README.md#install) says - on a publishing push to `main`; a tag, a dispatch
+or a forge that does not publish installs the packages its run built (`--candidate`) - creates an unprivileged user (a task runs
 rootless, so running the suite as root would prove less), runs the suite and destroys the
 server in a `finally`. The smallest kind, `amd64`, is enough - one core and 2 GB, because this installs
 packages and runs a single prompt.
@@ -165,9 +170,8 @@ Two halves:
   against, `porelo setup` registers the hooks. No credential needed.
 - **tier 2** - a task authenticates against OpenRouter and completes a prompt, and the
   real credential is then searched for in the container's environment and in every log
-  the run produced. Needs `PORELO_E2E_OPENROUTER_API_KEY`; without it this half is skipped
-  and the script still exits 0, so a fork or a revoked key loses coverage rather than
-  turning the build red with no information.
+  the run produced. Needs `PORELO_E2E_OPENROUTER_API_KEY`, in CI from the secret `OPEN_ROUTER_API_KEY`;
+  a CI leg whose secret is empty fails rather than skip this half and prove less.
 
 **The model is set in the workflow**, `PORELO_E2E_MODEL` in `.github/workflows/build.yml`,
 rather than in a repository setting - so it is visible in the diff, reviewable, and changes
@@ -230,5 +234,6 @@ Ubuntu 26.04's shell integration prints `user=acceptance` in its escape sequence
 `acceptance` reads as echoed and fails every such scenario on a rented machine, while on a machine
 whose account has another name the same scenario passes.
 
-In CI the same suite runs from the runner against the rented machine on every push to `main`.
+In CI the same suite runs from the runner against the rented machine on every push to `main`, unless a
+run of this repository proved the same tree within a day; then the Build takes those legs instead.
 A run that produces no scenarios fails rather than passing quietly.

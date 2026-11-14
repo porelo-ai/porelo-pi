@@ -48,7 +48,7 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 - A publish is believed only once the Debian index lists the exact version built, not merely the package's name.
 - Every job that validates installs shfmt 3.12.0, checked against its release's digest, since Spotless checks the shell scripts with it.
 - The update job fails when deleting its rented machines fails, instead of going on as if they were gone.
-- Built on the snapshot of `porelo-parent` (0.2.1-SNAPSHOT, with the release tooling 0.5.1-SNAPSHOT), against Porelo 0.5.1-SNAPSHOT.
+- Built on the snapshot of `porelo-parent` (0.2.2-SNAPSHOT, with the release tooling 0.5.2-SNAPSHOT), against Porelo 0.5.1-SNAPSHOT.
 
 ## [0.5.0] - 2026-10-17
 
