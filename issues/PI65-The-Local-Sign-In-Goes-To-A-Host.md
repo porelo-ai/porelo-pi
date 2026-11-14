@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI65",
   "title": "The Local Sign-In Goes To A Host",
-  "state": "Backlog",
+  "state": "Review",
   "size": "M",
   "priority": "High",
   "rank": 1,
@@ -50,3 +50,17 @@ the fields and the carrying by stdin or environment; Agent Frontend files the wi
 - **Two machines on one sign-in.** An OAuth sign-in whose refresh token is replaced at each renewal works on one
   machine at a time: the first to renew signs the other out. Whether a carried sign-in is said to sign the person's
   machine out, or is carried only as a kind that does not rotate, is the operator's call.
+
+## What was built
+
+- `PiSignInFacts` says, for each sign-in `PiFindings` finds in `auth.json` that the import can take, keyed by the
+  finding's provider: the file's last change, and the entry's `expires` (epoch milliseconds) for Anthropic's
+  subscription only. OpenRouter's key never expires, and Copilot's `expires` is its session token's, not the
+  carried GitHub token's, so both say none.
+- No account: the entries pi-ai writes for Anthropic, OpenRouter and GitHub Copilot name none, and a token is never
+  decoded for one.
+- Carriable is the finding's `importable`, as before. A key given as a command or a variable, a key in
+  `models.json`, and a sign-in without a provider of Porelo's (or moved to another address) have no facts.
+- The value goes to Porelo only through `PiCredentialExtractor`, the one an import already uses.
+- Tests: `PiSignInFactsTest`, 11, each route, no account or expiry guessed, and no fixture value in any fact.
+- Mapping the facts onto Porelo's listing waits for B775's listing; so does the third acceptance point.

@@ -31,7 +31,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 | # | Size | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
-| <a id="pi65"></a>[PI65](PI65-The-Local-Sign-In-Goes-To-A-Host.md) | M | - | on the person's machine the adapter lists each Pi sign-in it finds - provider, kind, account where known, age and expiry where known, and whether it can be carried, never its value - and hands a chosen one to Porelo, which carries it into a rented host's vault | 2 |
 | <a id="pi40"></a>[PI40](PI40-The-Acceptance-Legs-Run-On-The-Host-s-Forge.md) | S | [PI38](README.md#pi38) | the acceptance legs on the host's pool again, once it lends a forge job a machine by kind | 0 |
 | <a id="pi62"></a>[PI62](PI62-A-Continued-Session-Is-Asked-For-Its-Word.md) | XS | - | session.feature's continued-conversation check asks the restarted Pi for the word it was told, instead of looking for the first turn's text on the visible screen | - |
 
@@ -42,6 +41,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi58"></a>[PI58](PI58-A-Finished-Run-Answers-Its-Last-Message.md) | S | - | a finished unattended Pi run answers the text of its last assistant message, its text parts past its thinking, through session.waiting.last_message, while Porelo still never types a wake line into Pi and still says it cannot tell whether Pi waits | - |
 | <a id="pi64"></a>[PI64](PI64-The-Docs-Say-What-The-Code-Does.md) | S | - | every sentence of the user-facing documentation checked against the code on main, and each one the code does not bear out fixed | - |
 | <a id="pi57"></a>[PI57](PI57-The-Adapter-Reports-Each-Tool-Call-With-Its-Time.md) | S | - | the adapter reads each tool call from its agent's output and hands Porelo its tool, kind, start, end, a shell call's command line, whether it ran in the background, and a sub-agent's name and the calls made under it, in Porelo's common entry | 0 |
+| <a id="pi65"></a>[PI65](PI65-The-Local-Sign-In-Goes-To-A-Host.md) | M | - | on the person's machine the adapter lists each Pi sign-in it finds - provider, kind, account where known, age and expiry where known, and whether it can be carried, never its value - and hands a chosen one to Porelo, which carries it into a rented host's vault | 2 |
 | <a id="pi63"></a>[PI63](PI63-A-Leg-Installs-What-Its-Run-Built.md) | S | - | every acceptance leg of a run that publishes nothing - a dispatch, a tag - installs the packages that run built, so its result speaks for its own commit; only a push to main, which publishes its snapshot first, installs from the package repository | - |
 | <a id="pi53"></a>[PI53](PI53-An-Unreadable-Sign-In-File-Is-Tested-For-Every-Account.md) | S | - | the test that an unreadable `auth.json` cannot say runs and passes as root and as a user other than root, never skipped; the failure as uid 1001 reproduced first | - |
 | <a id="pi43"></a>[PI43](PI43-Mutation-Testing-With-PIT.md) | S | - | mutation testing by hand: a `pit` profile outside CI with no threshold, and a report sorting survivors into real gaps and harmless ones | - |
