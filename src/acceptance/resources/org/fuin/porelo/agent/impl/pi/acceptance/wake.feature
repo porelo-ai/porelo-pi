@@ -28,7 +28,7 @@ Feature: Pi is woken at rest, and never while its ask dialog is open
         And I press Enter
         Then within 120 seconds this script exits zero:
             """
-            podman exec "$(porelo task status wake --json | grep -o '"name": *"[^"]*"' | head -n 1 | cut -d'"' -f4)" tmux capture-pane -p -t porelo | tail -n 12 | grep -qF 'Pi asks you'
+            podman exec --user root "$(porelo task status wake --json | grep -o '"name": *"[^"]*"' | head -n 1 | cut -d'"' -f4)" tmux -S /run/porelo-tmux/tmux capture-pane -p -t porelo | tail -n 12 | grep -qF 'Pi asks you'
             """
         When a script runs "echo 'What is 1234 plus 4321? Reply with the digits only.' | porelo talk tell wake"
         Then it exits zero

@@ -26,7 +26,7 @@ Feature: Porelo shows Pi waiting for a person while its ask dialog is open
         # is asked after.
         Then within 120 seconds this script exits zero:
             """
-            screen=$(podman exec "$(porelo task status asks --json | grep -o '"name": *"[^"]*"' | head -n 1 | cut -d'"' -f4)" tmux capture-pane -p -t porelo)
+            screen=$(podman exec --user root "$(porelo task status asks --json | grep -o '"name": *"[^"]*"' | head -n 1 | cut -d'"' -f4)" tmux -S /run/porelo-tmux/tmux capture-pane -p -t porelo)
             printf '%s\n' "$screen" | tail -n 12 | grep -qF 'Pi asks you' && exit 0
             printf 'screen, last lines:\n'; printf '%s\n' "$screen" | grep -v '^ *$' | tail -25
             exit 1
@@ -37,7 +37,7 @@ Feature: Porelo shows Pi waiting for a person while its ask dialog is open
         # Not only the dialog gone, which it is the moment Enter is pressed, but the turn finished and Pi at rest.
         Then within 120 seconds this script exits zero:
             """
-            screen=$(podman exec "$(porelo task status asks --json | grep -o '"name": *"[^"]*"' | head -n 1 | cut -d'"' -f4)" tmux capture-pane -p -t porelo)
+            screen=$(podman exec --user root "$(porelo task status asks --json | grep -o '"name": *"[^"]*"' | head -n 1 | cut -d'"' -f4)" tmux -S /run/porelo-tmux/tmux capture-pane -p -t porelo)
             printf '%s\n' "$screen" | grep -qF '(auto)' || exit 1
             ! printf '%s\n' "$screen" | grep -qF -e 'Working ─' -e 'escape/ctrl+c cancel'
             """
