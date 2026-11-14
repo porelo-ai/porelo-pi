@@ -63,4 +63,4 @@ the fields and the carrying by stdin or environment; Agent Frontend files the wi
   `models.json`, and a sign-in without a provider of Porelo's (or moved to another address) have no facts.
 - The value goes to Porelo only through `PiCredentialExtractor`, the one an import already uses.
 - Tests: `PiSignInFactsTest`, 11, each route, no account or expiry guessed, and no fixture value in any fact.
-- Mapping the facts onto Porelo's listing waits for B775's listing; so does the third acceptance point.
+- Mapping the facts onto Porelo's listing waits for the listing Porelo's half adds; so does the third acceptance point.

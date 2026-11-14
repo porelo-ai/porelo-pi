@@ -79,7 +79,7 @@ class PiSignInFactsTest {
                         + ",\"anthropic\":"
                         + oauth(SECRET, EXPIRES)
                         + ",\"github-copilot\":"
-                        + oauth(SECRET, EXPIRES)
+                        + oauth(SECRET, EXPIRES + 1_000)
                         + "}");
 
         assertThat(facts())
@@ -145,6 +145,7 @@ class PiSignInFactsTest {
     // Prevents a key in the models file, which the import never takes, being offered to carry.
     @Test
     void aKeyInTheModelsFileHasNoFacts() throws IOException {
+        auth("{}");
         Files.writeString(
                 directory.resolve("models.json"),
                 "{\"providers\":{\"openrouter\":{\"apiKey\":\"" + SECRET + "\"}}}");
