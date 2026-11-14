@@ -11,7 +11,7 @@
   "rank": 1,
   "blockedBy": [],
   "covers": "on the person's machine the adapter lists each Pi sign-in it finds - provider, kind, account where known, age and expiry where known, and whether it can be carried, never its value - and hands a chosen one to Porelo, which carries it into a rented host's vault",
-  "openQuestions": 2
+  "openQuestions": 1
 }
 ```
 
@@ -43,13 +43,16 @@ the fields and the carrying by stdin or environment; Agent Frontend files the wi
 - No finding holds a value of its fixture.
 - With Porelo's half in, a sign-in found on the person's machine is in the host's vault and a task there runs on it.
 
-## To be checked
+## Open questions
 
-- **Porelo's half.** The fields (account, age, expiry, carriable) and the carrying are Agent Core's issue; it goes in
-  `blockedBy` once filed.
 - **Two machines on one sign-in.** An OAuth sign-in whose refresh token is replaced at each renewal works on one
   machine at a time: the first to renew signs the other out. Whether a carried sign-in is said to sign the person's
   machine out, or is carried only as a kind that does not rotate, is the operator's call.
+
+## To be checked
+
+- **Porelo's half.** Porelo seals the value it takes through this adapter's extractor, as an import does; the
+  listing that shows these facts is still to come from Porelo, and the facts are mapped onto it then.
 
 ## What was built
 
@@ -64,3 +67,6 @@ the fields and the carrying by stdin or environment; Agent Frontend files the wi
 - The value goes to Porelo only through `PiCredentialExtractor`, the one an import already uses.
 - Tests: `PiSignInFactsTest`, 11, each route, no account or expiry guessed, and no fixture value in any fact.
 - Mapping the facts onto Porelo's listing waits for the listing Porelo's half adds; so does the third acceptance point.
+- The reading by another model found the issue naming another repository's issue, and two tests that passed with
+  the facts read from another provider's entry or with no `auth.json` at all; all fixed. Noted, not fixed: the facts
+  read `auth.json` again after the findings, so a file changed in between is described as it is then.
