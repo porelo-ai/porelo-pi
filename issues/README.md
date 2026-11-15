@@ -39,6 +39,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 | # | Size | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
+| <a id="pi69"></a>[PI69](PI69-The-Unattended-View-Shows-No-Raw-Event-Lines.md) | S | - | the unattended view of a Pi task shows what the agent says and does, never a raw JSON event line: an unknown event dropped unless it names an error, read in the code beside the same finding for Claude Code | - |
 | <a id="pi40"></a>[PI40](PI40-The-Acceptance-Legs-Run-On-The-Host-s-Forge.md) | S | [PI38](README.md#pi38) | the acceptance legs on the host's pool again, once it lends a forge job a machine by kind | 0 |
 | <a id="pi62"></a>[PI62](PI62-A-Continued-Session-Is-Asked-For-Its-Word.md) | XS | - | session.feature's continued-conversation check asks the restarted Pi for the word it was told, instead of looking for the first turn's text on the visible screen | - |
 
