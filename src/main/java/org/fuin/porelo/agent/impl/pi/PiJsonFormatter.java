@@ -87,24 +87,43 @@ public final class PiJsonFormatter implements LogFormatter {
             case "message_end" -> message(event, line);
             case "tool_execution_start" ->
                     event.get("toolName") instanceof String tool
-                            ? call(oneLine(tool), event)
+                            ? call(name(tool), event)
                             : UNREADABLE + cut(line);
             case "tool_execution_end" ->
                     event.get("toolName") instanceof String tool
-                            ? result(oneLine(tool), event)
+                            ? result(name(tool), event)
                             : UNREADABLE + cut(line);
             case "agent_end" -> end(event, line);
             default -> unknown(event, type);
         };
     }
 
-    /** The arguments that name what a tool works on, in the order they are read. */
+    /**
+     * The arguments that name what a tool works on, in the order they are read. Only these are
+     * shown: another argument may be a file's whole content or a secret a tool was handed.
+     */
     private static final List<String> KEY_ARGS =
-            List.of("command", "pattern", "path", "file_path", "filePath");
+            List.of(
+                    "command",
+                    "pattern",
+                    "path",
+                    "file_path",
+                    "filePath",
+                    "url",
+                    "query",
+                    "description");
+
+    /** How many lines of a failed tool's output are shown, so its cause is not cut away. */
+    private static final int FAILED_LINES = 3;
+
+    /** A tool's name on one line, without the brackets that could make it read as another mark. */
+    private static String name(String tool) {
+        return oneLine(tool).replace("[", "").replace("]", "");
+    }
 
     /**
      * A tool call with its key input on one line: a command's first line, a search's pattern, a
-     * file's path; else the first text it was given, or what it says it intends, or its name.
+     * file's path, a URL, a query or a description; else what it says it intends, or its name.
      */
     private static String call(String tool, Map<?, ?> event) {
         final String input = input(event.get("args"), event.get("intent"));
@@ -118,18 +137,14 @@ public final class PiJsonFormatter implements LogFormatter {
                     return firstLine(given);
                 }
             }
-            for (final Object value : map.values()) {
-                if (text(value) instanceof String given) {
-                    return firstLine(given);
-                }
-            }
         }
         return text(intent);
     }
 
     /**
      * A tool's result on one line: whether it failed, with its output's first line that is not
-     * blank, or its size when it has none - never the whole output.
+     * blank, or its size when it has none - never the whole output. A failed one shows its first
+     * few lines, since its cause often follows what it printed first.
      */
     private static String result(String tool, Map<?, ?> event) {
         final String head = "[" + tool + (marked(event.get("isError")) ? " failed]" : " done]");
@@ -143,12 +158,26 @@ public final class PiJsonFormatter implements LogFormatter {
             if (part instanceof Map<?, ?> map
                     && "text".equals(map.get("type"))
                     && map.get("text") instanceof String said) {
-                text.append(said);
+                text.append(text.isEmpty() ? "" : "\n").append(said);
             }
         }
-        final String first = firstLine(text.toString());
-        if (first != null) {
-            return head + " " + cut(oneLine(first));
+        if (text.isEmpty() && event.get("result") instanceof Map<?, ?> result) {
+            for (final String key : List.of("error", "errorMessage", "message")) {
+                if (text(result.get(key)) instanceof String said) {
+                    text.append(said);
+                    break;
+                }
+            }
+        }
+        if (text.isEmpty() && text(event.get("result")) instanceof String said) {
+            text.append(said);
+        }
+        final String shown =
+                marked(event.get("isError"))
+                        ? firstLines(text.toString(), FAILED_LINES)
+                        : firstLine(text.toString());
+        if (shown != null) {
+            return head + " " + cut(oneLine(shown));
         }
         if (!text.isEmpty()) {
             final long lines = text.toString().lines().count();
@@ -158,6 +187,17 @@ public final class PiJsonFormatter implements LogFormatter {
             return head + " " + content.size() + (content.size() == 1 ? " part" : " parts");
         }
         return head;
+    }
+
+    /** A text's first lines that are not blank, joined by {@code " | "}, or {@code null}. */
+    private static @Nullable String firstLines(String text, int most) {
+        final List<String> lines =
+                text.lines()
+                        .map(String::strip)
+                        .filter(line -> !line.isEmpty())
+                        .limit(most)
+                        .toList();
+        return lines.isEmpty() ? null : String.join(" | ", lines);
     }
 
     /** The first line of a text that is not blank, or {@code null} when it has none. */

@@ -52,7 +52,7 @@ shown only when it failed, as `[<tool> failed]`, without its message; a result t
 ## What was built
 
 - **A tool call** (`tool_execution_start`) shows as `[<tool>] <input>`: the first non-blank line of `command`,
-  else `pattern`, `path`, `file_path` or `filePath`, else the first text in `args`, else the event's `intent`,
+  else `pattern`, `path`, `file_path`, `filePath`, `url`, `query` or `description`, else the event's `intent`,
   else the name alone; folded to one line and cut.
 - **A result** (`tool_execution_end`) shows as `[<tool> done]` or `[<tool> failed]` with the first non-blank line
   of `result.content`'s text parts, cut; without one, its size in lines (blank text) or in parts (no text), and
@@ -65,5 +65,15 @@ shown only when it failed, as `[<tool> failed]`, without its message; a result t
   calls by their input and its results by their first line. The old test that a result which worked shows
   nothing is gone with that rule. Breaking the failure mark, the key input, the first line, the size, the cut and
   the fold each turned a named test red.
-- **Level:** unit tests of the formatter ran; the reading by another model and the operator's test are the
-  coordinator's and still open.
+- **The reading by another model** found a failed tool's cause hidden behind the first line its output printed,
+  a tool name with a bracket that could read as another mark (`error] quota` gives `[error] quota`), any text
+  argument shown as the fallback (a secret or a file's content among them), and text parts run together. All fixed:
+  a failure shows its first 3 non-blank lines joined by ` | `, or its result's `error` where it has no text; a name
+  loses its brackets; only the arguments that name the work are shown (`url`, `query` and `description` added),
+  else the `intent`; parts are joined by a line break. Tests `aFailedToolShowsItsCause`,
+  `aResultsPartsAreNotRunTogether`, `aToolNameCannotPassForAnotherMark` and
+  `showsNoArgumentButTheOnesThatNameTheWork` seen red first, and `aToolsLineCarriesNoControlOrDirectionMark`
+  guarding the fold; the cause, the name and the join each broken on purpose and seen red. Unit suite 251 run,
+  0 failures, 0 skipped. Left as before: a command's first line, a URL or a query is shown whole up to the cut,
+  so a token typed into one reaches the log.
+- **Level:** unit tests of the formatter; the operator's test is the coordinator's and still open.

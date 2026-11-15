@@ -188,8 +188,7 @@ class PiJsonFormatterTest {
         assertThat(failed)
                 .as("a result that failed")
                 .startsWith("[bash")
-                .contains("failed", "fatal: not a git repository")
-                .doesNotContain("second line");
+                .contains("failed", "fatal: not a git repository");
         assertThat(worked)
                 .as("a result that worked")
                 .startsWith("[bash")
@@ -533,5 +532,73 @@ class PiJsonFormatterTest {
                                 .toList())
                 .as("an unknown event that says something but reports no error")
                 .containsOnlyNulls();
+    }
+
+    @Test
+    void aFailedToolShowsItsCause() {
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"tool_execution_end\",\"toolName\":\"bash\",\"isError\":true,"
+                                        + "\"result\":{\"content\":[{\"type\":\"text\",\"text\":"
+                                        + "\"BG-DONE\\nfatal: not a git repository\\n\\n\\nCommand exited with code 128\"}]}}"))
+                .as("the cause after what it printed first")
+                .startsWith("[bash failed]")
+                .contains("fatal: not a git repository", "exited with code 128");
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"tool_execution_end\",\"toolName\":\"read\",\"isError\":true,"
+                                        + "\"result\":{\"error\":\"permission denied\"}}"))
+                .as("a failure that gives its cause as an error, not as text")
+                .startsWith("[read failed]")
+                .contains("permission denied");
+    }
+
+    @Test
+    void aResultsPartsAreNotRunTogether() {
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"tool_execution_end\",\"toolName\":\"bash\",\"isError\":false,"
+                                        + "\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"first\"},"
+                                        + "{\"type\":\"text\",\"text\":\"second\"}]}}"))
+                .as("two text parts are two lines, of which the first is shown")
+                .contains("first")
+                .doesNotContain("firstsecond");
+    }
+
+    @Test
+    void aToolNameCannotPassForAnotherMark() {
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"tool_execution_start\",\"toolName\":\"error] quota\",\"args\":{}}"))
+                .as("a name with a bracket")
+                .doesNotStartWith("[error]");
+    }
+
+    @Test
+    void showsNoArgumentButTheOnesThatNameTheWork() {
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"tool_execution_start\",\"toolName\":\"upload\","
+                                        + "\"args\":{\"apiKey\":\"sk-not-for-the-log\",\"content\":\"a whole file\"},"
+                                        + "\"intent\":\"Uploading the report\"}"))
+                .as("a secret or a file's content stays out; what the tool intends is shown")
+                .doesNotContain("sk-not-for-the-log", "a whole file")
+                .contains("Uploading the report");
+    }
+
+    @Test
+    void aToolsLineCarriesNoControlOrDirectionMark() {
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"tool_execution_start\",\"toolName\":\"bash\","
+                                        + "\"args\":{\"command\":\"a\\u001b[31mb\\u202ec\"}}"))
+                .as("an escape or a direction override in a command")
+                .doesNotContain("\u001b", "\u202e");
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"tool_execution_end\",\"toolName\":\"bash\",\"isError\":false,"
+                                        + "\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"a\\u001b[31mb\\u202ec\"}]}}"))
+                .as("an escape or a direction override in a result")
+                .doesNotContain("\u001b", "\u202e");
     }
 }
