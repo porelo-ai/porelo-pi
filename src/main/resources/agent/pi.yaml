@@ -35,6 +35,15 @@ sandboxed:
 instructions:
     arguments: ["--append-system-prompt", "{file}"]
 
+# How Pi takes a reasoning effort, for a Start that names one; none named passes nothing and Pi
+# keeps its own default. 'pi --help' names --thinking <level> with off, minimal, low, medium, high,
+# xhigh and max, read on 1.4.0 offline on the test VM on 2026-11-15; the pinned 1.5.0 was not there
+# to read. Read by a Porelo that knows the section, skipped by an older one. "off" is quoted:
+# bare, YAML reads it as false.
+effort:
+    arguments: ["--thinking", "{effort}"]
+    values: ["off", minimal, low, medium, high, xhigh, max]
+
 git_identity:
     name: Pi
     email: noreply@pi.dev

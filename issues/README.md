@@ -39,12 +39,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi62"></a>[PI62](PI62-A-Continued-Session-Is-Asked-For-Its-Word.md) | XS | - | session.feature's continued-conversation check asks the restarted Pi for the word it was told, instead of looking for the first turn's text on the visible screen | - |
 | <a id="pi70"></a>[PI70](PI70-A-Missed-Dialog-Shows-The-Screen.md) | XS | - | wake.feature's wait for Pi's question prints the pane's last lines when it fails, as waiting.feature's does, so a missed dialog says what Pi showed instead | - |
 
-## Implementing
-
-| # | Size | Blocked by | What it covers |
-|---|---|---|---|
-| <a id="pi73"></a>[PI73](PI73-Start-Work-Offers-Pi-s-Efforts.md) | XS | - | the definition declares the reasoning efforts Pi takes and how one is passed (`--thinking {effort}`), so Start work offers them to pick instead of typing and an absent effort passes nothing |
-
 ## Review
 
 | # | Size | Blocked by | What it covers | Open questions |
@@ -52,6 +46,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi58"></a>[PI58](PI58-A-Finished-Run-Answers-Its-Last-Message.md) | S | - | a finished unattended Pi run answers the text of its last assistant message, its text parts past its thinking, through session.waiting.last_message, while Porelo still never types a wake line into Pi and still says it cannot tell whether Pi waits | - |
 | <a id="pi57"></a>[PI57](PI57-The-Adapter-Reports-Each-Tool-Call-With-Its-Time.md) | S | - | the adapter reads each tool call from its agent's output and hands Porelo its tool, kind, start, end, a shell call's command line, whether it ran in the background, and a sub-agent's name and the calls made under it, in Porelo's common entry | 0 |
 | <a id="pi72"></a>[PI72](PI72-The-Running-View-Says-What-Each-Tool-Did.md) | S | - | the running view of an unattended Pi task says each tool call with its key input from `args` and each result by whether it failed and its first line or its size, instead of only the tool's name | - |
+| <a id="pi73"></a>[PI73](PI73-Start-Work-Offers-Pi-s-Efforts.md) | XS | - | the definition declares the reasoning efforts Pi takes and how one is passed (`--thinking {effort}`), so Start work offers them to pick instead of typing and an absent effort passes nothing | - |
 | <a id="pi63"></a>[PI63](PI63-A-Leg-Installs-What-Its-Run-Built.md) | S | - | every acceptance leg of a run that publishes nothing - a dispatch, a tag - installs the packages that run built, so its result speaks for its own commit; only a push to main, which publishes its snapshot first, installs from the package repository | - |
 | <a id="pi53"></a>[PI53](PI53-An-Unreadable-Sign-In-File-Is-Tested-For-Every-Account.md) | S | - | the test that an unreadable `auth.json` cannot say runs and passes as root and as a user other than root, never skipped; the failure as uid 1001 reproduced first | - |
 | <a id="pi43"></a>[PI43](PI43-Mutation-Testing-With-PIT.md) | S | - | mutation testing by hand: a `pit` profile outside CI with no threshold, and a report sorting survivors into real gaps and harmless ones | - |

@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI73",
   "title": "Start Work Offers Pi's Efforts",
-  "state": "Implementing",
+  "state": "Review",
   "size": "XS",
   "priority": "High",
   "rank": 1,
@@ -40,3 +40,16 @@ declaration does not break an older Porelo.
 
 - The definition declares the effort levels and how they are passed, in the contract's shape, and today's reader
   still reads the definition.
+
+## What was built
+
+- **The definition** (`pi.yaml`) declares `effort` with `arguments: ["--thinking", "{effort}"]` and `values: ["off", minimal, low, medium, high, xhigh, max]`, in the
+  contract's shape; an older Porelo's reader skips the section.
+- **Where the levels come from:** `pi --help` on 1.4.0, read offline on the test VM; the pinned 1.5.0 was not there, so the levels are unconfirmed on the pin. "off" is quoted, since YAML reads a bare off as false; the test saw `false` until it was.
+- **Test** `EffortDeclarationTest` reads the section from the definition itself: the arguments and the levels, in
+  their order. Both seen red before the section stood; dropping the last level turned `offersTheLevelsTheCliTakes`
+  red, restored identical.
+- **The reading by another model** found no fault: the shape, the reader of porelo 5328c5df4, the substitution and
+  the placement hold. It confirmed the quoted `"off"` is needed: the reader takes each value as a string of what YAML read. Left: the test reads the YAML with a plain loader, so a duplicated `effort` key would pass it and fail the reader.
+- **Level:** unit tests; suite 253 run, 0 failures, 0 skipped. Whether the pinned CLI accepts each level in a
+  run is the operator's test.
