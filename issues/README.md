@@ -12,6 +12,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi59"></a>[PI59](PI59-The-Agent-s-Own-Telemetry-Goes-To-Porelo.md) | - | - | the adapter declares Pi's own OpenTelemetry export pointed at Porelo's local receiver in the task, with every switch that would carry content - prompts, tool arguments and output, responses - set explicitly off | - |
 | <a id="pi66"></a>[PI66](PI66-The-Sign-In-Facts-Smaller-Findings.md) | - | - | the smaller gaps left in how the adapter finds and describes a local Pi sign-in for carrying to a host, each fixed or measured | - |
 | <a id="pi48"></a>[PI48](PI48-The-Acceptance-Legs-Run-Side-By-Side.md) | - | - | a Build's acceptance legs run at the same time, two machines held at once instead of one, the Build done about one leg sooner | - |
+| <a id="pi68"></a>[PI68](PI68-Review-that-the-documentation-matches-the-implementation.md) | - | - | Review that the documentation matches the implementation | - |
 
 ## Analyzed
 
