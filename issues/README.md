@@ -13,16 +13,11 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi66"></a>[PI66](PI66-The-Sign-In-Facts-Smaller-Findings.md) | - | - | the smaller gaps left in how the adapter finds and describes a local Pi sign-in for carrying to a host, each fixed or measured | - |
 | <a id="pi48"></a>[PI48](PI48-The-Acceptance-Legs-Run-Side-By-Side.md) | - | - | a Build's acceptance legs run at the same time, two machines held at once instead of one, the Build done about one leg sooner | - |
 
-## In analysis
-
-| # | Size | Blocked by | What it covers |
-|---|---|---|---|
-| <a id="pi68"></a>[PI68](PI68-Review-that-the-documentation-matches-the-implementation.md) | - | - | Review that the documentation matches the implementation |
-
 ## Analyzed
 
 | # | Size | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
+| <a id="pi68"></a>[PI68](PI68-Review-that-the-documentation-matches-the-implementation.md) | - | - | Review that the documentation matches the implementation | - |
 | <a id="pi37"></a>[PI37](PI37-Nothing-The-Agent-Writes-Reaches-The-Next-Pi.md) | M | - | nothing the agent writes in a task reaches a later Pi: its settings, models, MCP servers, extensions | 0 |
 
 ## Estimated
