@@ -87,17 +87,87 @@ public final class PiJsonFormatter implements LogFormatter {
             case "message_end" -> message(event, line);
             case "tool_execution_start" ->
                     event.get("toolName") instanceof String tool
-                            ? "[" + tool + "]"
+                            ? call(oneLine(tool), event)
                             : UNREADABLE + cut(line);
             case "tool_execution_end" ->
-                    !(event.get("toolName") instanceof String tool)
-                            ? UNREADABLE + cut(line)
-                            : Boolean.TRUE.equals(event.get("isError"))
-                                    ? "[" + tool + " failed]"
-                                    : null;
+                    event.get("toolName") instanceof String tool
+                            ? result(oneLine(tool), event)
+                            : UNREADABLE + cut(line);
             case "agent_end" -> end(event, line);
             default -> unknown(event, type);
         };
+    }
+
+    /** The arguments that name what a tool works on, in the order they are read. */
+    private static final List<String> KEY_ARGS =
+            List.of("command", "pattern", "path", "file_path", "filePath");
+
+    /**
+     * A tool call with its key input on one line: a command's first line, a search's pattern, a
+     * file's path; else the first text it was given, or what it says it intends, or its name.
+     */
+    private static String call(String tool, Map<?, ?> event) {
+        final String input = input(event.get("args"), event.get("intent"));
+        return input == null ? "[" + tool + "]" : "[" + tool + "] " + cut(oneLine(input));
+    }
+
+    private static @Nullable String input(@Nullable Object args, @Nullable Object intent) {
+        if (args instanceof Map<?, ?> map) {
+            for (final String key : KEY_ARGS) {
+                if (text(map.get(key)) instanceof String given) {
+                    return firstLine(given);
+                }
+            }
+            for (final Object value : map.values()) {
+                if (text(value) instanceof String given) {
+                    return firstLine(given);
+                }
+            }
+        }
+        return text(intent);
+    }
+
+    /**
+     * A tool's result on one line: whether it failed, with its output's first line that is not
+     * blank, or its size when it has none - never the whole output.
+     */
+    private static String result(String tool, Map<?, ?> event) {
+        final String head = "[" + tool + (marked(event.get("isError")) ? " failed]" : " done]");
+        final List<?> content =
+                event.get("result") instanceof Map<?, ?> result
+                                && result.get("content") instanceof List<?> parts
+                        ? parts
+                        : List.of();
+        final StringBuilder text = new StringBuilder();
+        for (final Object part : content) {
+            if (part instanceof Map<?, ?> map
+                    && "text".equals(map.get("type"))
+                    && map.get("text") instanceof String said) {
+                text.append(said);
+            }
+        }
+        final String first = firstLine(text.toString());
+        if (first != null) {
+            return head + " " + cut(oneLine(first));
+        }
+        if (!text.isEmpty()) {
+            final long lines = text.toString().lines().count();
+            return head + " " + lines + (lines == 1 ? " line" : " lines");
+        }
+        if (!content.isEmpty()) {
+            return head + " " + content.size() + (content.size() == 1 ? " part" : " parts");
+        }
+        return head;
+    }
+
+    /** The first line of a text that is not blank, or {@code null} when it has none. */
+    private static @Nullable String firstLine(String text) {
+        for (final String line : text.split("\\R")) {
+            if (!line.isBlank()) {
+                return line.strip();
+            }
+        }
+        return null;
     }
 
     /** The words a status uses for a step that went wrong. */

@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI72",
   "title": "The Running View Says What Each Tool Did",
-  "state": "Implementing",
+  "state": "Review",
   "size": "S",
   "priority": "High",
   "rank": 1,
@@ -48,3 +48,22 @@ shown only when it failed, as `[<tool> failed]`, without its message; a result t
 - Rendered through the formatter, the recorded run shows each tool call with its key input and each result with its
   failure and its first line or size.
 - A result that failed always says so with its first line, and its test fails when the rule is taken out.
+
+## What was built
+
+- **A tool call** (`tool_execution_start`) shows as `[<tool>] <input>`: the first non-blank line of `command`,
+  else `pattern`, `path`, `file_path` or `filePath`, else the first text in `args`, else the event's `intent`,
+  else the name alone; folded to one line and cut.
+- **A result** (`tool_execution_end`) shows as `[<tool> done]` or `[<tool> failed]` with the first non-blank line
+  of `result.content`'s text parts, cut; without one, its size in lines (blank text) or in parts (no text), and
+  nothing more when it is empty. A result that worked is now shown too.
+- **A tool's name** is folded to one line as well, in a call and in a result; the rest of [PI71](README.md#pi71)'s
+  line-break point (a line that is not JSON) stays with it.
+- **Tests** in `PiJsonFormatterTest`, each seen red first: `showsAToolCallWithItsKeyInput`,
+  `aFailedResultSaysSoWithItsFirstLine`, `showsTheSizeOfAResultWithoutATextLine`, `neverShowsAWholeOutput`,
+  `aToolCannotOpenALineOfItsOwn`, and `showsNoRawEventLineOfARecordedRun`, which now also reads the recorded run's
+  calls by their input and its results by their first line. The old test that a result which worked shows
+  nothing is gone with that rule. Breaking the failure mark, the key input, the first line, the size, the cut and
+  the fold each turned a named test red.
+- **Level:** unit tests of the formatter ran; the reading by another model and the operator's test are the
+  coordinator's and still open.

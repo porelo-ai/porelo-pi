@@ -120,23 +120,155 @@ class PiJsonFormatterTest {
     }
 
     @Test
-    void namesAToolWhenItStartsAndAgainOnlyWhenItFails() {
+    void showsAToolCallWithItsKeyInput() {
 
+        // A call shown by its name alone leaves the person blind to what the agent ran or touched.
         assertThat(
                         formatter.format(
                                 "{\"type\":\"tool_execution_start\",\"toolCallId\":\"c1\",\"toolName\":\"bash\","
-                                        + "\"args\":{\"command\":\"ls\"}}"))
-                .isEqualTo("[bash]");
+                                        + "\"args\":{\"command\":\"\\n  git status\\nrm -rf build\",\"timeout\":10}}"))
+                .as("a command by its first line")
+                .startsWith("[bash")
+                .contains("git status")
+                .doesNotContain("rm -rf", "\n");
+        assertThat(
+                        List.of(
+                                        "{\"type\":\"tool_execution_start\",\"toolName\":\"read\",\"args\":{\"path\":\"src/A.java\",\"offset\":5}}",
+                                        "{\"type\":\"tool_execution_start\",\"toolName\":\"write\",\"args\":{\"content\":\"x\",\"path\":\"src/A.java\"}}",
+                                        "{\"type\":\"tool_execution_start\",\"toolName\":\"edit\",\"args\":{\"oldText\":\"a\",\"newText\":\"b\",\"file_path\":\"src/A.java\"}}")
+                                .stream()
+                                .map(formatter::format)
+                                .toList())
+                .as("a read, write or edit tool by its path")
+                .allSatisfy(
+                        shown ->
+                                assertThat(shown).contains("src/A.java").doesNotContain("oldText"));
         assertThat(
                         formatter.format(
-                                "{\"type\":\"tool_execution_end\",\"toolCallId\":\"c1\",\"toolName\":\"bash\","
-                                        + "\"result\":{\"content\":[]},\"isError\":false}"))
-                .isNull();
+                                "{\"type\":\"tool_execution_start\",\"toolName\":\"grep\","
+                                        + "\"args\":{\"path\":\"src\",\"pattern\":\"TODO\\\\(\",\"glob\":\"*.java\"}}"))
+                .as("a search by its pattern")
+                .startsWith("[grep")
+                .contains("TODO\\(");
         assertThat(
                         formatter.format(
-                                "{\"type\":\"tool_execution_end\",\"toolCallId\":\"c1\",\"toolName\":\"bash\","
-                                        + "\"result\":{\"content\":[]},\"isError\":true}"))
-                .isEqualTo("[bash failed]");
+                                "{\"type\":\"tool_execution_start\",\"toolName\":\"fetch\","
+                                        + "\"args\":{\"retries\":2,\"url\":\"https://example.org/a\"}}"))
+                .as("any other tool by a string it was given")
+                .contains("https://example.org/a");
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"tool_execution_start\",\"toolName\":\"wait\",\"args\":{},"
+                                        + "\"intent\":\"Waiting for the build\"}"))
+                .as("a tool without a telling input by its intent")
+                .contains("Waiting for the build");
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"tool_execution_start\",\"toolName\":\"todo\",\"args\":{}}"))
+                .as("a tool with nothing to say by its name")
+                .contains("todo");
+    }
+
+    @Test
+    void aFailedResultSaysSoWithItsFirstLine() {
+
+        // A failure shown without its message, or not shown at all, hides why the work went wrong.
+        final String failed =
+                formatter.format(
+                        "{\"type\":\"tool_execution_end\",\"toolCallId\":\"c1\",\"toolName\":\"bash\","
+                                + "\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"\\n  \\n"
+                                + "fatal: not a git repository\\nsecond line\"}]},\"isError\":true}");
+        final String worked =
+                formatter.format(
+                        "{\"type\":\"tool_execution_end\",\"toolCallId\":\"c1\",\"toolName\":\"bash\","
+                                + "\"result\":{\"content\":[{\"type\":\"image\",\"data\":\"AAAA\"},"
+                                + "{\"type\":\"text\",\"text\":\"On branch main\\nnothing to commit\"}]},"
+                                + "\"isError\":false}");
+
+        assertThat(failed)
+                .as("a result that failed")
+                .startsWith("[bash")
+                .contains("failed", "fatal: not a git repository")
+                .doesNotContain("second line");
+        assertThat(worked)
+                .as("a result that worked")
+                .startsWith("[bash")
+                .contains("On branch main")
+                .doesNotContain("failed", "nothing to commit", "AAAA");
+    }
+
+    @Test
+    void showsTheSizeOfAResultWithoutATextLine() {
+
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"tool_execution_end\",\"toolName\":\"bash\","
+                                        + "\"result\":{\"content\":[{\"type\":\"text\",\"text\":\" \\n\\n \"}]},\"isError\":false}"))
+                .as("blank lines")
+                .contains("3 lines");
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"tool_execution_end\",\"toolName\":\"read\","
+                                        + "\"result\":{\"content\":[{\"type\":\"image\",\"data\":\"AAAA\"}]},\"isError\":true}"))
+                .as("a result without text")
+                .contains("failed", "1 part")
+                .doesNotContain("AAAA");
+    }
+
+    @Test
+    void neverShowsAWholeOutput() {
+
+        // A tool's whole output in the view buries the work it was meant to show.
+        final String lines =
+                java.util.stream.IntStream.rangeClosed(1, 50)
+                        .mapToObj(i -> "line " + i)
+                        .collect(java.util.stream.Collectors.joining("\\n"));
+        final String many =
+                formatter.format(
+                        "{\"type\":\"tool_execution_end\",\"toolName\":\"bash\","
+                                + "\"result\":{\"content\":[{\"type\":\"text\",\"text\":\""
+                                + lines
+                                + "\"}]},\"isError\":false}");
+        final String wide =
+                formatter.format(
+                        "{\"type\":\"tool_execution_end\",\"toolName\":\"bash\","
+                                + "\"result\":{\"content\":[{\"type\":\"text\",\"text\":\""
+                                + "x".repeat(1000)
+                                + "\"}]},\"isError\":false}");
+        final String command =
+                formatter.format(
+                        "{\"type\":\"tool_execution_start\",\"toolName\":\"bash\","
+                                + "\"args\":{\"command\":\""
+                                + "y".repeat(1000)
+                                + "\"}}");
+
+        assertThat(many).as("a long output").contains("line 1").doesNotContain("line 2", "\n");
+        assertThat(wide).as("a wide output").contains("xxx").hasSizeLessThan(400);
+        assertThat(command).as("a wide command").contains("yyy").hasSizeLessThan(400);
+    }
+
+    @Test
+    void aToolCannotOpenALineOfItsOwn() {
+
+        // A line break in a tool's name or input could forge a line that reads like the agent's.
+        assertThat(
+                        List.of(
+                                        "{\"type\":\"tool_execution_start\",\"toolName\":\"x\\n[error] forged\",\"args\":{}}",
+                                        "{\"type\":\"tool_execution_start\",\"toolName\":\"bash\","
+                                                + "\"args\":{\"command\":\"echo a\\u2028[error] forged\"}}",
+                                        "{\"type\":\"tool_execution_start\",\"toolName\":\"read\","
+                                                + "\"args\":{\"path\":\"a\\r[error] forged\"}}",
+                                        "{\"type\":\"tool_execution_end\",\"toolName\":\"x\\u2029[error] forged\","
+                                                + "\"result\":{\"content\":[]},\"isError\":true}")
+                                .stream()
+                                .map(formatter::format)
+                                .toList())
+                .as("a tool's name and input on one line")
+                .allSatisfy(
+                        shown ->
+                                assertThat(shown)
+                                        .isNotNull()
+                                        .doesNotContain("\n", "\r", "\u2028", "\u2029"));
     }
 
     @Test
@@ -249,6 +381,26 @@ class PiJsonFormatterTest {
         assertThat(lines.stream().map(formatter::format).filter(Objects::nonNull))
                 .as("lines of the Pi 1.4.0 run a person would read as raw JSON")
                 .noneMatch(shown -> shown.startsWith("{"));
+        assertThat(lines.stream().map(formatter::format).filter(Objects::nonNull).toList())
+                .as(
+                        "the recorded run's tool calls by their input, and their results by their first line")
+                .anySatisfy(
+                        shown ->
+                                assertThat(shown)
+                                        .startsWith("[bash")
+                                        .contains("(sleep 4; echo BG-DONE > bg.txt) &"))
+                .anySatisfy(shown -> assertThat(shown).startsWith("[write").contains("note.txt"))
+                .anySatisfy(
+                        shown ->
+                                assertThat(shown)
+                                        .startsWith("[bash")
+                                        .endsWith("BG-DONE")
+                                        .doesNotContain("failed"))
+                .anySatisfy(
+                        shown ->
+                                assertThat(shown)
+                                        .startsWith("[write")
+                                        .contains("Successfully wrote to note.txt"));
     }
 
     @Test
