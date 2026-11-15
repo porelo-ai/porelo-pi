@@ -48,3 +48,8 @@
   purpose and seen red. The older test that held an unknown event shown cut now holds it dropped.
 - Built with a Claude Code sub-agent (the first rule) and finished by the repository's agent (the wider error rule the
   other adapters' readings asked for). Not found by a run: what other event types the pinned CLI writes beyond this one run.
+- The reading by another model found the end of retries that ran out still dropped: `auto_retry_end` with `success`
+  false and a `finalError`, a shape taken from a Pi build; also an `errorMessage` given as an object, an `errors` list
+  and an `isError` in capitals. All fixed: a `success` of false, `finalError` and `errors` now report an error. It also
+  found the recorded run guards nothing, as said above. Noted, not fixed: an error carried by an event of a known silent
+  type is dropped, and a tool name or a line that is not JSON keeps its line breaks, both as before the change.

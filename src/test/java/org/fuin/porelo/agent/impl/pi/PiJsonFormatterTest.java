@@ -342,4 +342,44 @@ class PiJsonFormatterTest {
                 .as("a line break or a Unicode separator in an error is folded away")
                 .doesNotContain("\n", "\u2028");
     }
+
+    @Test
+    void showsThatRetriesRanOut() {
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"auto_retry_end\",\"success\":false,\"attempt\":3,\"finalError\":\"429 quota\"}"))
+                .as("the last retry failed, in the shape Pi writes it")
+                .startsWith("[error]")
+                .contains("429 quota");
+        assertThat(formatter.format("{\"type\":\"auto_retry_end\",\"success\":true,\"attempt\":2}"))
+                .as("a retry that worked")
+                .isNull();
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"auto_retry_end\",\"success\":false,\"attempt\":3}"))
+                .as("the last retry failed without saying why")
+                .isEqualTo("[error] auto_retry_end");
+        assertThat(
+                        List.of(
+                                        "{\"type\":\"something_new\",\"errorMessage\":{\"message\":\"quota exceeded\"}}",
+                                        "{\"type\":\"something_new\",\"errors\":[\"quota exceeded\"]}",
+                                        "{\"type\":\"something_new\",\"isError\":\"TRUE\",\"message\":\"quota exceeded\"}")
+                                .stream()
+                                .map(formatter::format)
+                                .toList())
+                .as("an error message as an object, a list of errors, a flag in capitals")
+                .allSatisfy(
+                        shown ->
+                                assertThat(shown).startsWith("[error]").contains("quota exceeded"));
+        assertThat(
+                        List.of(
+                                        "{\"type\":\"something_new\",\"error\":false,\"message\":\"hello\"}",
+                                        "{\"type\":\"something_new\",\"isError\":false,\"errors\":[]}",
+                                        "{\"type\":\"something_new\",\"message\":\"hello\"}")
+                                .stream()
+                                .map(formatter::format)
+                                .toList())
+                .as("an unknown event that says something but reports no error")
+                .containsOnlyNulls();
+    }
 }

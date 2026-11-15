@@ -107,7 +107,8 @@ public final class PiJsonFormatter implements LogFormatter {
     /**
      * An unknown event that reports an error or a warning, as such with its message on one line;
      * any other is dropped. An error is named by the event's type, its level, a status of failure,
-     * an error mark, or an error it carries; a warning by its type or level.
+     * an error mark, a success that is false (retries that ran out), or an error it carries; a
+     * warning by its type or level.
      */
     private static @Nullable String unknown(Map<?, ?> event, String type) {
         final boolean error =
@@ -116,8 +117,11 @@ public final class PiJsonFormatter implements LogFormatter {
                         || failure(event.get("status"))
                         || marked(event.get("isError"))
                         || marked(event.get("is_error"))
+                        || Boolean.FALSE.equals(event.get("success"))
                         || carries(event.get("error"))
-                        || text(event.get("errorMessage")) != null;
+                        || carries(event.get("errorMessage"))
+                        || carries(event.get("finalError"))
+                        || carries(event.get("errors"));
         final boolean warning = names(type, "warn") || names(event.get("level"), "warn");
         if (!error && !warning) {
             return null;
@@ -144,7 +148,8 @@ public final class PiJsonFormatter implements LogFormatter {
     }
 
     private static boolean marked(@Nullable Object value) {
-        return Boolean.TRUE.equals(value) || "true".equals(value);
+        return Boolean.TRUE.equals(value)
+                || value instanceof String text && "true".equalsIgnoreCase(text.strip());
     }
 
     /**
@@ -158,21 +163,31 @@ public final class PiJsonFormatter implements LogFormatter {
                 || error instanceof Map<?, ?> map && !map.isEmpty();
     }
 
+    /** The fields an event gives an error in, in the order they are read. */
+    private static final List<String> ERROR_KEYS =
+            List.of("error", "errorMessage", "finalError", "errors");
+
     /** What an error says: its own text or message, the event's, the error itself, or its type. */
     private static String troubleText(Map<?, ?> event, String type) {
-        final Object error = event.get("error");
-        if (text(error) instanceof String own) {
-            return own;
-        }
-        if (error instanceof Map<?, ?> nested && text(nested.get("message")) instanceof String m) {
-            return m;
-        }
-        for (final String key : List.of("errorMessage", "message")) {
-            if (text(event.get(key)) instanceof String said) {
-                return said;
+        for (final String key : ERROR_KEYS) {
+            final Object error = event.get(key);
+            if (text(error) instanceof String own) {
+                return own;
+            }
+            if (error instanceof Map<?, ?> nested
+                    && text(nested.get("message")) instanceof String message) {
+                return message;
             }
         }
-        return error != null && !Boolean.TRUE.equals(error) ? String.valueOf(error) : type;
+        if (text(event.get("message")) instanceof String said) {
+            return said;
+        }
+        for (final String key : ERROR_KEYS) {
+            if (carries(event.get(key)) && !Boolean.TRUE.equals(event.get(key))) {
+                return String.valueOf(event.get(key));
+            }
+        }
+        return type;
     }
 
     private static @Nullable String text(@Nullable Object value) {
