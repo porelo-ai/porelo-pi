@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI69",
   "title": "The Unattended View Shows No Raw Event Lines",
-  "state": "Implementing",
+  "state": "Review",
   "size": "S",
   "priority": "Medium",
   "rank": 1,
@@ -33,6 +33,18 @@
 - A recorded unattended run of the pinned CLI rendered through the formatter holds no line that begins with `{`.
 - An error event of an unknown type still shows, and its test fails when the error rule is taken out.
 
-## To be checked
+## What was built
 
-- **The events 1.5.0 writes.** Which event types an unattended run of the pinned CLI writes beyond the handled ones, read from a run on a VM, values replaced.
+- The formatter leaves an event of a type it does not know out instead of showing it as it came; the events it words,
+  its silent ones, `[unreadable]` and a line that is not a JSON object are as before.
+- Such an event that reports an error or a warning is always shown, as `[error]` or `[warning]` with its message on one
+  line: by its type (error, fail, fatal, exception, warn), its level, a status of failure (failed, error, killed,
+  rejected, denied, aborted, in any case), `isError` or `is_error`, an `errorMessage`, or any error it carries. A line
+  break, a Unicode separator or an invisible format mark in it is folded away.
+- Fixture: an unattended run recorded in a task on a VM, a command in the background, a wait and a commit, ids
+  replaced, `src/test/resources/streams/unattended-background-run-pi-1.4.0.jsonl`; recorded with Pi 1.4.0, the adapter the VM had, not the pinned 1.5.0. Every event of that run is one the formatter already knew, so the recorded run shows
+  no raw line before the change either; the rule is shown by the unknown events of the other tests.
+- Tests in the formatter's test class, each seen red first; the error rule, the status rule and the fold each broken on
+  purpose and seen red. The older test that held an unknown event shown cut now holds it dropped.
+- Built with a Claude Code sub-agent (the first rule) and finished by the repository's agent (the wider error rule the
+  other adapters' readings asked for). Not found by a run: what other event types the pinned CLI writes beyond this one run.

@@ -2,7 +2,11 @@ package org.fuin.porelo.agent.impl.pi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import org.fuin.porelo.agent.api.AgentEnd;
 import org.junit.jupiter.api.Test;
 
@@ -192,16 +196,59 @@ class PiJsonFormatterTest {
     }
 
     @Test
-    void showsAnUnknownEventCut() {
-
-        final String line =
-                "{\"type\":\"auto_retry_start\",\"attempt\":1,\"errorMessage\":\""
-                        + "x".repeat(400)
-                        + "\"}";
+    void dropsAnUnknownEvent() {
 
         assertThat(formatter.format("{\"type\":\"compaction_start\",\"reason\":\"threshold\"}"))
-                .isEqualTo("{\"type\":\"compaction_start\",\"reason\":\"threshold\"}");
-        assertThat(formatter.format(line)).isEqualTo(line.substring(0, 300) + "…");
+                .as("an unknown event without an error is raw JSON to a person")
+                .isNull();
+    }
+
+    @Test
+    void showsAnUnknownEventThatCarriesAnError() {
+
+        assertThat(formatter.format("{\"type\":\"something_new\",\"error\":\"disk full\"}"))
+                .as("an error string hidden")
+                .isEqualTo("[error] disk full");
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"something_new\",\"error\":{\"message\":\"quota gone\"}}"))
+                .as("an error object's message hidden")
+                .isEqualTo("[error] quota gone");
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"auto_retry_start\",\"attempt\":1,\"errorMessage\":\"429 slow down\"}"))
+                .as("an error message hidden")
+                .isEqualTo("[error] 429 slow down");
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"something_new\",\"isError\":true,\"message\":\"it broke\"}"))
+                .as("a flagged error's message hidden")
+                .isEqualTo("[error] it broke");
+        assertThat(formatter.format("{\"type\":\"something_new\",\"isError\":true}"))
+                .as("a flagged error without a message hidden")
+                .isEqualTo("[error] something_new");
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"auto_retry_start\",\"errorMessage\":\""
+                                        + "x".repeat(400)
+                                        + "\"}"))
+                .as("a long error shown whole or as raw JSON")
+                .isEqualTo("[error] " + "x".repeat(300) + "…");
+    }
+
+    @Test
+    void showsNoRawEventLineOfARecordedRun() throws IOException {
+
+        // Recorded unattended with Pi 1.4.0, the adapter the VM had; values replaced.
+        final List<String> lines =
+                Files.readAllLines(
+                        Path.of(
+                                "src/test/resources/streams/unattended-background-run-pi-1.4.0.jsonl"));
+
+        assertThat(lines).as("the recorded run of Pi 1.4.0").isNotEmpty();
+        assertThat(lines.stream().map(formatter::format).filter(Objects::nonNull))
+                .as("lines of the Pi 1.4.0 run a person would read as raw JSON")
+                .noneMatch(shown -> shown.startsWith("{"));
     }
 
     @Test
@@ -260,5 +307,39 @@ class PiJsonFormatterTest {
                         "control characters in %s",
                         text.codePoints().mapToObj(Integer::toHexString).toList())
                 .isEmpty();
+    }
+
+    @Test
+    void showsAnErrorByItsKindItsLevelOrItsStatus() {
+        assertThat(
+                        List.of(
+                                        "{\"type\":\"stream_failure\",\"message\":\"quota exceeded\"}",
+                                        "{\"type\":\"something_new\",\"status\":\"Error\",\"message\":\"quota exceeded\"}",
+                                        "{\"type\":\"something_new\",\"level\":\"FATAL\",\"message\":\"quota exceeded\"}",
+                                        "{\"type\":\"something_new\",\"error\":true,\"message\":\"quota exceeded\"}",
+                                        "{\"type\":\"something_new\",\"is_error\":\"true\",\"message\":\"quota exceeded\"}")
+                                .stream()
+                                .map(formatter::format)
+                                .toList())
+                .as(
+                        "an unknown event that reports an error by its type, a status or level in any case, or a flag")
+                .allSatisfy(
+                        shown ->
+                                assertThat(shown).startsWith("[error]").contains("quota exceeded"));
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"something_new\",\"level\":\"warning\",\"message\":\"slow\"}"))
+                .as("a warning")
+                .startsWith("[warning]")
+                .contains("slow");
+    }
+
+    @Test
+    void anErrorCannotOpenALineOfItsOwn() {
+        assertThat(
+                        formatter.format(
+                                "{\"type\":\"something_new\",\"error\":\"first\\n[error] forged\\u2028x\"}"))
+                .as("a line break or a Unicode separator in an error is folded away")
+                .doesNotContain("\n", "\u2028");
     }
 }

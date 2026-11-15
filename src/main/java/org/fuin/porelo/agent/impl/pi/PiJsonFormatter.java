@@ -16,9 +16,9 @@ import org.jspecify.annotations.Nullable;
  * The finished message is repeated in {@code message_end}, so the deltas are dropped and the
  * assistant's text is taken from there.
  *
- * <p>A line this formatter does not recognise is shown, cut to a readable length, because for an
- * unattended run the log is the only record there is, and a new event Pi starts writing is exactly
- * what nobody has seen before.
+ * <p>A person reads what the agent says and does, so an event of a type this formatter does not
+ * know is shown only when it reports an error, as {@code [error] <message>}: nothing that went
+ * wrong is hidden. A line that is not a JSON object still shows as it came, cut.
  */
 public final class PiJsonFormatter implements LogFormatter {
 
@@ -96,8 +96,97 @@ public final class PiJsonFormatter implements LogFormatter {
                                     ? "[" + tool + " failed]"
                                     : null;
             case "agent_end" -> end(event, line);
-            default -> cut(line);
+            default -> unknown(event, type);
         };
+    }
+
+    /** The words a status uses for a step that went wrong. */
+    private static final Set<String> FAILED =
+            Set.of("failed", "failure", "error", "killed", "rejected", "denied", "aborted");
+
+    /**
+     * An unknown event that reports an error or a warning, as such with its message on one line;
+     * any other is dropped. An error is named by the event's type, its level, a status of failure,
+     * an error mark, or an error it carries; a warning by its type or level.
+     */
+    private static @Nullable String unknown(Map<?, ?> event, String type) {
+        final boolean error =
+                names(type, "error", "fail", "fatal", "exception")
+                        || names(event.get("level"), "error", "fatal")
+                        || failure(event.get("status"))
+                        || marked(event.get("isError"))
+                        || marked(event.get("is_error"))
+                        || carries(event.get("error"))
+                        || text(event.get("errorMessage")) != null;
+        final boolean warning = names(type, "warn") || names(event.get("level"), "warn");
+        if (!error && !warning) {
+            return null;
+        }
+        return (error ? "[error] " : "[warning] ") + cut(oneLine(troubleText(event, type)));
+    }
+
+    private static boolean names(@Nullable Object value, String... words) {
+        if (!(value instanceof String text)) {
+            return false;
+        }
+        final String lower = text.toLowerCase(java.util.Locale.ROOT);
+        for (final String word : words) {
+            if (lower.contains(word)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean failure(@Nullable Object status) {
+        return status instanceof String text
+                && FAILED.contains(text.strip().toLowerCase(java.util.Locale.ROOT));
+    }
+
+    private static boolean marked(@Nullable Object value) {
+        return Boolean.TRUE.equals(value) || "true".equals(value);
+    }
+
+    /**
+     * Whether a field holds an error: any text, a flag that is set, a number, a list or an object.
+     */
+    private static boolean carries(@Nullable Object error) {
+        return text(error) != null
+                || Boolean.TRUE.equals(error)
+                || error instanceof Number
+                || error instanceof List<?> list && !list.isEmpty()
+                || error instanceof Map<?, ?> map && !map.isEmpty();
+    }
+
+    /** What an error says: its own text or message, the event's, the error itself, or its type. */
+    private static String troubleText(Map<?, ?> event, String type) {
+        final Object error = event.get("error");
+        if (text(error) instanceof String own) {
+            return own;
+        }
+        if (error instanceof Map<?, ?> nested && text(nested.get("message")) instanceof String m) {
+            return m;
+        }
+        for (final String key : List.of("errorMessage", "message")) {
+            if (text(event.get(key)) instanceof String said) {
+                return said;
+            }
+        }
+        return error != null && !Boolean.TRUE.equals(error) ? String.valueOf(error) : type;
+    }
+
+    private static @Nullable String text(@Nullable Object value) {
+        return value instanceof String said && !said.isBlank() ? said.strip() : null;
+    }
+
+    /**
+     * Folds a message onto one line, so a line break in it - a Unicode separator included - cannot
+     * pass for a line of the log, and drops the invisible marks that turn text around.
+     */
+    private static String oneLine(String text) {
+        return text.replaceAll("\\p{Cf}", "")
+                .replaceAll("[\\s\\u0085\\u2028\\u2029]+", " ")
+                .strip();
     }
 
     private static @Nullable String message(Map<?, ?> event, String line) {

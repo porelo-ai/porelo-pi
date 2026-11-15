@@ -33,6 +33,7 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 
 ### Changed
 
+- An unattended task's log shows what Pi says and does and no event as raw JSON: an event it does not know is left out, and one that reports an error or a warning - by its type, level, status or a flag, or an error it carries - is always shown as such, on one line.
 - The bill generator's lock takes `fast-uri` 3.1.9 and, by `overrides`, `glob` 14.0.2 and `minimatch` 11.0.1, closing their advisories; the bill it writes is unchanged.
 - The acceptance legs run on every forge, the host's lending each a machine of its kind from its pool through `PORELO_POOL_SSH`, and a leg takes the packages its run built from the Actions cache, keyed by the run; GitHub's artifact stays for the release job.
 - Central's snapshots (`central.sonatype.snapshots`) are asked only for `org.fuin.porelo`, the group listed in `.mvn/rrf/`, through the switch in the now committed `.mvn/maven.config`, on a forge too, where they are read beside its registry and the newest wins; the forge's own repository stays unfiltered. The daily shared rules check refuses a filter that would let another name out.
