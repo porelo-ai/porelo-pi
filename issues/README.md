@@ -27,7 +27,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi52"></a>[PI52](PI52-The-Tests-Follow-The-Pyramid.md) | M | - | the suites by level with measured times; the status extension's prompt stack proven in the unit phase, the sign-in store outside the home guarded there, five end-to-end scenarios that test only Porelo leave the legs, and the timeout test waits 100 ms | - |
 | <a id="pi50"></a>[PI50](PI50-The-Clean-Up-Says-When-Nothing-Was-Rented.md) | XS | - | a leg that failed before resolving the machine tooling rented nothing, and its clean-up says so instead of failing on a missing class | 0 |
 | <a id="pi45"></a>[PI45](PI45-Depend-On-The-Agent-Protocol-Porelo-Provides.md) | S | - | the agent contract named at install time | 0 |
-| <a id="pi68"></a>[PI68](PI68-Review-that-the-documentation-matches-the-implementation.md) | S | - | Review that the documentation matches the implementation | - |
 | <a id="pi44"></a>[PI44](PI44-A-Copilot-Task-Uses-The-Models-The-Account-Has.md) | M | - | a task on GitHub Copilot runs on a model the account has: no flagless failure on a default it lacks, and `--model` takes every model the account has | 0 |
 
 ## Backlog
@@ -37,6 +36,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi72"></a>[PI72](PI72-The-Running-View-Says-What-Each-Tool-Did.md) | S | - | the running view of an unattended Pi task says each tool call with its key input from `args` and each result by whether it failed and its first line or its size, instead of only the tool's name | - |
 | <a id="pi71"></a>[PI71](PI71-The-Unattended-View-s-Remaining-Gaps.md) | S | - | what [PI69](README.md#pi69) left open in the unattended view: an error carried by an event of a known silent type, line breaks in a tool name or a line that is not JSON, the event types of the pinned CLI, and a recorded-run test that guards nothing | - |
 | <a id="pi40"></a>[PI40](PI40-The-Acceptance-Legs-Run-On-The-Host-s-Forge.md) | S | [PI38](README.md#pi38) | the acceptance legs on the host's pool again, once it lends a forge job a machine by kind | 0 |
+| <a id="pi68"></a>[PI68](PI68-Review-that-the-documentation-matches-the-implementation.md) | S | - | Review that the documentation matches the implementation | - |
 | <a id="pi62"></a>[PI62](PI62-A-Continued-Session-Is-Asked-For-Its-Word.md) | XS | - | session.feature's continued-conversation check asks the restarted Pi for the word it was told, instead of looking for the first turn's text on the visible screen | - |
 | <a id="pi70"></a>[PI70](PI70-A-Missed-Dialog-Shows-The-Screen.md) | XS | - | wake.feature's wait for Pi's question prints the pane's last lines when it fails, as waiting.feature's does, so a missed dialog says what Pi showed instead | - |
 

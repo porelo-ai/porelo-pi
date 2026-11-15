@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI68",
   "title": "Review that the documentation matches the implementation",
-  "state": "Estimated",
+  "state": "Backlog",
   "size": "S",
   "priority": "Medium",
   "rank": 9,
