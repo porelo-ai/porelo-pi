@@ -39,6 +39,12 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi62"></a>[PI62](PI62-A-Continued-Session-Is-Asked-For-Its-Word.md) | XS | - | session.feature's continued-conversation check asks the restarted Pi for the word it was told, instead of looking for the first turn's text on the visible screen | - |
 | <a id="pi70"></a>[PI70](PI70-A-Missed-Dialog-Shows-The-Screen.md) | XS | - | wake.feature's wait for Pi's question prints the pane's last lines when it fails, as waiting.feature's does, so a missed dialog says what Pi showed instead | - |
 
+## Implementing
+
+| # | Size | Blocked by | What it covers |
+|---|---|---|---|
+| <a id="pi73"></a>[PI73](PI73-Start-Work-Offers-Pi-s-Efforts.md) | XS | - | the definition declares the reasoning efforts Pi takes and how one is passed (`--thinking {effort}`), so Start work offers them to pick instead of typing and an absent effort passes nothing |
+
 ## Review
 
 | # | Size | Blocked by | What it covers | Open questions |
