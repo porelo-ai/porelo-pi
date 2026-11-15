@@ -39,6 +39,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 | # | Size | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
+| <a id="pi71"></a>[PI71](PI71-The-Unattended-View-s-Remaining-Gaps.md) | S | - | what [PI69](README.md#pi69) left open in the unattended view: an error carried by an event of a known silent type, line breaks in a tool name or a line that is not JSON, the event types of the pinned CLI, and a recorded-run test that guards nothing | - |
 | <a id="pi40"></a>[PI40](PI40-The-Acceptance-Legs-Run-On-The-Host-s-Forge.md) | S | [PI38](README.md#pi38) | the acceptance legs on the host's pool again, once it lends a forge job a machine by kind | 0 |
 | <a id="pi62"></a>[PI62](PI62-A-Continued-Session-Is-Asked-For-Its-Word.md) | XS | - | session.feature's continued-conversation check asks the restarted Pi for the word it was told, instead of looking for the first turn's text on the visible screen | - |
 | <a id="pi70"></a>[PI70](PI70-A-Missed-Dialog-Shows-The-Screen.md) | XS | - | wake.feature's wait for Pi's question prints the pane's last lines when it fails, as waiting.feature's does, so a missed dialog says what Pi showed instead | - |
@@ -51,7 +52,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi57"></a>[PI57](PI57-The-Adapter-Reports-Each-Tool-Call-With-Its-Time.md) | S | - | the adapter reads each tool call from its agent's output and hands Porelo its tool, kind, start, end, a shell call's command line, whether it ran in the background, and a sub-agent's name and the calls made under it, in Porelo's common entry | 0 |
 | <a id="pi63"></a>[PI63](PI63-A-Leg-Installs-What-Its-Run-Built.md) | S | - | every acceptance leg of a run that publishes nothing - a dispatch, a tag - installs the packages that run built, so its result speaks for its own commit; only a push to main, which publishes its snapshot first, installs from the package repository | - |
 | <a id="pi53"></a>[PI53](PI53-An-Unreadable-Sign-In-File-Is-Tested-For-Every-Account.md) | S | - | the test that an unreadable `auth.json` cannot say runs and passes as root and as a user other than root, never skipped; the failure as uid 1001 reproduced first | - |
-| <a id="pi69"></a>[PI69](PI69-The-Unattended-View-Shows-No-Raw-Event-Lines.md) | S | - | the unattended view of a Pi task shows what the agent says and does, never a raw JSON event line: an unknown event dropped unless it names an error, read in the code beside the same finding for Claude Code | - |
 | <a id="pi43"></a>[PI43](PI43-Mutation-Testing-With-PIT.md) | S | - | mutation testing by hand: a `pit` profile outside CI with no threshold, and a report sorting survivors into real gaps and harmless ones | - |
 | <a id="pi46"></a>[PI46](PI46-A-Task-Has-No-Skills.md) | XS | - | a task has no skills, on any start | - |
 | <a id="pi38"></a>[PI38](PI38-The-Build-Runs-On-The-Local-Forge-As-On-The-Central-One.md) | S | - | the workflows run 1:1 on the local Forgejo and the central forge: snapshots from `MAVEN_SNAPSHOTS_URL`, publishing switched by `PORELO_PUBLISH`, legs asked by kind, green on a local Forgejo | - |
@@ -63,6 +63,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 | # | Title | What was built |
 |---|---|---|
+| <a id="pi69"></a>[PI69](README.md#pi69) | The Unattended View Shows No Raw Event Lines | The unattended view shows no raw JSON: an event of a type the formatter does not know is left out, and one that reports an error or a warning - by its type, level, status, a flag, a success of false (retries that ran out) or an error it carries - is always shown as such on one line; a Pi 1.4.0 run shows no raw line. |
 | <a id="pi65"></a>[PI65](README.md#pi65) | The Local Sign-In Goes To A Host | The adapter describes each Pi sign-in in `auth.json` an import can take - Anthropic, OpenRouter, GitHub Copilot - by the file's last change and, for Anthropic's subscription alone, its expiry, never a value or a guessed account, and a key given as a command or a variable has no facts. |
 | <a id="pi64"></a>[PI64](README.md#pi64) | The Docs Say What The Code Does | The user-facing documentation was read sentence by sentence against the code on main: of about 148 claims, the 11 it did not bear out were fixed in the README, `build.md` and the changelog, and none was a fault of the code. |
 | <a id="pi49"></a>[PI49](README.md#pi49) | The Tree Build Retries A Failed Download | Pi's tree build fetches the pinned Node runtime, fd and ripgrep through the shared `pinned_fetch`, which tries again on a 5xx or a broken connection with growing pauses and fails at once on a wrong digest or a 4xx. |
