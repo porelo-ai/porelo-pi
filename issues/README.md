@@ -34,6 +34,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 | # | Size | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
+| <a id="pi72"></a>[PI72](PI72-The-Running-View-Says-What-Each-Tool-Did.md) | S | - | the running view of an unattended Pi task says each tool call with its key input from `args` and each result by whether it failed and its first line or its size, instead of only the tool's name | - |
 | <a id="pi71"></a>[PI71](PI71-The-Unattended-View-s-Remaining-Gaps.md) | S | - | what [PI69](README.md#pi69) left open in the unattended view: an error carried by an event of a known silent type, line breaks in a tool name or a line that is not JSON, the event types of the pinned CLI, and a recorded-run test that guards nothing | - |
 | <a id="pi40"></a>[PI40](PI40-The-Acceptance-Legs-Run-On-The-Host-s-Forge.md) | S | [PI38](README.md#pi38) | the acceptance legs on the host's pool again, once it lends a forge job a machine by kind | 0 |
 | <a id="pi62"></a>[PI62](PI62-A-Continued-Session-Is-Asked-For-Its-Word.md) | XS | - | session.feature's continued-conversation check asks the restarted Pi for the word it was told, instead of looking for the first turn's text on the visible screen | - |
