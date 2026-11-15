@@ -39,6 +39,6 @@ Write the report from the findings in the plan, each with document, passage, con
 ## Findings
 
 - Spot-checked on main: decisions.md:48-50 still says 'one file', build.md:107-109 still says Node 'is not touched', build.md:113 still names only pi-coding-agent, and pom.xml:50 pins agent.cli.version at 1.5.0. The plan's findings still hold.
-- No measured velocity is recorded for this repository. stats/PI68.jsonl has only state moves, with no wall or estimate minutes, so the minutes are judged from the edit count and one documents test run plus one mkdocs build.
+- No measured velocity is recorded for this repository. This issue's file under stats/ has only state moves, with no wall or estimate minutes, so the minutes are judged from the edit count and one documents test run plus one mkdocs build.
 - Uncertainty: the open questions above can change two or three passages, but not the size. If a -Pdist build is run to settle the MB figure, add about 20 to 30 minutes.
-- The order asked for one sub-agent per issue. This session has no sub-agent tool, so PI68 was estimated directly in the main session.
+- The order asked for one sub-agent per issue. This session has no sub-agent tool, so this issue was estimated directly in the main session.
