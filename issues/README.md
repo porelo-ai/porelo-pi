@@ -38,7 +38,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi62"></a>[PI62](PI62-A-Continued-Session-Is-Asked-For-Its-Word.md) | XS | - | session.feature's continued-conversation check asks the restarted Pi for the word it was told, instead of looking for the first turn's text on the visible screen | - |
 | <a id="pi70"></a>[PI70](PI70-A-Missed-Dialog-Shows-The-Screen.md) | XS | - | wake.feature's wait for Pi's question prints the pane's last lines when it fails, as waiting.feature's does, so a missed dialog says what Pi showed instead | - |
 
-## Implementing
+## Reading
 
 | # | Size | Blocked by | What it covers |
 |---|---|---|---|
