@@ -35,7 +35,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 |---|---|---|---|---|
 | <a id="pi71"></a>[PI71](PI71-The-Unattended-View-s-Remaining-Gaps.md) | S | - | what [PI69](README.md#pi69) left open in the unattended view: an error carried by an event of a known silent type, line breaks in a tool name or a line that is not JSON, the event types of the pinned CLI, and a recorded-run test that guards nothing | - |
 | <a id="pi40"></a>[PI40](PI40-The-Acceptance-Legs-Run-On-The-Host-s-Forge.md) | S | [PI38](README.md#pi38) | the acceptance legs on the host's pool again, once it lends a forge job a machine by kind | 0 |
-| <a id="pi74"></a>[PI74](PI74-Pis-documentation-says-what-the-adapter-does-today.md) | S | - | Pi's documentation says what the adapter does today | - |
 | <a id="pi62"></a>[PI62](PI62-A-Continued-Session-Is-Asked-For-Its-Word.md) | XS | - | session.feature's continued-conversation check asks the restarted Pi for the word it was told, instead of looking for the first turn's text on the visible screen | - |
 | <a id="pi70"></a>[PI70](PI70-A-Missed-Dialog-Shows-The-Screen.md) | XS | - | wake.feature's wait for Pi's question prints the pane's last lines when it fails, as waiting.feature's does, so a missed dialog says what Pi showed instead | - |
 
