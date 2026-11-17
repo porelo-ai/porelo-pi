@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI74",
   "title": "Pi's documentation says what the adapter does today",
-  "state": "Analyzed",
+  "state": "Under estimation",
   "size": "S",
   "priority": "Medium",
   "rank": 9,
