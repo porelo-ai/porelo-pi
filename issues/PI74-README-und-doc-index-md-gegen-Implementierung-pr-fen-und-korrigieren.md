@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI74",
   "title": "README und doc/index.md gegen Implementierung prüfen und korrigieren",
-  "state": "Idea",
+  "state": "In analysis",
   "size": "-",
   "priority": "Medium",
   "rank": 9,
