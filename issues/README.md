@@ -17,8 +17,13 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 | # | Size | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
-| <a id="pi74"></a>[PI74](PI74-README-und-doc-index-md-gegen-Implementierung-pr-fen-und-korrigieren.md) | S | - | README und doc/index.md gegen Implementierung prüfen und korrigieren | - |
 | <a id="pi37"></a>[PI37](PI37-Nothing-The-Agent-Writes-Reaches-The-Next-Pi.md) | M | - | nothing the agent writes in a task reaches a later Pi: its settings, models, MCP servers, extensions | 0 |
+
+## Under estimation
+
+| # | Size | Blocked by | What it covers |
+|---|---|---|---|
+| <a id="pi74"></a>[PI74](PI74-README-und-doc-index-md-gegen-Implementierung-pr-fen-und-korrigieren.md) | S | - | README und doc/index.md gegen Implementierung prüfen und korrigieren |
 
 ## Estimated
 
