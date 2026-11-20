@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI75",
   "title": "The Wake Scenario Shows Why No Dialog Came",
-  "state": "Backlog",
+  "state": "Implementing",
   "size": "S",
   "priority": "High",
   "rank": 1,
