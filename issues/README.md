@@ -38,12 +38,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi74"></a>[PI74](PI74-README-und-doc-index-md-gegen-Implementierung-pr-fen-und-korrigieren.md) | S | - | README und doc/index.md gegen Implementierung prüfen und korrigieren | - |
 | <a id="pi62"></a>[PI62](PI62-A-Continued-Session-Is-Asked-For-Its-Word.md) | XS | - | session.feature's continued-conversation check asks the restarted Pi for the word it was told, instead of looking for the first turn's text on the visible screen | - |
 
-## Implementing
-
-| # | Size | Blocked by | What it covers |
-|---|---|---|---|
-| <a id="pi76"></a>[PI76](PI76-The-Maven-Cache-Follows-What-The-Build-Resolves.md) | S | - | the Build's Maven cache is saved again when the versions it resolves move, so a Build after a cache hit fetches nothing from Maven Central |
-
 ## Review
 
 | # | Size | Blocked by | What it covers | Open questions |
@@ -53,6 +47,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi72"></a>[PI72](PI72-The-Running-View-Says-What-Each-Tool-Did.md) | S | - | the running view of an unattended Pi task says each tool call with its key input from `args` and each result by whether it failed and its first line or its size, instead of only the tool's name | - |
 | <a id="pi73"></a>[PI73](PI73-Start-Work-Offers-Pi-s-Efforts.md) | XS | - | the definition declares the reasoning efforts Pi takes and how one is passed (`--thinking {effort}`), so Start work offers them to pick instead of typing and an absent effort passes nothing | - |
 | <a id="pi75"></a>[PI75](PI75-The-Wake-Scenario-Shows-Why-No-Dialog-Came.md) | S | - | the wake scenario's wait for Pi's ask dialog shows the screen when it fails; ten runs on fedora passed at the first attempt, so the next failure shows its cause | - |
+| <a id="pi76"></a>[PI76](PI76-The-Maven-Cache-Follows-What-The-Build-Resolves.md) | XS | - | the Build restores the Maven cache by a key holding the run and saves it in one job when that job fetched a jar or pom, so the next Build asks Central for nothing; the shared form, proven by the first two Builds after the push | - |
 | <a id="pi63"></a>[PI63](PI63-A-Leg-Installs-What-Its-Run-Built.md) | S | - | every acceptance leg of a run that publishes nothing - a dispatch, a tag - installs the packages that run built, so its result speaks for its own commit; only a push to main, which publishes its snapshot first, installs from the package repository | - |
 | <a id="pi53"></a>[PI53](PI53-An-Unreadable-Sign-In-File-Is-Tested-For-Every-Account.md) | S | - | the test that an unreadable `auth.json` cannot say runs and passes as root and as a user other than root, never skipped; the failure as uid 1001 reproduced first | - |
 | <a id="pi43"></a>[PI43](PI43-Mutation-Testing-With-PIT.md) | S | - | mutation testing by hand: a `pit` profile outside CI with no threshold, and a report sorting survivors into real gaps and harmless ones | - |
