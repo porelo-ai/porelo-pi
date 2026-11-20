@@ -5,12 +5,12 @@
   "$schema": "issue-1.json",
   "id": "PI75",
   "title": "The Wake Scenario Shows Why No Dialog Came",
-  "state": "Implementing",
+  "state": "Review",
   "size": "S",
   "priority": "High",
   "rank": 1,
   "blockedBy": [],
-  "covers": "the wake scenario's wait for Pi's ask dialog shows the screen when it fails, and its cause is fixed rather than run again"
+  "covers": "the wake scenario's wait for Pi's ask dialog shows the screen when it fails; ten runs on fedora passed at the first attempt, so the next failure shows its cause"
 }
 ```
 
@@ -35,12 +35,24 @@ drives the same dialog with the same words and already prints the screen when th
 - **Red first:** the wake scenario's wait takes `waiting.feature`'s form: the pane read once, `Pi asks you` looked
   for in its last 12 lines, and on failure its last 25 lines that are not blank printed. Seen to fail with the
   dialog's title changed, the screen in the failure message.
-- **Measure:** the scenario run on the build box until it fails or passes ten times, reading each screen.
+- **Measure:** the scenario run on a fedora machine, the leg where it failed, until it fails or passes ten times.
 - **The cause decides the fix**, never a retry or a longer bound alone: the model answering in text calls for a
   prompt that leaves no choice or a model pinned for tool calls in both scenarios; a bound below the measured time
   of the slowest pass calls for a bound from that measure; a Porelo or Pi fault is filed where it belongs.
 
 ## Acceptance
 
-- Ten runs of the scenario on the build box pass, each with its time recorded; and the wait, with the title
-  changed, fails showing the screen.
+- Ten runs of the scenario on fedora pass, each with its time recorded; and the wait, with the title changed,
+  fails showing the screen.
+
+## Measured
+
+- **Red:** with the title changed to one Pi never shows, the wait failed after 120 seconds and printed the pane's
+  last lines: Pi had called `ask_person` and its dialog `Pi asks you` was up.
+- **Ten runs** on fedora with Porelo 0.5.1~snapshot.561 and `z-ai/glm-5.3-flash`, the scenario alone, each from a
+  removed task and project: all ten passed at the first attempt, failsafe reruns nothing. Wall time per run, Maven
+  included: 137, 144, 229, 147, 141, 139, 143, 141, 145 and 138 seconds; where the third spent its extra 85 seconds
+  was not kept.
+- **Not reproduced:** the failure seen once on the fedora leg did not come back in ten runs, so its cause is still
+  inferred, and no bound or prompt was changed for it. A failure from now on prints what Pi showed, and its cause is
+  filed from that screen.

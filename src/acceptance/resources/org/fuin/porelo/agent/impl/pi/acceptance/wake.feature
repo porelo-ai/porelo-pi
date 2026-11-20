@@ -26,9 +26,13 @@ Feature: Pi is woken at rest, and never while its ask dialog is open
         Then the "pi" agent in task "wake" of "wake" reaches work without being asked anything
         When I type "Use your ask_person tool to ask me whether I prefer red or blue. Do nothing else."
         And I press Enter
+        # A run where the dialog never comes shows what Pi showed instead.
         Then within 120 seconds this script exits zero:
             """
-            podman exec --user root "$(porelo task status wake --json | grep -o '"name": *"[^"]*"' | head -n 1 | cut -d'"' -f4)" tmux -S /run/porelo-tmux/tmux capture-pane -p -t porelo | tail -n 12 | grep -qF 'Pi asks you'
+            screen=$(podman exec --user root "$(porelo task status wake --json | grep -o '"name": *"[^"]*"' | head -n 1 | cut -d'"' -f4)" tmux -S /run/porelo-tmux/tmux capture-pane -p -t porelo)
+            printf '%s\n' "$screen" | tail -n 12 | grep -qF 'Pi asks you' && exit 0
+            printf 'screen, last lines:\n'; printf '%s\n' "$screen" | grep -v '^ *$' | tail -25
+            exit 1
             """
         When a script runs "echo 'What is 1234 plus 4321? Reply with the digits only.' | porelo talk tell wake"
         Then it exits zero

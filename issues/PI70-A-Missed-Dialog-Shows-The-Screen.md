@@ -5,7 +5,7 @@
   "$schema": "issue-1.json",
   "id": "PI70",
   "title": "A Missed Dialog Shows The Screen",
-  "state": "Backlog",
+  "state": "Review",
   "size": "XS",
   "priority": "Low",
   "rank": 2,
@@ -41,3 +41,8 @@ the job is run again. That could not be shown from the log, because this check p
 ## Acceptance
 
 - The check prints the pane's last lines when it fails, and both legs pass with it.
+
+## Measured
+
+- On fedora, with the title changed, the check failed and printed the pane's last lines; with the title kept,
+  ten runs passed at the first attempt. The runs and their times are in [PI75](README.md#pi75).

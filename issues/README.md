@@ -38,13 +38,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi40"></a>[PI40](PI40-The-Acceptance-Legs-Run-On-The-Host-s-Forge.md) | S | [PI38](README.md#pi38) | the acceptance legs on the host's pool again, once it lends a forge job a machine by kind | 0 |
 | <a id="pi74"></a>[PI74](PI74-README-und-doc-index-md-gegen-Implementierung-pr-fen-und-korrigieren.md) | S | - | README und doc/index.md gegen Implementierung prüfen und korrigieren | - |
 | <a id="pi62"></a>[PI62](PI62-A-Continued-Session-Is-Asked-For-Its-Word.md) | XS | - | session.feature's continued-conversation check asks the restarted Pi for the word it was told, instead of looking for the first turn's text on the visible screen | - |
-| <a id="pi70"></a>[PI70](PI70-A-Missed-Dialog-Shows-The-Screen.md) | XS | - | wake.feature's wait for Pi's question prints the pane's last lines when it fails, as waiting.feature's does, so a missed dialog says what Pi showed instead | - |
-
-## Implementing
-
-| # | Size | Blocked by | What it covers |
-|---|---|---|---|
-| <a id="pi75"></a>[PI75](PI75-The-Wake-Scenario-Shows-Why-No-Dialog-Came.md) | S | - | the wake scenario's wait for Pi's ask dialog shows the screen when it fails, and its cause is fixed rather than run again |
 
 ## Review
 
@@ -54,6 +47,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi57"></a>[PI57](PI57-The-Adapter-Reports-Each-Tool-Call-With-Its-Time.md) | S | - | the adapter reads each tool call from its agent's output and hands Porelo its tool, kind, start, end, a shell call's command line, whether it ran in the background, and a sub-agent's name and the calls made under it, in Porelo's common entry | 0 |
 | <a id="pi72"></a>[PI72](PI72-The-Running-View-Says-What-Each-Tool-Did.md) | S | - | the running view of an unattended Pi task says each tool call with its key input from `args` and each result by whether it failed and its first line or its size, instead of only the tool's name | - |
 | <a id="pi73"></a>[PI73](PI73-Start-Work-Offers-Pi-s-Efforts.md) | XS | - | the definition declares the reasoning efforts Pi takes and how one is passed (`--thinking {effort}`), so Start work offers them to pick instead of typing and an absent effort passes nothing | - |
+| <a id="pi75"></a>[PI75](PI75-The-Wake-Scenario-Shows-Why-No-Dialog-Came.md) | S | - | the wake scenario's wait for Pi's ask dialog shows the screen when it fails; ten runs on fedora passed at the first attempt, so the next failure shows its cause | - |
 | <a id="pi63"></a>[PI63](PI63-A-Leg-Installs-What-Its-Run-Built.md) | S | - | every acceptance leg of a run that publishes nothing - a dispatch, a tag - installs the packages that run built, so its result speaks for its own commit; only a push to main, which publishes its snapshot first, installs from the package repository | - |
 | <a id="pi53"></a>[PI53](PI53-An-Unreadable-Sign-In-File-Is-Tested-For-Every-Account.md) | S | - | the test that an unreadable `auth.json` cannot say runs and passes as root and as a user other than root, never skipped; the failure as uid 1001 reproduced first | - |
 | <a id="pi43"></a>[PI43](PI43-Mutation-Testing-With-PIT.md) | S | - | mutation testing by hand: a `pit` profile outside CI with no threshold, and a report sorting survivors into real gaps and harmless ones | - |
@@ -62,6 +56,7 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi33"></a>[PI33](PI33-Tell-Waiting-From-Pi-s-Program-Status.md) | M | - | Porelo tells a waiting Pi from one at rest by what Pi 1 reports of itself | 0 |
 | <a id="pi39"></a>[PI39](PI39-The-Repository-s-Agent-Works-In-A-Porelo-Task.md) | S | [PI38](README.md#pi38) | the repository's agent moves into its own Porelo task, after a dry run on this machine | - |
 | <a id="pi61"></a>[PI61](PI61-The-SBOM-Tool-Takes-Fixed-URI-And-Glob-Releases.md) | XS | - | buildtools/sbom's lock takes fast-uri 3.1.9, closing four advisories, and glob and minimatch either move to their fixed majors or stay as an accepted risk written down, so GitHub's Dependabot alerts on main are answered | - |
+| <a id="pi70"></a>[PI70](PI70-A-Missed-Dialog-Shows-The-Screen.md) | XS | - | wake.feature's wait for Pi's question prints the pane's last lines when it fails, as waiting.feature's does, so a missed dialog says what Pi showed instead | - |
 
 ## Finished
 
