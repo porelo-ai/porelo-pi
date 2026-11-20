@@ -33,11 +33,16 @@ Within a group, the order is the priority. The number is identity, not sequence.
 
 | # | Size | Blocked by | What it covers | Open questions |
 |---|---|---|---|---|
-| <a id="pi76"></a>[PI76](PI76-The-Maven-Cache-Follows-What-The-Build-Resolves.md) | S | - | the Build's Maven cache is saved again when the versions it resolves move, so a Build after a cache hit fetches nothing from Maven Central | - |
 | <a id="pi71"></a>[PI71](PI71-The-Unattended-View-s-Remaining-Gaps.md) | S | - | what [PI69](README.md#pi69) left open in the unattended view: an error carried by an event of a known silent type, line breaks in a tool name or a line that is not JSON, the event types of the pinned CLI, and a recorded-run test that guards nothing | - |
 | <a id="pi40"></a>[PI40](PI40-The-Acceptance-Legs-Run-On-The-Host-s-Forge.md) | S | [PI38](README.md#pi38) | the acceptance legs on the host's pool again, once it lends a forge job a machine by kind | 0 |
 | <a id="pi74"></a>[PI74](PI74-README-und-doc-index-md-gegen-Implementierung-pr-fen-und-korrigieren.md) | S | - | README und doc/index.md gegen Implementierung prüfen und korrigieren | - |
 | <a id="pi62"></a>[PI62](PI62-A-Continued-Session-Is-Asked-For-Its-Word.md) | XS | - | session.feature's continued-conversation check asks the restarted Pi for the word it was told, instead of looking for the first turn's text on the visible screen | - |
+
+## Implementing
+
+| # | Size | Blocked by | What it covers |
+|---|---|---|---|
+| <a id="pi76"></a>[PI76](PI76-The-Maven-Cache-Follows-What-The-Build-Resolves.md) | S | - | the Build's Maven cache is saved again when the versions it resolves move, so a Build after a cache hit fetches nothing from Maven Central |
 
 ## Review
 
