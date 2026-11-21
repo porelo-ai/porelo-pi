@@ -213,6 +213,25 @@ class WorkflowRulesTest {
     }
 
     @Test
+    void theUpdateAsksGitHubWithTheJobsToken() throws IOException {
+
+        // Anonymous, GitHub answers 60 questions an hour per address, which a shared runner has
+        // spent: fd's and ripgrep's latest release then come back as HTTP 403, and the update
+        // cannot tell whether they moved. The release tool sends GITHUB_TOKEN to GitHub's API
+        // alone; on another forge the runner's own token would stand in that variable, so it is
+        // empty there.
+        assertThat(
+                        step(
+                                Files.readAllLines(WORKFLOWS.resolve("update.yml")),
+                                "What upstream publishes, and what moves"))
+                .as("the step that asks upstream hands the release tool the job's token on GitHub")
+                .map(String::trim)
+                .contains(
+                        "GITHUB_TOKEN: ${{ github.server_url == 'https://github.com'"
+                                + " && github.token || '' }}");
+    }
+
+    @Test
     void theAcceptanceLegsRunOnEveryForge() throws IOException {
 
         // On the host's forge a leg takes a machine of its kind from the host's pool, told where by

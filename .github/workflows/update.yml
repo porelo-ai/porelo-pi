@@ -85,13 +85,16 @@ jobs:
 
             # Through env, never interpolated into the script, so no value can become shell. The pom holds
             # each pin's upstream and line, and the age a release must reach before it is taken; the script
-            # refuses a version typed by hand for all of them at once.
+            # refuses a version typed by hand for all of them at once. The job's token on GitHub, so its API
+            # answers fd's and ripgrep's latest release, which a shared runner's anonymous allowance does not;
+            # empty elsewhere, since a forge's runner puts its own token into GITHUB_TOKEN for every step.
             - name: What upstream publishes, and what moves
               id: follow
               env:
                   WHAT: ${{ inputs.what || 'all' }}
                   VERSION: ${{ inputs.version }}
                   CHANNEL: ${{ inputs.channel || 'latest' }}
+                  GITHUB_TOKEN: ${{ github.server_url == 'https://github.com' && github.token || '' }}
               run: buildtools/follow-upstream.sh
 
             # ------------------------------------------------------------------ verify
