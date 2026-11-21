@@ -85,8 +85,9 @@ like the shared block, and so is the skill `adapter-building`; what is one adapt
 
 ## Work in this repository
 
-- **Issues here are `PInn-Short-Title.md`, with the prefix `PI`.** `porelo-release check-citations`,
-  run by the `shared-rules` workflow, refuses a citation that breaks once an issue is deleted.
+- **Issues here are in the repository's GitHub Issues**, each named by its reference there
+  (`porelo-ai/porelo-pi#<number>`); one carried over from the Markdown files keeps its old id (`PI`) as a
+  fixed alias.
 - **The tests tagged `documents` run alone with `./mvnw -o -B -s settings.xml -Pdocuments test`**, and
   `DocumentTestsTaggedTest` fails when a test reads a document without the tag.
 - **`buildtools/build-pi-tree.sh` cannot be Java**: it drives podman and npm to build Pi's Node tree
