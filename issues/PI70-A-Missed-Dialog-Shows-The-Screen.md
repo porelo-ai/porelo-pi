@@ -44,5 +44,13 @@ the job is run again. That could not be shown from the log, because this check p
 
 ## Measured
 
-- On fedora, with the title changed, the check failed and printed the pane's last lines; with the title kept,
-  ten runs passed at the first attempt. The runs and their times are in [PI75](README.md#pi75).
+- **Red:** with the title changed to one Pi never shows, the wait failed after 120 seconds and printed the pane's
+  last lines: Pi had called `ask_person` and its dialog `Pi asks you` was up.
+- **Ten runs** on fedora with Porelo 0.5.1~snapshot.561 and `z-ai/glm-5.3-flash`, the scenario alone, each from a
+  removed task and project: all ten passed at the first attempt, failsafe reruns nothing. Wall time per run, Maven
+  included: 137, 144, 229, 147, 141, 139, 143, 141, 145 and 138 seconds; where the third spent its extra 85 seconds
+  was not kept.
+- **Not reproduced:** the failure seen once on the fedora leg did not come back in ten runs, so its cause is still
+  inferred (the model answering without calling `ask_person`, or calling it after more than 120 seconds), and no
+  bound or prompt was changed for it. A failure from now on prints what Pi showed, and its cause is filed from that
+  screen.

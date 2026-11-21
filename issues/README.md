@@ -46,7 +46,6 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi57"></a>[PI57](PI57-The-Adapter-Reports-Each-Tool-Call-With-Its-Time.md) | S | - | the adapter reads each tool call from its agent's output and hands Porelo its tool, kind, start, end, a shell call's command line, whether it ran in the background, and a sub-agent's name and the calls made under it, in Porelo's common entry | 0 |
 | <a id="pi72"></a>[PI72](PI72-The-Running-View-Says-What-Each-Tool-Did.md) | S | - | the running view of an unattended Pi task says each tool call with its key input from `args` and each result by whether it failed and its first line or its size, instead of only the tool's name | - |
 | <a id="pi73"></a>[PI73](PI73-Start-Work-Offers-Pi-s-Efforts.md) | XS | - | the definition declares the reasoning efforts Pi takes and how one is passed (`--thinking {effort}`), so Start work offers them to pick instead of typing and an absent effort passes nothing | - |
-| <a id="pi75"></a>[PI75](PI75-The-Wake-Scenario-Shows-Why-No-Dialog-Came.md) | S | - | the wake scenario's wait for Pi's ask dialog shows the screen when it fails; ten runs on fedora passed at the first attempt, so the next failure shows its cause | - |
 | <a id="pi76"></a>[PI76](PI76-The-Maven-Cache-Follows-What-The-Build-Resolves.md) | XS | - | the Build restores the Maven cache by a key holding the run and saves it in one job when that job fetched a jar or pom, so the next Build asks Central for nothing; the shared form, proven by the first two Builds after the push | - |
 | <a id="pi63"></a>[PI63](PI63-A-Leg-Installs-What-Its-Run-Built.md) | S | - | every acceptance leg of a run that publishes nothing - a dispatch, a tag - installs the packages that run built, so its result speaks for its own commit; only a push to main, which publishes its snapshot first, installs from the package repository | - |
 | <a id="pi53"></a>[PI53](PI53-An-Unreadable-Sign-In-File-Is-Tested-For-Every-Account.md) | S | - | the test that an unreadable `auth.json` cannot say runs and passes as root and as a user other than root, never skipped; the failure as uid 1001 reproduced first | - |
@@ -83,6 +82,12 @@ Within a group, the order is the priority. The number is identity, not sequence.
 | <a id="pi30"></a>[PI30](README.md#pi30) | Reformat To The Shared Style | The code is in the shared style, google-java-format in its AOSP variant with YAML and Gherkin at four spaces; `validate` refuses code that is not, and `git blame` with `.git-blame-ignore-revs` skips the reformatting. |
 | <a id="pi28"></a>[PI28](README.md#pi28) | Read The Code Changed Since The Last Skills Review | The code changed since 2026-09-27 read against seven skills, each finding fixed, with a test where it could do harm: no terminal control character reaches a log, and no checkout keeps the job's token. |
 | <a id="pi29"></a>[PI29](README.md#pi29) | Rename The Adapter Porelo | The repository, its artifact, its packages, its Java packages and its documents say Porelo; a documents test keeps the old name to the released part of `CHANGELOG.md`. |
+
+## Rejected
+
+| # | Title | Why |
+|---|---|---|
+| <a id="pi75"></a>[PI75](README.md#pi75) | The Wake Scenario Shows Why No Dialog Came | A duplicate of [PI70](README.md#pi70), which already covers the wake scenario showing the screen when the ask dialog does not come. |
 
 ## What lives here and what in Porelo
 
