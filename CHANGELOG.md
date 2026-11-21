@@ -42,8 +42,8 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 - fd pinned to 10.5.2 (was 10.5.0).
 - The package says that the `porelo-wire` classes in its executable are under Apache-2.0, in its
   Debian copyright and its RPM license, with the license's text beside the GPL's in the RPM.
-- Pi pinned to 1.5.0 (was 0.85.0).
-- Node pinned to 22.23.4 (was 22.20.0).
+- Pi pinned to 1.5.2 (was 0.85.0).
+- Node pinned to 22.23.5 (was 22.20.0).
 - The code is in the shared style, google-java-format in its AOSP variant, with YAML and Gherkin at four spaces, and `validate` refuses code that is not; `.git-blame-ignore-revs` lets `git blame` skip the commit that reformatted it.
 - The acceptance suite allows the agent 120 seconds to reach work and an unattended run 120 seconds to end, about four times what the adapters' rented test machine measured, so a run stuck at a question fails in minutes, not half an hour.
 - The log formatter cuts a long line after 300 characters counted as code points, so an emoji at the cut is no longer split in half.
