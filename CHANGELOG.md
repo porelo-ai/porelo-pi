@@ -32,6 +32,7 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 
 ### Changed
 
+- Both packages depend, beside `porelo`, on a Porelo whose lowest agent protocol this adapter speaks, `porelo-agent-protocol` 6, the protocol in which Porelo starts an agent with `--limits` before its mode, so the package manager refuses a pairing Porelo would refuse at the first task.
 - The definition says how Pi takes a reasoning effort - `--thinking {effort}` with off, minimal, low, medium, high, xhigh, max - for a Porelo that offers it at a start; an older Porelo skips it.
 - An unattended task's log shows each tool call with its key input - a command's first line, a file's path, a search's pattern - and each result by whether it failed, with its first line or its size - a failure with its first three lines, so its cause shows - never the whole output; no other argument, which may be a file's content or a secret, is shown.
 - An unattended task's log shows what Pi says and does and no event as raw JSON: an event it does not know is left out, and one that reports an error or a warning - by its type, level, status or a flag, or an error it carries - is always shown as such, on one line.
