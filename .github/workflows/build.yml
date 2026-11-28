@@ -4,15 +4,16 @@ name: Build
 # A push that only touches documentation builds nothing.
 # Workflows alone build nothing: an action's move is checked by its pull request, and the next push with
 # content builds with it.
+# porelo.yml builds: it moves with the GraalVM pin, and the executable is rebuilt by the new one.
 on:
     push:
         branches: [main]
         # A release: v<version>, built and published to the 'releases' channel. Paths are not filtered for a tag.
         tags: ['v*']
-        paths-ignore: ['**/*.md', 'mkdocs.yml', 'doc/**', '.github/**', 'porelo.yml']
+        paths-ignore: ['**/*.md', 'mkdocs.yml', 'doc/**', '.github/**']
     pull_request:
         branches: ['**']
-        paths-ignore: ['**/*.md', 'mkdocs.yml', 'doc/**', '.github/**', 'porelo.yml']
+        paths-ignore: ['**/*.md', 'mkdocs.yml', 'doc/**', '.github/**']
     workflow_dispatch:
 
 # Read by every Maven call, the pinned-jdk action's too. On a tag -P!standard,!forge,!upstream: no snapshot
