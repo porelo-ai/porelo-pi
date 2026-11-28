@@ -25,6 +25,7 @@ entry rather than a heading. One sentence per change - `git log` has the detail.
 
 ### Security
 
+- `porelo-agent-pi` is built by GraalVM CE 25.6, whose Base64 decoder no longer lets a malformed string from outside run code (CVE-2026-114938), and its build refuses a JDK below 25.0.5.1; a task's image on this repository installs the same GraalVM by its digest.
 - A `/login` in a task leaves no key in Pi's stores: its directory is `/var/lib/pi/agent`, outside the home, and its `auth.json` and `mcp-auth.json` are root's and read-only.
 - The packages need porelo 0.5.1~snapshot.317 or later, the first whose definition reader takes Pi's session directory outside the home.
 - The log formatter drops terminal control characters but newline and tab from what it shows and from how a run ended, so an escape sequence in Pi's output, a provider's error or a tool's name no longer reaches the terminal.
